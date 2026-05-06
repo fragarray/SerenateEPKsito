@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Serenate &#8211; Press Kit Wedding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream:  #faf7f2;
+      --light:  #f2ede4;
+      --ink:    #1c1a17;
+      --muted:  #5a5248;
+      --gold:   #9b7b2f;
+      --gold-lt:#c9a84c;
+      --border: #e4ddd0;
+      --text-max: 820px;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--cream); color: var(--ink); font-family: Georgia, serif; font-size: 17px; line-height: 1.8; }
+    .lang-bar { position: fixed; top: 0; right: 0; z-index: 200; display: flex; }
+    .lang-btn { padding: 7px 20px; font-family: 'Lato', Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; cursor: pointer; border: 1px solid var(--gold); background: rgba(250,247,242,0.95); color: var(--gold); transition: background .2s, color .2s; user-select: none; }
+    .lang-btn:first-child { border-radius: 0 0 0 4px; border-right: none; }
+    .lang-btn:last-child  { border-radius: 0 0 4px 0; }
+    .lang-btn.active { background: var(--gold); color: #fff; }
+    .cover-header { background: #1c1a17; text-align: center; padding: 32px 0; }
+    .cover-logo { height: 88px; width: auto; display: inline-block; }
+    .cover-photo { display: block; width: 100%; height: auto; }
+    .sec { padding: 64px 48px; border-bottom: 1px solid var(--border); }
+    .sec-alt { background: var(--light); }
+    .sec-wrap { max-width: var(--text-max); margin: 0 auto; }
+    .sec-img-btm { padding-bottom: 0; }
+    .sec-img-btm .sec-wrap { padding-bottom: 52px; }
+    p { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.17rem; font-weight: 300; line-height: 1.85; margin-bottom: 1.3em; color: var(--muted); }
+    p:last-child { margin-bottom: 0; }
+    p.lead { font-size: 1.32rem; color: var(--ink); font-weight: 400; line-height: 1.75; }
+    strong { color: var(--ink); font-weight: 600; }
+    em { font-style: italic; }
+    .sec-img-full { display: block; width: 100%; height: auto; }
+    .sec-specs { background: var(--ink); color: #e8e2d8; padding: 72px 48px; border-bottom: none; }
+    .specs-intro { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.25rem; font-weight: 300; line-height: 1.8; color: #e8e2d8; margin-bottom: 44px; }
+    .specs-list { list-style: none; border-top: 1px solid #3a3730; margin-bottom: 36px; }
+    .specs-list li { padding: 12px 0 12px 24px; border-bottom: 1px solid #3a3730; font-family: 'Lato', Arial, sans-serif; font-size: .9rem; color: #c8bfb0; position: relative; }
+    .specs-list li::before { content: '\2013'; position: absolute; left: 0; color: var(--gold-lt); }
+    .specs-ctx { list-style: none; border-top: 1px solid #3a3730; margin-bottom: 36px; }
+    .specs-ctx li { padding: 10px 0 10px 24px; border-bottom: 1px solid #3a3730; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.1rem; font-style: italic; color: #d8d2c8; position: relative; }
+    .specs-ctx li::before { content: '\203A'; position: absolute; left: 0; color: var(--gold-lt); font-style: normal; }
+    .specs-table { width: 100%; border-collapse: collapse; }
+    .specs-table tr { border-bottom: 1px solid #3a3730; }
+    .specs-table tr:first-child { border-top: 1px solid #3a3730; }
+    .specs-table td { padding: 14px 0; vertical-align: top; font-family: 'Lato', Arial, sans-serif; font-size: .9rem; }
+    .specs-table .td-lbl { color: var(--gold-lt); text-transform: uppercase; letter-spacing: 2px; font-size: .72rem; font-weight: 700; white-space: nowrap; padding-right: 28px; width: 1%; }
+    .specs-table .td-val { color: #d8d2c8; }
+    .specs-footer { margin-top: 60px; padding-top: 44px; border-top: 1px solid #3a3730; text-align: center; }
+    .specs-logo { height: 62px; width: auto; display: inline-block; }
+    .specs-url { font-family: 'Lato', Arial, sans-serif; font-size: .85rem; letter-spacing: .08em; color: var(--gold-lt); text-decoration: none; }
+    .specs-url:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <div class="lang-bar">
+    <button class="lang-btn active" onclick="setLang('it')">ITA</button>
+    <button class="lang-btn"        onclick="setLang('en')">ENG</button>
+  </div>
+
+  <!-- COVER — PDF p.1 -->
+  <div class="cover-header">
+    <img class="cover-logo" src="https://res.cloudinary.com/dal2qk6d4/image/upload/v1778090583/logo_white_kbteu4.png" alt="Serenate" />
+  </div>
+  <img class="cover-photo" src="https://res.cloudinary.com/dal2qk6d4/image/upload/v1778089934/extracted_wed_p1_img0_xxqvth.jpg" alt="Serenate" />
+
+  <!-- SECTION 1 &#8212; PDF p.2 (solo testo) -->
+  <div class="sec">
+    <div class="sec-wrap">
+
+      <div data-lang="it">
+        <p class="lead">Le serenate sono una forma di musica &#8220;di strada&#8221; raffinata e popolare: pochi strumenti acustici, una voce protagonista e l&#8217;arte di fermarsi davanti a una casa, un balcone, un tavolo per cantare una dedica.</p>
+        <p>Nascono nei vicoli e nelle piazze del Sud e diventano il linguaggio universale dell&#8217;amore: una canzone al posto di un discorso, una melodia al posto di un biglietto.</p>
+        <p>Un repertorio di serenate napoletane, dette anche &#8220;di posteggia&#8221;, molte nate tra fine &#8217;800 e i primi &#8217;900 tra salotti e cortili, tra teatri popolari e canzonieri urbani. Sono canzoni d&#8217;amore intense e coinvolgenti, capaci di parlare direttamente al cuore, per poi aprirsi progressivamente a una dimensione pi&#249; luminosa e partecipata, ispirata alla tradizione musicale rom per raccontare emozioni semplici e universali.</p>
+        <p>La musica prende vita in una formula essenziale: la voce intensa e calda di <strong>Irene Lungo</strong>, napoletana verace e interprete di grande sensibilit&#224;, si intreccia con il violino di <strong>Marco Ghezzo</strong> e la fisarmonica di <strong>Bruno Galeone</strong>. Tre musicisti con solida esperienza internazionale.</p>
+        <p>L&#8217;evento pu&#242; prevedere, su richiesta, la presenza di una voce narrante, interpretata da <strong>Giuseppe Semeraro</strong>, per alternare delicati momenti di poesie d&#8217;amore.</p>
+        <p>In base alle esigenze dell&#8217;evento, la formazione &#232; modulabile e pu&#242; includere altri musicisti.</p>
+      </div>
+
+      <div data-lang="en">
+        <p class="lead">Serenades are a refined yet popular form of &#8220;street&#8221; music: a few acoustic instruments, a leading voice, and the art of stopping in front of a house, a balcony, or a table to sing a dedication.</p>
+        <p>Born in the alleys and squares of Southern Italy, they became the universal language of love: a song instead of a speech, a melody instead of a written note.</p>
+        <p>A repertoire of Neapolitan serenades, also known as &#8220;posteggia&#8221; songs, many of which born between the late nineteenth and early twentieth centuries, among salons and courtyards, popular theatres and urban songbooks. These are intense and engaging love songs, capable of speaking directly to the heart, gradually opening into a brighter, more participatory dimension inspired by Romani musical tradition: listening becomes presence, sharing, celebration &#8212; telling simple and universal emotions.</p>
+        <p>The music comes to life in an essential format of strong presence: the intense and warm voice of <strong>Irene Lungo</strong>, an authentic Neapolitan singer and highly sensitive interpreter, intertwines with <strong>Marco Ghezzo</strong>&#8217;s violin and <strong>Bruno Galeone</strong>&#8217;s accordion. Three musicians with solid international experience.</p>
+        <p>Upon request, the event may also include a narrator, performed by <strong>Giuseppe Semeraro</strong>, alternating the music with delicate moments of love poetry.</p>
+        <p>Depending on the needs of the event, the ensemble is flexible and may include additional musicians.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 2 &#8212; PDF p.3 (testo + immagine in fondo) -->
+  <div class="sec sec-alt sec-img-btm">
+    <div class="sec-wrap">
+
+      <div data-lang="it">
+        <p class="lead">Le &#8220;Serenate&#8221; si integrano con eleganza in contesti esclusivi e location d&#8217;eccellenza: dalla vigilia delle nozze con una serenata a sorpresa sotto un balcone, a un intermezzo durante la festa, fino a un set &#8220;su misura&#8221; tra i tavoli o in un punto dedicato, in dialogo con la regia dell&#8217;evento.</p>
+        <p>Alla vigilia del matrimonio le Serenate diventano un rituale di buon auspicio: un gesto antico da condividere con amici e famiglia, una promessa cantata.</p>
+        <p>Durante il matrimonio, un set acustico offre un cambio di ritmo elegante, crea attenzione e coinvolgimento, lasciando un ricordo autentico e duraturo, ben oltre qualsiasi effetto scenico.</p>
+      </div>
+
+      <div data-lang="en">
+        <p class="lead">&#8220;Serenades&#8221; integrate elegantly into exclusive settings and outstanding venues: from a surprise balcony serenade on the eve of a wedding, to a musical interlude during the celebration, to a tailor-made set among the tables or in a dedicated space, in dialogue with the event direction.</p>
+        <p>On the eve of the wedding, Serenades become a ritual of good fortune: an ancient gesture to share with friends and family, a promise sung aloud.</p>
+        <p>During the wedding, an acoustic set offers an elegant change of pace, creating attention and engagement, leaving an authentic and lasting memory &#8212; far beyond any scenic effect.</p>
+      </div>
+
+    </div>
+    <img class="sec-img-full" src="https://res.cloudinary.com/dal2qk6d4/image/upload/v1778089934/extracted_wed_p3_img0_eu3l6o.jpg" alt="Serenate" />
+  </div>
+
+  <!-- SECTION 3 &#8212; PDF p.4 (testo + immagine in fondo) -->
+  <div class="sec sec-img-btm">
+    <div class="sec-wrap">
+
+      <div data-lang="it">
+        <p class="lead">Cuore del repertorio sono antiche canzoni d&#8217;amore napoletane, da <em>I&#8217; te vurria vas&#224;</em> (1900) a <em>Nun t&#8217;affacci&#224;!</em> (1908), da <em>Dicitencello vuje</em> (1930) a <em>Malafemmena</em> (1951) e <em>Indifferentemente</em> (1963).</p>
+        <p>La scelta dei brani e l&#8217;energia del set possono essere calibrate sullo stile dell&#8217;evento e sui suoi momenti, mantenendo sempre una cifra acustica, curata e &#8220;di prossimit&#224;&#8221; dove l&#8217;amore &#8212; cantato &#8212; &#232; protagonista.</p>
+      </div>
+
+      <div data-lang="en">
+        <p class="lead">At the heart of the repertoire are ancient Neapolitan love songs, from <em>I&#8217; te vurria vas&#224;</em> (1900) to <em>Nun t&#8217;affacci&#224;!</em> (1908), from <em>Dicitencello vuje</em> (1930) to <em>Malafemmena</em> (1951) and <em>Indifferentemente</em> (1963).</p>
+        <p>The selection of songs and the energy of the set can be tailored to the style and key moments of the event, always maintaining a refined, intimate acoustic identity where love &#8212; sung &#8212; takes center stage.</p>
+      </div>
+
+    </div>
+    <img class="sec-img-full" src="https://res.cloudinary.com/dal2qk6d4/image/upload/v1778089934/extracted_wed_p4_img0_xe3mj1.jpg" alt="Serenate" />
+  </div>
+
+  <!-- SECTION 4 &#8212; PDF p.5 (specs / chiusura, sfondo scuro) -->
+  <div class="sec-specs">
+    <div class="sec-wrap">
+
+      <div data-lang="it">
+        <p class="specs-intro">Un repertorio composto da antiche canzoni d&#8217;amore, pensato per creare atmosfera, emozionare e portare bellezza: la scelta ideale per ogni occasione in cui l&#8217;amore &#232; protagonista!</p>
+        <table class="specs-table">
+          <tr><td class="td-lbl">Durata</td><td class="td-val">1:30&#8217;</td></tr>
+          <tr><td class="td-lbl">Amplificazione</td><td class="td-val">Acustica e/o amplificazione leggera in base a spazio e numero ospiti</td></tr>
+          <tr><td class="td-lbl">Formazione</td><td class="td-val">Irene Lungo (voce), Marco Ghezzo (violino), Bruno Galeone (Fisa) &#8211; ampliabile</td></tr>
+        </table>
+      </div>
+
+      <div data-lang="en">
+        <ul class="specs-list">
+          <li>immediate emotional impact / minimal technical setup</li>
+          <li>seamless integration with the wedding coordination / strong guest engagement</li>
+          <li>a unique and memorable experience</li>
+        </ul>
+        <ul class="specs-ctx">
+          <li>pre-wedding serenades</li>
+          <li>wedding celebrations (in the main hall or among the tables)</li>
+        </ul>
+        <p class="specs-intro">A living, essential, and timeless tradition: Serenades transform any event into a unique experience, bringing emotion and beauty &#8212; the ideal choice for every occasion where love takes center stage.</p>
+        <table class="specs-table">
+          <tr><td class="td-lbl">Duration</td><td class="td-val">1 hour, 30 minutes</td></tr>
+          <tr><td class="td-lbl">Sets</td><td class="td-val">Flexible sets: one or more moments distributed throughout the event</td></tr>
+          <tr><td class="td-lbl">Sound</td><td class="td-val">Acoustic and/or light amplification depending on the venue and number of guests</td></tr>
+          <tr><td class="td-lbl">Line-up</td><td class="td-val">Irene Lungo (vocals), Marco Ghezzo (violin), Bruno Galeone (accordion)</td></tr>
+        </table>
+      </div>
+
+      <div class="specs-footer">
+        <img class="specs-logo" src="https://res.cloudinary.com/dal2qk6d4/image/upload/v1778090583/logo_white_kbteu4.png" alt="Serenate" /><br><br>
+        <a class="specs-url" href="https://www.altramareaproduzioni.it" target="_blank" rel="noopener">www.altramareaproduzioni.it</a>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function setLang(lang) {
+      document.querySelectorAll('.lang-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.textContent.toLowerCase().startsWith(lang === 'it' ? 'ita' : 'eng'));
+      });
+      document.querySelectorAll('[data-lang]').forEach(function(el) {
+        el.style.display = el.getAttribute('data-lang') === lang ? '' : 'none';
+      });
+      document.documentElement.lang = lang === 'it' ? 'it' : 'en';
+    }
+    setLang('it');
+  </script>
+
+</body>
+</html>
