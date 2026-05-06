@@ -26,6 +26,8 @@
     .lang-btn:first-child { border-radius: 0 0 0 4px; border-right: none; }
     .lang-btn:last-child  { border-radius: 0 0 4px 0; }
     .lang-btn.active { background: var(--acc); color: #fff; }
+    .home-btn { position: fixed; top: 0; left: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 7px 14px; font-family: 'Lato', Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; border: 1px solid var(--acc); border-top: none; border-left: none; background: rgba(245,241,234,0.95); color: var(--acc); text-decoration: none; border-radius: 0 0 4px 0; transition: background .2s, color .2s; }
+    .home-btn:hover { background: var(--acc); color: #fff; }
     .cover-header { background: #1c1a17; text-align: center; padding: 32px 0; }
     .cover-logo { height: 88px; width: auto; display: inline-block; }
     .cover-photo { display: block; width: 100%; height: auto; }
@@ -70,6 +72,8 @@
   </style>
 </head>
 <body>
+
+  <a class="home-btn" href="index.html" title="Home"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg></a>
 
   <div class="lang-bar">
     <button class="lang-btn active" onclick="setLang('it')">ITA</button>
