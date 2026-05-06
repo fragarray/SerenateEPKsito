@@ -64,11 +64,12 @@
     .video-lbl { font-family: 'Lato', Arial, sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--acc); margin-bottom: 20px; }
     .video-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 3px; background: #111; }
     .video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-    .video-links-lbl { font-family: 'Lato', Arial, sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-top: 32px; margin-bottom: 8px; }
-    .video-links { list-style: none; border-top: 1px solid var(--border); }
-    .video-links li { border-bottom: 1px solid var(--border); padding: 9px 0 9px 0; }
-    .video-links a { font-family: 'Lato', Arial, sans-serif; font-size: .88rem; color: var(--acc); text-decoration: none; letter-spacing: .03em; }
+    .video-links-lbl { font-family: 'Lato', Arial, sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-top: 32px; margin-bottom: 12px; }
+    .video-links { list-style: none; display: flex; gap: 16px; flex-wrap: wrap; }
+    .video-links li { flex: 1 1 0; min-width: 140px; }
+    .video-links a { display: flex; flex-direction: column; gap: 8px; text-decoration: none; color: var(--acc); font-family: 'Lato', Arial, sans-serif; font-size: .80rem; letter-spacing: .03em; line-height: 1.3; }
     .video-links a:hover { text-decoration: underline; }
+    .video-links a img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 3px; display: block; }
   </style>
 </head>
 <body>
@@ -168,9 +169,9 @@
         <p>Il live diventa un percorso teatrale: ogni brano &#232; un quadro, una dedica, un cambio di luce che passa dall&#8217;intimit&#224; della serenata a momenti pi&#249; aperti e partecipati, fino a un finale brillante, dove il pubblico viene accompagnato naturalmente verso una dimensione pi&#249; festosa.</p>
         <p class="video-links-lbl">Guarda anche</p>
         <ul class="video-links">
-          <li><a href="https://www.youtube.com/watch?v=Sdd9V_xn_rY&amp;list=RDSdd9V_xn_rY&amp;start_radio=1" target="_blank" rel="noopener">Serenate canzoni d&apos;amore e d&apos;occasione &ldquo;Dicitincell&apos; vuje&rdquo;</a></li>
-          <li><a href="https://www.youtube.com/watch?v=hBHLMDIlMtY&amp;list=RDhBHLMDIlMtY&amp;start_radio=1" target="_blank" rel="noopener">Serenate, canzoni d&apos;amore e d&apos;occasione &ndash; Indifferentemente</a></li>
-          <li><a href="https://www.youtube.com/watch?v=wZiZEGY-0bE&amp;list=RDwZiZEGY-0bE&amp;start_radio=1" target="_blank" rel="noopener">Serenate, canzoni d&apos;amore e d&apos;occasione &ldquo;Maruzzella&rdquo;</a></li>
+          <li><a href="https://www.youtube.com/watch?v=Sdd9V_xn_rY&amp;list=RDSdd9V_xn_rY&amp;start_radio=1" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/Sdd9V_xn_rY/hqdefault.jpg" alt="Dicitincell' vuje">Serenate canzoni d&apos;amore e d&apos;occasione &ldquo;Dicitincell&apos; vuje&rdquo;</a></li>
+          <li><a href="https://www.youtube.com/watch?v=hBHLMDIlMtY&amp;list=RDhBHLMDIlMtY&amp;start_radio=1" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/hBHLMDIlMtY/hqdefault.jpg" alt="Indifferentemente">Serenate, canzoni d&apos;amore e d&apos;occasione &ndash; Indifferentemente</a></li>
+          <li><a href="https://www.youtube.com/watch?v=wZiZEGY-0bE&amp;list=RDwZiZEGY-0bE&amp;start_radio=1" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/wZiZEGY-0bE/hqdefault.jpg" alt="Maruzzella">Serenate, canzoni d&apos;amore e d&apos;occasione &ldquo;Maruzzella&rdquo;</a></li>
         </ul>
       </div>
 
@@ -180,9 +181,9 @@
         <p>The live performance becomes a theatrical journey: each song is a tableau, a dedication, a change of light. It moves from the intimacy of the serenade to more open and engaging moments, culminating in a brilliant finale where the audience is naturally led into a more festive dimension.</p>
         <p class="video-links-lbl">See also</p>
         <ul class="video-links">
-          <li><a href="https://www.youtube.com/watch?v=Sdd9V_xn_rY&amp;list=RDSdd9V_xn_rY&amp;start_radio=1" target="_blank" rel="noopener">Serenate canzoni d&apos;amore e d&apos;occasione &ldquo;Dicitincell&apos; vuje&rdquo;</a></li>
-          <li><a href="https://www.youtube.com/watch?v=hBHLMDIlMtY&amp;list=RDhBHLMDIlMtY&amp;start_radio=1" target="_blank" rel="noopener">Serenate, canzoni d&apos;amore e d&apos;occasione &ndash; Indifferentemente</a></li>
-          <li><a href="https://www.youtube.com/watch?v=wZiZEGY-0bE&amp;list=RDwZiZEGY-0bE&amp;start_radio=1" target="_blank" rel="noopener">Serenate, canzoni d&apos;amore e d&apos;occasione &ldquo;Maruzzella&rdquo;</a></li>
+          <li><a href="https://www.youtube.com/watch?v=Sdd9V_xn_rY&amp;list=RDSdd9V_xn_rY&amp;start_radio=1" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/Sdd9V_xn_rY/hqdefault.jpg" alt="Dicitincell' vuje">Serenate canzoni d&apos;amore e d&apos;occasione &ldquo;Dicitincell&apos; vuje&rdquo;</a></li>
+          <li><a href="https://www.youtube.com/watch?v=hBHLMDIlMtY&amp;list=RDhBHLMDIlMtY&amp;start_radio=1" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/hBHLMDIlMtY/hqdefault.jpg" alt="Indifferentemente">Serenate, canzoni d&apos;amore e d&apos;occasione &ndash; Indifferentemente</a></li>
+          <li><a href="https://www.youtube.com/watch?v=wZiZEGY-0bE&amp;list=RDwZiZEGY-0bE&amp;start_radio=1" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/wZiZEGY-0bE/hqdefault.jpg" alt="Maruzzella">Serenate, canzoni d&apos;amore e d&apos;occasione &ldquo;Maruzzella&rdquo;</a></li>
         </ul>
       </div>
 
