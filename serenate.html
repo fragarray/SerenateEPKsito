@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Serenate – AltraMarea Produzioni</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream:   #faf7f2;
+      --light:   #f2ede4;
+      --ink:     #1c1a17;
+      --muted:   #5a5248;
+      --gold:    #9b7b2f;
+      --gold-lt: #c9a84c;
+      --border:  #e4ddd0;
+      --acc-wed: #9b7b2f;
+      --acc-liv: #6b2737;
+      --text-max: 820px;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--cream); color: var(--ink); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 17px; line-height: 1.8; }
+
+    /* ── HOME LINK ── */
+    .home-link {
+      position: fixed; top: 0; left: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      padding: 7px 14px;
+      text-decoration: none;
+      border: 1px solid var(--gold);
+      border-top: none; border-left: none;
+      border-radius: 0 0 4px 0;
+      background: rgba(250,247,242,0.95);
+      color: var(--gold);
+      transition: background .2s, color .2s;
+    }
+    .home-link:hover { background: var(--gold); color: #fff; }
+
+    /* ── LANG BAR ── */
+    .lang-bar { position: fixed; top: 0; right: 0; z-index: 200; display: flex; }
+    .lang-btn { padding: 7px 20px; font-family: 'Lato', Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; cursor: pointer; border: 1px solid var(--gold); background: rgba(250,247,242,0.95); color: var(--gold); transition: background .2s, color .2s; user-select: none; }
+    .lang-btn:first-child { border-radius: 0 0 0 4px; border-right: none; }
+    .lang-btn:last-child  { border-radius: 0 0 4px 0; }
+    .lang-btn.active { background: var(--gold); color: #fff; }
+
+    /* ── HEADER ── */
+    .cover-header { background: var(--ink); text-align: center; padding: 32px 0; }
+    .cover-logo   { height: 88px; width: auto; display: inline-block; }
+
+    /* ── HERO ── */
+    .hero { position: relative; overflow: hidden; line-height: 0; }
+    .hero img { display: block; width: 100%; height: auto; max-height: 580px; object-fit: cover; object-position: center 30%; }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(28,26,23,0.18) 0%, rgba(28,26,23,0.52) 100%);
+    }
+    .hero-caption {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 40px 48px 44px;
+      color: #fff;
+    }
+    .hero-caption h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+    .hero-caption p {
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold-lt);
+      font-weight: 400;
+    }
+
+    /* ── INTRO ── */
+    .intro { padding: 72px 48px; border-bottom: 1px solid var(--border); }
+    .intro .wrap { max-width: var(--text-max); margin: 0 auto; }
+    .intro .lead {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.38rem;
+      font-weight: 400;
+      line-height: 1.75;
+      color: var(--ink);
+      margin-bottom: 1.1em;
+    }
+    .intro .sub {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.12rem;
+      font-weight: 300;
+      line-height: 1.85;
+      color: var(--muted);
+    }
+    .intro .sub em { font-style: italic; }
+
+    /* ── CARDS ── */
+    .cards { padding: 72px 48px; background: var(--light); border-bottom: 1px solid var(--border); }
+    .cards .wrap { max-width: var(--text-max); margin: 0 auto; }
+    .cards-label {
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 40px;
+    }
+    .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    @media (max-width: 640px) { .cards-grid { grid-template-columns: 1fr; } }
+
+    .card { background: var(--cream); border: 1px solid var(--border); display: flex; flex-direction: column; }
+    .card-img { overflow: hidden; line-height: 0; }
+    .card-img img { display: block; width: 100%; height: 220px; object-fit: cover; object-position: center; transition: transform .4s ease; }
+    .card:hover .card-img img { transform: scale(1.04); }
+    .card-body { padding: 28px 28px 24px; flex: 1; display: flex; flex-direction: column; }
+    .card-tag {
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .card-tag.wed { color: var(--acc-wed); }
+    .card-tag.liv { color: var(--acc-liv); }
+    .card-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.55rem;
+      font-weight: 400;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      color: var(--ink);
+    }
+    .card-desc {
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.85rem;
+      font-weight: 300;
+      line-height: 1.7;
+      color: var(--muted);
+      flex: 1;
+      margin-bottom: 24px;
+    }
+    .card-link {
+      display: inline-block;
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 10px 22px;
+      border: 1px solid;
+      align-self: flex-start;
+      transition: background .2s, color .2s;
+    }
+    .card-link.wed { color: var(--acc-wed); border-color: var(--acc-wed); }
+    .card-link.wed:hover { background: var(--acc-wed); color: #fff; }
+    .card-link.liv { color: var(--acc-liv); border-color: var(--acc-liv); }
+    .card-link.liv:hover { background: var(--acc-liv); color: #fff; }
+
+    /* ── CONTACTS ── */
+    .contacts { background: var(--ink); color: #e8e2d8; padding: 72px 48px; }
+    .contacts .wrap { max-width: var(--text-max); margin: 0 auto; }
+    .contacts-label {
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: var(--gold-lt);
+      margin-bottom: 40px;
+    }
+    .contacts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; border-top: 1px solid #3a3730; padding-top: 36px; }
+    @media (max-width: 640px) { .contacts-grid { grid-template-columns: 1fr; } }
+    .contact-group h3 {
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold-lt);
+      margin-bottom: 14px;
+      font-weight: 700;
+    }
+    .contact-group p, .contact-group a {
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.88rem;
+      line-height: 1.9;
+      color: #c8bfb0;
+      text-decoration: none;
+      display: block;
+    }
+    .contact-group a:hover { color: var(--gold-lt); }
+    .contact-group a.mailto { color: var(--gold-lt); }
+    .contact-group a.mailto:hover { text-decoration: underline; }
+
+    .contacts-footer { margin-top: 60px; padding-top: 44px; border-top: 1px solid #3a3730; text-align: center; }
+    .contacts-footer img { height: 56px; width: auto; display: inline-block; margin-bottom: 18px; }
+    .contacts-footer a {
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      color: var(--gold-lt);
+      text-decoration: none;
+      display: block;
+    }
+    .contacts-footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <!-- HOME LINK -->
+  <a class="home-link" href="index.html" title="Home"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg></a>
+
+  <!-- LANG BAR -->
+  <div class="lang-bar">
+    <button class="lang-btn active" onclick="setLang('it')">ITA</button>
+    <button class="lang-btn"        onclick="setLang('en')">ENG</button>
+  </div>
+
+  <!-- HEADER -->
+  <div class="cover-header">
+    <img class="cover-logo"
+         src="https://raw.githubusercontent.com/fragarray/SerenateEPKsito/main/logo_white.png"
+         alt="Serenate" />
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <img src="hero.jpg" alt="Serenate – una serenata dal balcone" />
+    <div class="hero-overlay"></div>
+    <div class="hero-caption">
+      <h1>Serenate</h1>
+      <p data-lang="it">Una produzione AltraMarea</p>
+      <p data-lang="en" style="display:none">An AltraMarea production</p>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="intro">
+    <div class="wrap">
+      <p class="lead" data-lang="it">Le serenate sono la forma più antica e popolare di musica "di strada": pochi strumenti acustici, una voce conduttrice, l'arte di fermarsi sotto un balcone o davanti a un tavolo per cantare una dedica d'amore.</p>
+      <p class="lead" data-lang="en" style="display:none">Serenades are the oldest and most popular form of "street" music: a few acoustic instruments, a leading voice, the art of pausing beneath a balcony or in front of a table to sing a love dedication.</p>
+
+      <p class="sub" data-lang="it">Un repertorio di serenate napoletane — la voce intensa di <em>Irene Lungo</em>, il violino di <em>Marco Ghezzo</em>, la fisarmonica di <em>Bruno Galeone</em> — che si trasforma in ogni contesto: dalla vigilia di nozze al concerto, dal banchetto all'evento privato.</p>
+      <p class="sub" data-lang="en" style="display:none">A repertoire of Neapolitan serenades — the intense voice of <em>Irene Lungo</em>, the violin of <em>Marco Ghezzo</em>, the accordion of <em>Bruno Galeone</em> — adapting to any context: from the eve of a wedding to a live concert, from a banquet to a private event.</p>
+    </div>
+  </div>
+
+  <!-- CARDS -->
+  <div class="cards">
+    <div class="wrap">
+      <p class="cards-label" data-lang="it">Press Kit</p>
+      <p class="cards-label" data-lang="en" style="display:none">Press Kit</p>
+      <div class="cards-grid">
+
+        <!-- WEDDING -->
+        <div class="card">
+          <div class="card-img">
+            <img src="https://raw.githubusercontent.com/fragarray/SerenateEPKsito/main/extracted_wed_p1_img0.jpeg" alt="Serenate Wedding" />
+          </div>
+          <div class="card-body">
+            <p class="card-tag wed" data-lang="it">Matrimoni &amp; eventi</p>
+            <p class="card-tag wed" data-lang="en" style="display:none">Weddings &amp; events</p>
+            <h2 class="card-title">Serenate Wedding</h2>
+            <p class="card-desc" data-lang="it">La serenata napoletana come rito d'amore: dalla vigilia di nozze al ricevimento, un set acustico che lascia un'emozione autentica e duratura.</p>
+            <p class="card-desc" data-lang="en" style="display:none">The Neapolitan serenade as a love ritual: from the wedding eve to the reception, an acoustic set that leaves an authentic and lasting emotion.</p>
+            <a class="card-link wed" href="presskit_wedding.html" data-lang="it">Scopri →</a>
+            <a class="card-link wed" href="presskit_wedding.html" data-lang="en" style="display:none">Discover →</a>
+          </div>
+        </div>
+
+        <!-- LIVE -->
+        <div class="card">
+          <div class="card-img">
+            <img src="https://raw.githubusercontent.com/fragarray/SerenateEPKsito/main/extracted_live_p1_img0.jpeg" alt="Serenate Live" />
+          </div>
+          <div class="card-body">
+            <p class="card-tag liv" data-lang="it">Concerto</p>
+            <p class="card-tag liv" data-lang="en" style="display:none">Concert</p>
+            <h2 class="card-title">Serenate Live</h2>
+            <p class="card-desc" data-lang="it">Un concerto di serenate e postegge napoletane che si apre alle tradizioni balcaniche e gitane: ascolto, partecipazione, festa.</p>
+            <p class="card-desc" data-lang="en" style="display:none">A concert of Neapolitan serenades and postegge opening to Balkan and Romani traditions: listening, participation, celebration.</p>
+            <a class="card-link liv" href="presskit_live.html" data-lang="it">Scopri →</a>
+            <a class="card-link liv" href="presskit_live.html" data-lang="en" style="display:none">Discover →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACTS -->
+  <div class="contacts">
+    <div class="wrap">
+      <p class="contacts-label" data-lang="it">Contatti</p>
+      <p class="contacts-label" data-lang="en" style="display:none">Contact</p>
+      <div class="contacts-grid">
+        <div class="contact-group">
+          <h3 data-lang="it">Produzione</h3>
+          <h3 data-lang="en" style="display:none">Production</h3>
+          <p>AltraMarea</p>
+          <a class="mailto" href="mailto:altramarea.produzioni@gmail.com">altramarea.produzioni@gmail.com</a>
+        </div>
+        <div class="contact-group">
+          <h3 data-lang="it">Organizzazione</h3>
+          <h3 data-lang="en" style="display:none">Management</h3>
+          <p>Marinella Mazzotta &nbsp;+39 347 815 7272</p>
+          <p>Raffaella Romano &nbsp;+39 327 737 2824</p>
+        </div>
+      </div>
+      <div class="contacts-footer">
+        <img src="https://raw.githubusercontent.com/fragarray/SerenateEPKsito/main/logo_white.png" alt="Serenate" /><br>
+        <a href="https://www.altramareaproduzioni.it" target="_blank" rel="noopener">www.altramareaproduzioni.it</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function setLang(lang) {
+      document.documentElement.lang = lang;
+      document.querySelectorAll('[data-lang]').forEach(el => {
+        el.style.display = el.dataset.lang === lang ? '' : 'none';
+      });
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.trim().toLowerCase().startsWith(lang));
+      });
+    }
+    // init
+    setLang('it');
+  </script>
+</body>
+</html>

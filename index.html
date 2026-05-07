@@ -3,26 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Serenate – AltraMarea Produzioni</title>
+  <title>AltraMarea Produzioni</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --cream:   #faf7f2;
-      --light:   #f2ede4;
-      --ink:     #1c1a17;
-      --muted:   #5a5248;
-      --gold:    #9b7b2f;
-      --gold-lt: #c9a84c;
-      --border:  #e4ddd0;
-      --acc-wed: #9b7b2f;
-      --acc-liv: #6b2737;
+      --cream:    #faf7f2;
+      --light:    #f2ede4;
+      --ink:      #1c1a17;
+      --muted:    #5a5248;
+      --gold:     #9b7b2f;
+      --gold-lt:  #c9a84c;
+      --border:   #e4ddd0;
       --text-max: 820px;
     }
     html { scroll-behavior: smooth; }
-    body { background: var(--cream); color: var(--ink); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 17px; line-height: 1.8; }
+    body { background: var(--cream); color: var(--ink); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 19px; line-height: 1.8; }
 
     /* ── LANG BAR ── */
     .lang-bar { position: fixed; top: 0; right: 0; z-index: 200; display: flex; }
@@ -32,63 +30,135 @@
     .lang-btn.active { background: var(--gold); color: #fff; }
 
     /* ── HEADER ── */
-    .cover-header { background: var(--ink); text-align: center; padding: 32px 0; }
-    .cover-logo   { height: 88px; width: auto; display: inline-block; }
-
-    /* ── HERO ── */
-    .hero { position: relative; overflow: hidden; line-height: 0; }
-    .hero img { display: block; width: 100%; height: auto; max-height: 580px; object-fit: cover; object-position: center 30%; }
-    .hero-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(to bottom, rgba(28,26,23,0.18) 0%, rgba(28,26,23,0.52) 100%);
-    }
-    .hero-caption {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 40px 48px 44px;
-      color: #fff;
-    }
-    .hero-caption h1 {
+    .cover-header { background: var(--ink); text-align: center; padding: 44px 24px 40px; }
+    .agency-name {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-size: clamp(2rem, 5vw, 3rem);
       font-weight: 300;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
+      color: #fff;
       line-height: 1.15;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
-    .hero-caption p {
+    .agency-tagline {
       font-family: 'Lato', Arial, sans-serif;
-      font-size: 0.82rem;
+      font-size: 0.7rem;
       letter-spacing: 3px;
       text-transform: uppercase;
       color: var(--gold-lt);
       font-weight: 400;
     }
 
-    /* ── INTRO ── */
-    .intro { padding: 72px 48px; border-bottom: 1px solid var(--border); }
-    .intro .wrap { max-width: var(--text-max); margin: 0 auto; }
-    .intro .lead {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.38rem;
-      font-weight: 400;
-      line-height: 1.75;
-      color: var(--ink);
-      margin-bottom: 1.1em;
+    /* ── HERO ── */
+    .hero { position: relative; overflow: hidden; line-height: 0; }
+    .hero img { display: block; width: 100%; height: auto; max-height: 580px; object-fit: cover; object-position: center 30%; }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(28,26,23,0.25) 0%, rgba(28,26,23,0.68) 100%);
     }
-    .intro .sub {
+    .hero-caption {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 40px 48px 48px;
+      color: #fff;
+    }
+    .hero-poem {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.12rem;
+      font-size: clamp(1.5rem, 3.5vw, 2.4rem);
       font-weight: 300;
+      font-style: italic;
+      letter-spacing: 0.04em;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .hero-sub {
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold-lt);
+      font-weight: 400;
+    }
+
+    /* ── TAGLINE STRIP ── */
+    .tagline-strip { padding: 52px 48px; border-bottom: 1px solid var(--border); }
+    .tagline-strip .wrap { max-width: var(--text-max); margin: 0 auto; }
+    .tagline-strip p {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.45rem;
+      font-weight: 300;
+      font-style: italic;
       line-height: 1.85;
       color: var(--muted);
     }
-    .intro .sub em { font-style: italic; }
+    .tagline-strip p + p { margin-top: 0.6em; }
 
-    /* ── CARDS ── */
-    .cards { padding: 72px 48px; background: var(--light); border-bottom: 1px solid var(--border); }
-    .cards .wrap { max-width: var(--text-max); margin: 0 auto; }
-    .cards-label {
+    /* ── SECTION GENERIC ── */
+    .section { padding: 72px 48px; border-bottom: 1px solid var(--border); }
+    .section.alt { background: var(--light); }
+    .section .wrap { max-width: var(--text-max); margin: 0 auto; }
+    .section-label {
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 32px;
+    }
+    .section-body {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 300;
+      line-height: 1.9;
+      color: var(--muted);
+    }
+    .section-body p + p { margin-top: 1em; }
+
+    /* ── SERVICES GRID ── */
+    .services-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border-top: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+      margin-top: 40px;
+    }
+    @media (max-width: 640px) { .services-grid { grid-template-columns: 1fr; } }
+    .service-item {
+      padding: 32px 28px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .service-tag {
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.62rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+    .service-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.35rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 12px;
+      line-height: 1.25;
+    }
+    .service-desc {
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.92rem;
+      font-weight: 300;
+      line-height: 1.75;
+      color: var(--muted);
+    }
+    .service-desc ul { padding-left: 1em; margin-top: 6px; }
+    .service-desc li { margin-bottom: 2px; }
+
+    /* ── PRODUCTIONS GRID ── */
+    .productions { padding: 72px 48px; background: var(--light); border-bottom: 1px solid var(--border); }
+    .productions .wrap { max-width: 1100px; margin: 0 auto; }
+    .productions-label {
       font-family: 'Lato', Arial, sans-serif;
       font-size: 0.7rem;
       letter-spacing: 3.5px;
@@ -96,57 +166,84 @@
       color: var(--gold);
       margin-bottom: 40px;
     }
-    .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
-    @media (max-width: 640px) { .cards-grid { grid-template-columns: 1fr; } }
-
-    .card { background: var(--cream); border: 1px solid var(--border); display: flex; flex-direction: column; }
-    .card-img { overflow: hidden; line-height: 0; }
-    .card-img img { display: block; width: 100%; height: 220px; object-fit: cover; object-position: center; transition: transform .4s ease; }
-    .card:hover .card-img img { transform: scale(1.04); }
-    .card-body { padding: 28px 28px 24px; flex: 1; display: flex; flex-direction: column; }
-    .card-tag {
+    .productions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 32px;
+    }
+    .prod-card { background: var(--cream); border: 1px solid var(--border); display: flex; flex-direction: column; }
+    .prod-card-img { overflow: hidden; line-height: 0; }
+    .prod-card-img img { display: block; width: 100%; height: 220px; object-fit: cover; object-position: center; transition: transform .4s ease; }
+    .prod-card:hover .prod-card-img img { transform: scale(1.04); }
+    .prod-card-body { padding: 26px 26px 22px; flex: 1; display: flex; flex-direction: column; }
+    .prod-card-tag {
       font-family: 'Lato', Arial, sans-serif;
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       letter-spacing: 3px;
       text-transform: uppercase;
-      margin-bottom: 10px;
+      color: var(--gold);
+      margin-bottom: 8px;
     }
-    .card-tag.wed { color: var(--acc-wed); }
-    .card-tag.liv { color: var(--acc-liv); }
-    .card-title {
+    .prod-card-title {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.55rem;
+      font-size: 1.5rem;
       font-weight: 400;
       line-height: 1.2;
       margin-bottom: 12px;
       color: var(--ink);
     }
-    .card-desc {
+    .prod-card-desc {
       font-family: 'Lato', Arial, sans-serif;
-      font-size: 0.85rem;
+      font-size: 0.93rem;
       font-weight: 300;
       line-height: 1.7;
       color: var(--muted);
       flex: 1;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
-    .card-link {
+    .prod-card-link {
       display: inline-block;
       font-family: 'Lato', Arial, sans-serif;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
       letter-spacing: 2.5px;
       text-transform: uppercase;
       text-decoration: none;
-      padding: 10px 22px;
-      border: 1px solid;
+      padding: 9px 20px;
+      border: 1px solid var(--gold);
+      color: var(--gold);
       align-self: flex-start;
       transition: background .2s, color .2s;
     }
-    .card-link.wed { color: var(--acc-wed); border-color: var(--acc-wed); }
-    .card-link.wed:hover { background: var(--acc-wed); color: #fff; }
-    .card-link.liv { color: var(--acc-liv); border-color: var(--acc-liv); }
-    .card-link.liv:hover { background: var(--acc-liv); color: #fff; }
+    .prod-card-link:hover { background: var(--gold); color: #fff; }
+
+    /* ── ARCHIVE ── */
+    .archive-list {
+      margin-top: 8px;
+      list-style: none;
+    }
+    .archive-list li {
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.94rem;
+      font-weight: 300;
+      line-height: 1.8;
+      color: var(--muted);
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 16px;
+      align-items: baseline;
+    }
+    .archive-list li:first-child { border-top: 1px solid var(--border); }
+    .archive-list .arch-year {
+      font-family: 'Lato', Arial, sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--gold);
+      white-space: nowrap;
+      min-width: 60px;
+    }
 
     /* ── CONTACTS ── */
     .contacts { background: var(--ink); color: #e8e2d8; padding: 72px 48px; }
@@ -181,9 +278,7 @@
     .contact-group a:hover { color: var(--gold-lt); }
     .contact-group a.mailto { color: var(--gold-lt); }
     .contact-group a.mailto:hover { text-decoration: underline; }
-
     .contacts-footer { margin-top: 60px; padding-top: 44px; border-top: 1px solid #3a3730; text-align: center; }
-    .contacts-footer img { height: 56px; width: auto; display: inline-block; margin-bottom: 18px; }
     .contacts-footer a {
       font-family: 'Lato', Arial, sans-serif;
       font-size: 0.8rem;
@@ -205,73 +300,134 @@
 
   <!-- HEADER -->
   <div class="cover-header">
-    <img class="cover-logo"
-         src="https://raw.githubusercontent.com/fragarray/SerenateEPKsito/main/logo_white.png"
-         alt="Serenate" />
+    <h1 class="agency-name">AltraMarea Produzioni</h1>
+    <p class="agency-tagline" data-lang="it">Produzione culturale · Booking · Management · Diritto dello spettacolo</p>
+    <p class="agency-tagline" data-lang="en" style="display:none">Cultural Production · Booking · Management · Entertainment Law</p>
   </div>
 
   <!-- HERO -->
   <div class="hero">
-    <img src="hero.jpg" alt="Serenate – una serenata dal balcone" />
+    <img src="hero.jpg" alt="AltraMarea Produzioni" />
     <div class="hero-overlay"></div>
     <div class="hero-caption">
-      <h1>Serenate</h1>
-      <p data-lang="it">Una produzione AltraMarea</p>
-      <p data-lang="en" style="display:none">An AltraMarea production</p>
+      <p class="hero-poem" data-lang="it">Siamo un'Altra Marea.</p>
+      <p class="hero-poem" data-lang="en" style="display:none">We are Another Tide.</p>
+      <p class="hero-sub" data-lang="it">Salento · Puglia · Italia</p>
+      <p class="hero-sub" data-lang="en" style="display:none">Salento · Puglia · Italy</p>
     </div>
   </div>
 
-  <!-- INTRO -->
-  <div class="intro">
+  <!-- TAGLINE STRIP -->
+  <div class="tagline-strip">
     <div class="wrap">
-      <p class="lead" data-lang="it">Le serenate sono la forma più antica e popolare di musica "di strada": pochi strumenti acustici, una voce conduttrice, l'arte di fermarsi sotto un balcone o davanti a un tavolo per cantare una dedica d'amore.</p>
-      <p class="lead" data-lang="en" style="display:none">Serenades are the oldest and most popular form of "street" music: a few acoustic instruments, a leading voice, the art of pausing beneath a balcony or in front of a table to sing a love dedication.</p>
-
-      <p class="sub" data-lang="it">Un repertorio di serenate napoletane — la voce intensa di <em>Irene Lungo</em>, il violino di <em>Marco Ghezzo</em>, la fisarmonica di <em>Bruno Galeone</em> — che si trasforma in ogni contesto: dalla vigilia di nozze al concerto, dal banchetto all'evento privato.</p>
-      <p class="sub" data-lang="en" style="display:none">A repertoire of Neapolitan serenades — the intense voice of <em>Irene Lungo</em>, the violin of <em>Marco Ghezzo</em>, the accordion of <em>Bruno Galeone</em> — adapting to any context: from the eve of a wedding to a live concert, from a banquet to a private event.</p>
+      <p data-lang="it">Nasciamo nel Salento, terra di confine e di vento, dove il mare non è solo orizzonte, ma movimento continuo.</p>
+      <p data-lang="it">Portiamo un'onda diversa nel panorama culturale: più profonda, più consapevole, più libera.</p>
+      <p data-lang="it">Uniamo radici mediterranee e visioni contemporanee. Selezioniamo qualità, proteggiamo il talento, costruiamo progetti solidi come la terra e dinamici come il mare.</p>
+      <p data-lang="en" style="display:none">Born in Salento, a land of borders and wind, where the sea is not just a horizon, but constant movement.</p>
+      <p data-lang="en" style="display:none">We bring a different wave into the cultural landscape: deeper, more aware, freer.</p>
+      <p data-lang="en" style="display:none">We unite Mediterranean roots with contemporary visions. We select quality, protect talent, and build projects as solid as the earth and as dynamic as the sea.</p>
     </div>
   </div>
 
-  <!-- CARDS -->
-  <div class="cards">
+  <!-- CHI SIAMO -->
+  <div class="section">
     <div class="wrap">
-      <p class="cards-label" data-lang="it">Press Kit</p>
-      <p class="cards-label" data-lang="en" style="display:none">Press Kit</p>
-      <div class="cards-grid">
-
-        <!-- WEDDING -->
-        <div class="card">
-          <div class="card-img">
-            <img src="https://raw.githubusercontent.com/fragarray/SerenateEPKsito/main/extracted_wed_p1_img0.jpeg" alt="Serenate Wedding" />
-          </div>
-          <div class="card-body">
-            <p class="card-tag wed" data-lang="it">Matrimoni &amp; eventi</p>
-            <p class="card-tag wed" data-lang="en" style="display:none">Weddings &amp; events</p>
-            <h2 class="card-title">Serenate Wedding</h2>
-            <p class="card-desc" data-lang="it">La serenata napoletana come rito d'amore: dalla vigilia di nozze al ricevimento, un set acustico che lascia un'emozione autentica e duratura.</p>
-            <p class="card-desc" data-lang="en" style="display:none">The Neapolitan serenade as a love ritual: from the wedding eve to the reception, an acoustic set that leaves an authentic and lasting emotion.</p>
-            <a class="card-link wed" href="presskit_wedding.html" data-lang="it">Scopri →</a>
-            <a class="card-link wed" href="presskit_wedding.html" data-lang="en" style="display:none">Discover →</a>
-          </div>
-        </div>
-
-        <!-- LIVE -->
-        <div class="card">
-          <div class="card-img">
-            <img src="https://raw.githubusercontent.com/fragarray/SerenateEPKsito/main/extracted_live_p1_img0.jpeg" alt="Serenate Live" />
-          </div>
-          <div class="card-body">
-            <p class="card-tag liv" data-lang="it">Concerto</p>
-            <p class="card-tag liv" data-lang="en" style="display:none">Concert</p>
-            <h2 class="card-title">Serenate Live</h2>
-            <p class="card-desc" data-lang="it">Un concerto di serenate e postegge napoletane che si apre alle tradizioni balcaniche e gitane: ascolto, partecipazione, festa.</p>
-            <p class="card-desc" data-lang="en" style="display:none">A concert of Neapolitan serenades and postegge opening to Balkan and Romani traditions: listening, participation, celebration.</p>
-            <a class="card-link liv" href="presskit_live.html" data-lang="it">Scopri →</a>
-            <a class="card-link liv" href="presskit_live.html" data-lang="en" style="display:none">Discover →</a>
-          </div>
-        </div>
-
+      <p class="section-label" data-lang="it">Chi siamo</p>
+      <p class="section-label" data-lang="en" style="display:none">Who We Are</p>
+      <div class="section-body">
+        <p data-lang="it">AltraMarea Produzioni è un'organizzazione culturale e creativa con sede in Puglia, attiva sin dal 2008 nell'organizzazione di festival e rassegne, la progettazione, produzione e promozione di eventi artistico musicali a livello regionale, nazionale e internazionale unici e originali, che ha costruito coniugando visione artistica, competenza giuridica e progettazione strategica.</p>
+        <p data-lang="it">AltraMarea è anche agenzia di booking e management artistico: rappresenta artisti, ensemble e compagnie offrendo un accompagnamento professionale completo che include assistenza legale specializzata in diritto d'autore e diritto dello spettacolo, consulenza contrattuale, gestione diritti e supporto amministrativo.</p>
+        <p data-lang="it">Ogni progetto nasce da una curatela attenta e da una selezione artistica rigorosa, con particolare attenzione alla qualità, all'originalità e alla coerenza culturale delle proposte.</p>
+        <p data-lang="en" style="display:none">AltraMarea Produzioni is a cultural and creative organization based in Puglia, active since 2008 in the design, production, and promotion of artistic and musical events at regional, national, and international levels. Founded by Marinella Mazzotta, combining artistic vision, legal expertise, and strategic planning.</p>
+        <p data-lang="en" style="display:none">AltraMarea is also a booking and artist management agency: it represents artists, ensembles, and companies, offering comprehensive professional support including specialized legal assistance in copyright and entertainment law, contract consultancy, rights management, and administrative support.</p>
+        <p data-lang="en" style="display:none">Each project originates from attentive curatorial work and rigorous artistic selection, with particular focus on quality, originality, and cultural coherence.</p>
       </div>
+    </div>
+  </div>
+
+  <!-- COSA FACCIAMO -->
+  <div class="section alt">
+    <div class="wrap">
+      <p class="section-label" data-lang="it">Cosa facciamo</p>
+      <p class="section-label" data-lang="en" style="display:none">What We Do</p>
+      <div class="services-grid">
+        <div class="service-item">
+          <p class="service-tag">01</p>
+          <h3 class="service-title" data-lang="it">Produzione &amp; Direzione Artistica</h3>
+          <h3 class="service-title" data-lang="en" style="display:none">Production &amp; Artistic Direction</h3>
+          <div class="service-desc">
+            <ul data-lang="it"><li>Spettacoli urbani e site-specific</li><li>Festival e rassegne</li><li>Mostre multimediali e installazioni immersive</li><li>Progetti multidisciplinari tra musica, teatro e arti visive</li></ul>
+            <ul data-lang="en" style="display:none"><li>Urban and site-specific performances</li><li>Festivals and cultural programs</li><li>Multimedia exhibitions and immersive installations</li><li>Multidisciplinary projects combining music, theatre, and visual arts</li></ul>
+          </div>
+        </div>
+        <div class="service-item">
+          <p class="service-tag">02</p>
+          <h3 class="service-title" data-lang="it">Produzione Musicale &amp; Programmazione</h3>
+          <h3 class="service-title" data-lang="en" style="display:none">Music Production &amp; Programming</h3>
+          <div class="service-desc">
+            <p data-lang="it">Direzioni artistiche, programmazioni concertistiche e progetti musicali con ensemble tradizionali e contemporanei selezionati per alto profilo qualitativo, ricerca sonora e valore artistico.</p>
+            <p data-lang="en" style="display:none">Artistic direction, concert programming, and musical projects with traditional and contemporary ensembles selected for their high artistic standards, sonic research, and creative value.</p>
+          </div>
+        </div>
+        <div class="service-item">
+          <p class="service-tag">03</p>
+          <h3 class="service-title">Booking &amp; Management</h3>
+          <div class="service-desc">
+            <ul data-lang="it"><li>Rappresentanza artistica</li><li>Costruzione tournée</li><li>Contrattualistica nazionale e internazionale</li><li>Gestione diritti d'autore e diritti connessi</li><li>Consulenza su diritto d'autore e diritto dello spettacolo</li></ul>
+            <ul data-lang="en" style="display:none"><li>Artistic representation</li><li>Tour development</li><li>National and international contracts</li><li>SIAE and related rights management</li><li>Consultancy in copyright and entertainment law</li></ul>
+          </div>
+        </div>
+        <div class="service-item">
+          <p class="service-tag">04</p>
+          <h3 class="service-title" data-lang="it">Allestimenti &amp; Comunicazione</h3>
+          <h3 class="service-title" data-lang="en" style="display:none">Set Design &amp; Communication</h3>
+          <div class="service-desc">
+            <p data-lang="it">Scenografie, installazioni partecipate e percorsi condivisi con artigiani e comunità locali. Identità visive, strategie di comunicazione, ufficio stampa e valorizzazione mediatica dei progetti.</p>
+            <p data-lang="en" style="display:none">Stage settings, participatory installations, and collaborative pathways with artisans and local communities. Visual identities, communication strategies, press office, and media enhancement.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARTISTI & PRODUZIONI -->
+  <div class="productions">
+    <div class="wrap">
+      <p class="productions-label" data-lang="it">Artisti &amp; Produzioni</p>
+      <p class="productions-label" data-lang="en" style="display:none">Artists &amp; Productions</p>
+      <div class="productions-grid">
+        <div class="prod-card">
+          <div class="prod-card-img">
+            <img src="extracted_wed_p1_img0.jpeg" alt="Serenate" />
+          </div>
+          <div class="prod-card-body">
+            <p class="prod-card-tag" data-lang="it">Musica · Matrimoni · Concerti</p>
+            <p class="prod-card-tag" data-lang="en" style="display:none">Music · Weddings · Concerts</p>
+            <h2 class="prod-card-title">Serenate</h2>
+            <p class="prod-card-desc" data-lang="it">Serenate napoletane con Irene Lungo, Marco Ghezzo e Bruno Galeone. Dalla vigilia di nozze al concerto, il rito antico della serenata sotto al balcone.</p>
+            <p class="prod-card-desc" data-lang="en" style="display:none">Neapolitan serenades with Irene Lungo, Marco Ghezzo, and Bruno Galeone. From wedding eve to concert stage, the ancient ritual of the serenade under the balcony.</p>
+            <a class="prod-card-link" href="serenate.html" data-lang="it">Scopri →</a>
+            <a class="prod-card-link" href="serenate.html" data-lang="en" style="display:none">Discover →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALTRI PROGETTI -->
+  <div class="section">
+    <div class="wrap">
+      <p class="section-label" data-lang="it">Tra i nostri progetti</p>
+      <p class="section-label" data-lang="en" style="display:none">Among Our Projects</p>
+      <ul class="archive-list">
+        <li><span class="arch-year">2016 →</span><span data-lang="it">Circonauta – Festival Internazionale del Circo Contemporaneo (Nardò/Lecce)</span><span data-lang="en" style="display:none">Circonauta – International Festival of Contemporary Circus (Nardò/Lecce)</span></li>
+        <li><span class="arch-year">2021 →</span><span data-lang="it">I Canti delle Sirene e dei Tritoni (Lecce/Nardò)</span><span data-lang="en" style="display:none">I Canti delle Sirene e dei Tritoni (Lecce/Nardò)</span></li>
+        <li><span class="arch-year">2024–26</span><span data-lang="it">Circus Love – The Magical Life of Europe's Family Circuses</span><span data-lang="en" style="display:none">Circus Love – The Magical Life of Europe's Family Circuses</span></li>
+        <li><span class="arch-year">2025</span><span data-lang="it">Le serenate sotto al balcone (Lecce)</span><span data-lang="en" style="display:none">Serenades Under the Balcony (Lecce)</span></li>
+        <li><span class="arch-year">2024–25</span><span data-lang="it">Fòcara di Carmiano (Lecce)</span><span data-lang="en" style="display:none">Fòcara di Carmiano (Lecce)</span></li>
+        <li><span class="arch-year">2005–14</span><span data-lang="it">11/8 Records – Livello Undiciottavi, casa della musica</span><span data-lang="en" style="display:none">11/8 Records – Livello Undiciottavi, House of Music</span></li>
+        <li><span class="arch-year">2007–09</span><span data-lang="it">Notte della Taranta</span><span data-lang="en" style="display:none">Notte della Taranta</span></li>
+      </ul>
     </div>
   </div>
 
@@ -282,20 +438,21 @@
       <p class="contacts-label" data-lang="en" style="display:none">Contact</p>
       <div class="contacts-grid">
         <div class="contact-group">
-          <h3 data-lang="it">Produzione</h3>
-          <h3 data-lang="en" style="display:none">Production</h3>
-          <p>AltraMarea</p>
+          <h3 data-lang="it">Direzione artistica &amp; Produzione</h3>
+          <h3 data-lang="en" style="display:none">Artistic Direction &amp; Production</h3>
+          <p>Marinella Mazzotta</p>
+          <p>+39 347 815 7272</p>
           <a class="mailto" href="mailto:altramarea.produzioni@gmail.com">altramarea.produzioni@gmail.com</a>
         </div>
         <div class="contact-group">
-          <h3 data-lang="it">Organizzazione</h3>
-          <h3 data-lang="en" style="display:none">Management</h3>
-          <p>Marinella Mazzotta &nbsp;+39 347 815 7272</p>
-          <p>Raffaella Romano &nbsp;+39 327 737 2824</p>
+          <h3 data-lang="it">Circonauta Festival</h3>
+          <h3 data-lang="en" style="display:none">Circonauta Festival</h3>
+          <a class="mailto" href="mailto:marinella@circonauta.it">marinella@circonauta.it</a>
+          <a href="https://www.circonauta.it" target="_blank" rel="noopener">www.circonauta.it</a>
+          <p style="margin-top:16px; font-size:0.78rem; color:#7a7168;">Corte dei Mesagnesi, 31/A · 73100 Lecce</p>
         </div>
       </div>
       <div class="contacts-footer">
-        <img src="https://raw.githubusercontent.com/fragarray/SerenateEPKsito/main/logo_white.png" alt="Serenate" /><br>
         <a href="https://www.altramareaproduzioni.it" target="_blank" rel="noopener">www.altramareaproduzioni.it</a>
       </div>
     </div>
@@ -311,7 +468,6 @@
         btn.classList.toggle('active', btn.textContent.trim().toLowerCase().startsWith(lang));
       });
     }
-    // init
     setLang('it');
   </script>
 </body>
