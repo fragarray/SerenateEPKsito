@@ -1,252 +1,304 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Serenate &#8211; Press Kit Live</title>
+  <title>Serenate – Press Kit Live</title>
+
+  <!-- SEO -->
+  <meta name="description" content="Press kit Serenate Live – concerto di serenate e postegge napoletane. Irene Lungo, Marco Ghezzo, Bruno Galeone. Una produzione AltraMarea." />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://www.altramareaproduzioni.it/presskit_live.html" />
+  <meta property="og:title"       content="Serenate Live – Press Kit" />
+  <meta property="og:description" content="Concerto di serenate e postegge napoletane. Musica, ascolto, partecipazione." />
+  <meta property="og:image"       content="https://www.altramareaproduzioni.it/img/extracted_live_p1_img0_web.jpg" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="favicon.ico" />
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --cream:  #f5f1ea;
-      --light:  #ede8de;
-      --ink:    #1c1a17;
-      --muted:  #5a5248;
-      --acc:    #6b2737;
-      --acc-lt: #9c3d52;
-      --border: #e0d9cf;
-      --text-max: 820px;
-    }
-    html { scroll-behavior: smooth; }
-    body { background: var(--cream); color: var(--ink); font-family: Georgia, serif; font-size: 17px; line-height: 1.8; }
-    .lang-bar { position: fixed; top: 0; right: 0; z-index: 200; display: flex; }
-    .lang-btn { padding: 7px 20px; font-family: 'Lato', Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; cursor: pointer; border: 1px solid var(--acc); background: rgba(245,241,234,0.95); color: var(--acc); transition: background .2s, color .2s; user-select: none; }
-    .lang-btn:first-child { border-radius: 0 0 0 4px; border-right: none; }
-    .lang-btn:last-child  { border-radius: 0 0 4px 0; }
-    .lang-btn.active { background: var(--acc); color: #fff; }
-    .home-btn { position: fixed; top: 0; left: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 7px 14px; font-family: 'Lato', Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; border: 1px solid var(--acc); border-top: none; border-left: none; background: rgba(245,241,234,0.95); color: var(--acc); text-decoration: none; border-radius: 0 0 4px 0; transition: background .2s, color .2s; }
-    .home-btn:hover { background: var(--acc); color: #fff; }
-    .cover-header { background: #1c1a17; text-align: center; padding: 32px 0; }
-    .cover-logo { height: 88px; width: auto; display: inline-block; }
-    .cover-photo { display: block; width: auto; max-width: 100%; max-height: 70vh; height: auto; margin: 0 auto; }
-    .sec { padding: 64px 48px; border-bottom: 1px solid var(--border); }
-    .sec-alt { background: var(--light); }
-    .sec-wrap { max-width: var(--text-max); margin: 0 auto; }
-    .sec-img-btm { padding-bottom: 0; }
-    .sec-img-btm .sec-wrap { padding-bottom: 52px; }
-    .sec-img-top { padding-top: 0; }
-    p { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.17rem; font-weight: 300; line-height: 1.85; margin-bottom: 1.3em; color: var(--muted); }
-    p:last-child { margin-bottom: 0; }
-    p.lead { font-size: 1.32rem; color: var(--ink); font-weight: 400; line-height: 1.75; }
-    strong { color: var(--ink); font-weight: 600; }
-    em { font-style: italic; }
-    .sec-img-full { display: block; width: auto; max-width: 100%; max-height: 55vh; height: auto; margin: 0 auto; }
-    /* stacked images: no gap between them */
-    .sec-img-full + .sec-img-full { margin-top: 0; }
-    .sec-specs { background: var(--ink); color: #e8e2d8; padding: 72px 48px; border-bottom: none; }
-    .specs-table { width: 100%; border-collapse: collapse; margin-bottom: 36px; }
-    .specs-table tr { border-bottom: 1px solid #3a3730; }
-    .specs-table tr:first-child { border-top: 1px solid #3a3730; }
-    .specs-table td { padding: 14px 0; vertical-align: top; font-family: 'Lato', Arial, sans-serif; font-size: .9rem; }
-    .specs-table .td-lbl { color: var(--acc-lt); text-transform: uppercase; letter-spacing: 2px; font-size: .72rem; font-weight: 700; white-space: nowrap; padding-right: 28px; width: 1%; }
-    .specs-table .td-val { color: #d8d2c8; }
-    .specs-credits { font-family: 'Lato', Arial, sans-serif; font-size: .9rem; line-height: 1.9; color: #a09b93; margin-top: 36px; padding-top: 32px; border-top: 1px solid #3a3730; }
-    .specs-credits a { color: var(--acc-lt); text-decoration: none; }
-    .specs-credits a:hover { text-decoration: underline; }
-    .specs-footer { margin-top: 56px; padding-top: 44px; border-top: 1px solid #3a3730; text-align: center; }
-    .specs-logo { height: 62px; width: auto; display: inline-block; }
-    .specs-url { font-family: 'Lato', Arial, sans-serif; font-size: .85rem; letter-spacing: .08em; color: var(--acc-lt); text-decoration: none; }
-    .specs-url:hover { text-decoration: underline; }
-    /* video */
-    .video-sec { padding: 64px 48px; border-bottom: 1px solid var(--border); }
-    .video-lbl { font-family: 'Lato', Arial, sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--acc); margin-bottom: 20px; }
-    .video-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 3px; background: #111; }
-    .video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-    .video-links-lbl { font-family: 'Lato', Arial, sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-top: 32px; margin-bottom: 12px; }
-    .video-links { list-style: none; display: flex; gap: 16px; flex-wrap: wrap; }
-    .video-links li { flex: 1 1 0; min-width: 140px; }
-    .video-links a { display: flex; flex-direction: column; gap: 8px; text-decoration: none; color: var(--acc); font-family: 'Lato', Arial, sans-serif; font-size: .80rem; letter-spacing: .03em; line-height: 1.3; }
-    .video-links a:hover { text-decoration: underline; }
-    .video-links a img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 3px; display: block; }
-    .yt-thumb { position: relative; display: block; line-height: 0; }
-    .yt-play { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; }
-  </style>
+
+  <!-- Shared stylesheet -->
+  <link rel="stylesheet" href="assets/css/style.css" />
 </head>
-<body>
+<body class="live">
 
-  <a class="home-btn" href="index.html" title="Home"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg></a>
+  <!-- Skip to content -->
+  <a href="#main" class="skip-link" aria-label="Salta al contenuto principale">Skip to content</a>
 
-  <div class="lang-bar">
-    <button class="lang-btn active" onclick="setLang('it')">ITA</button>
-    <button class="lang-btn"        onclick="setLang('en')">ENG</button>
-  </div>
+  <!-- Home link -->
+  <a class="home-btn" href="serenate.html" aria-label="Torna a Serenate">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
+  </a>
 
-  <!-- COVER — PDF p.1 -->
-  <div class="cover-header">
-    <img class="cover-logo" src="logo_white.png" alt="Serenate" />
-  </div>
-  <img class="cover-photo" src="img/extracted_live_p1_img0_web.jpg" alt="Serenate" loading="lazy" />
+  <!-- Lang bar -->
+  <nav class="lang-bar" role="navigation" aria-label="Seleziona lingua">
+    <button class="lang-btn" data-lang-target="it" aria-pressed="true"  aria-current="true">ITA</button>
+    <button class="lang-btn" data-lang-target="en" aria-pressed="false">ENG</button>
+  </nav>
 
-  <!-- SECTION 1 &#8212; PDF p.2 (testo + immagine in fondo) -->
-  <div class="sec sec-img-btm">
-    <div class="sec-wrap">
+  <!-- Cover header -->
+  <header class="cover-header">
+    <img class="cover-logo" src="logo_white.png" alt="Serenate – AltraMarea Produzioni" width="220" height="88" />
+  </header>
 
-      <div data-lang="it">
-        <p class="lead">Le serenate sono una forma di musica &#8220;di strada&#8221; raffinata e popolare: pochi strumenti acustici, una voce protagonista e l&#8217;arte di fermarsi davanti a una casa, un balcone, un tavolo per cantare una dedica.</p>
-        <p>Nascono nei vicoli e nelle piazze del Sud e diventano linguaggio universale dell&#8217;amore: una canzone al posto di un discorso, una melodia al posto di un biglietto.</p>
-        <p>Nel passato hanno avuto un valore sociale fortissimo. Servivano per dichiararsi, chiedere perdono, celebrare un fidanzamento, accompagnare un passaggio importante nella vita di una comunit&#224;.</p>
-        <p>In un&#8217;epoca in cui le parole &#8220;in pubblico&#8221; erano misurate e i sentimenti spesso restavano inespressi, la serenata dava voce a ci&#242; che non si poteva dire, portando poesia nella quotidianit&#224; e trasformando una strada qualunque in una scena teatrale.</p>
+  <!-- Cover photo -->
+  <figure class="cover-photo-wrap">
+    <picture>
+      <source type="image/webp" srcset="img/extracted_live_p1_img0_web.webp" />
+      <source type="image/jpeg" srcset="img/extracted_live_p1_img0_web.jpg" />
+      <img class="cover-photo" src="img/extracted_live_p1_img0_web.jpg" alt="Serenate Live – foto concerto" width="1400" height="933" loading="lazy" />
+    </picture>
+  </figure>
+
+  <main id="main">
+
+    <!-- Section 1 – origini + immagine in fondo -->
+    <section class="sec sec-img-btm" aria-labelledby="lbl-live-intro">
+      <div class="sec-wrap">
+
+        <div data-lang="it">
+          <p class="lead" id="lbl-live-intro">Le serenate sono una forma di musica "di strada" raffinata e popolare: pochi strumenti acustici, una voce protagonista e l'arte di fermarsi davanti a una casa, un balcone, un tavolo per cantare una dedica.</p>
+          <p>Nascono nei vicoli e nelle piazze del Sud e diventano linguaggio universale dell'amore: una canzone al posto di un discorso, una melodia al posto di un biglietto.</p>
+          <p>Nel passato hanno avuto un valore sociale fortissimo. Servivano per dichiararsi, chiedere perdono, celebrare un fidanzamento, accompagnare un passaggio importante nella vita di una comunità.</p>
+          <p>In un'epoca in cui le parole "in pubblico" erano misurate e i sentimenti spesso restavano inespressi, la serenata dava voce a ciò che non si poteva dire, portando poesia nella quotidianità e trasformando una strada qualunque in una scena teatrale.</p>
+        </div>
+
+        <div data-lang="en">
+          <p class="lead">Serenades are a refined yet popular form of "street" music: a few acoustic instruments, a leading voice, and the art of stopping in front of a house, a balcony, or a table to sing a dedication.</p>
+          <p>Born in the alleys and squares of Southern Italy, they became a universal language of love: a song instead of a speech, a melody instead of a written note.</p>
+          <p>In the past, they had a very strong social value. They were used to declare love, ask forgiveness, celebrate an engagement, or mark an important transition in the life of a community.</p>
+          <p>In an era when words spoken "in public" were measured and feelings often remained unexpressed, the serenade gave voice to what could not be said. It brought poetry into everyday life, transforming any ordinary street into a theatrical stage.</p>
+        </div>
+
       </div>
+      <picture>
+        <source type="image/webp" srcset="img/extracted_live_p2_img0_web.webp" />
+        <source type="image/jpeg" srcset="img/extracted_live_p2_img0_web.jpg" />
+        <img class="sec-img-full" src="img/extracted_live_p2_img0_web.jpg" alt="Serenate Live – performance" loading="lazy" />
+      </picture>
+    </section>
 
-      <div data-lang="en">
-        <p class="lead">Serenades are a refined yet popular form of &#8220;street&#8221; music: a few acoustic instruments, a leading voice, and the art of stopping in front of a house, a balcony, or a table to sing a dedication.</p>
-        <p>Born in the alleys and squares of Southern Italy, they became a universal language of love: a song instead of a speech, a melody instead of a written note.</p>
-        <p>In the past, they had a very strong social value. They were used to declare love, ask forgiveness, celebrate an engagement, or mark an important transition in the life of a community.</p>
-        <p>In an era when words spoken &#8220;in public&#8221; were measured and feelings often remained unexpressed, the serenade gave voice to what could not be said. It brought poetry into everyday life, transforming any ordinary street into a theatrical stage.</p>
+    <!-- Section 2 – immagine in cima + progetto -->
+    <section class="sec sec-alt sec-img-top" aria-labelledby="lbl-live-project">
+      <picture>
+        <source type="image/webp" srcset="img/extracted_live_p3_img0_web.webp" />
+        <source type="image/jpeg" srcset="img/extracted_live_p3_img0_web.jpg" />
+        <img class="sec-img-full" src="img/extracted_live_p3_img0_web.jpg" alt="Serenate Live – scena" loading="lazy" />
+      </picture>
+      <div class="sec-wrap" style="padding-top: 52px;">
+
+        <div data-lang="it">
+          <p class="lead" id="lbl-live-project">Il progetto nasce dalle serenate napoletane, dette anche "di posteggia", molte delle quali composte tra fine Ottocento e primi Novecento.</p>
+          <p>La formula acustica permette un ascolto ravvicinato e coinvolgente, ideale per teatri, rassegne e spazi non convenzionali, dove la narrazione musicale alterna intensità, leggerezza e partecipazione del pubblico.</p>
+          <p>La musica prende vita in una formula essenziale: la voce intensa e calda di <strong>Irene Lungo</strong> si intreccia con il violino di <strong>Marco Ghezzo</strong> e la fisarmonica di <strong>Bruno Galeone</strong>. Una parte del repertorio si ispira alla tradizione musicale rom e il progetto studia ulteriori contaminazioni in base al contesto, allo spazio e alla linea curatoriale mantenendo una forte identità artistica.</p>
+        </div>
+
+        <div data-lang="en">
+          <p class="lead">The project originates from Neapolitan serenades, also known as "posteggia" songs, many of which were composed between the late nineteenth and early twentieth centuries. The acoustic format allows for an intimate and immersive listening experience, ideal for theatres, festivals, and unconventional spaces, where musical storytelling alternates intensity, lightness, and audience participation.</p>
+          <p>The music comes to life in an essential and engaging form: the intense and warm voice of <strong>Irene Lungo</strong> intertwines with <strong>Marco Ghezzo</strong>'s violin and <strong>Bruno Galeone</strong>'s accordion.</p>
+        </div>
+
       </div>
+    </section>
 
-    </div>
-    <img class="sec-img-full" src="img/extracted_live_p2_img0_web.jpg" alt="Serenate" loading="lazy" />
-  </div>
-
-  <!-- SECTION 2 &#8212; PDF p.3 (immagine in cima + testo) -->
-  <div class="sec sec-alt sec-img-top">
-    <img class="sec-img-full" src="img/extracted_live_p3_img0_web.jpg" alt="Serenate" loading="lazy" />
-    <div class="sec-wrap" style="padding-top: 52px;">
-
-      <div data-lang="it">
-        <p class="lead">Il progetto nasce dalle serenate napoletane, dette anche &#8220;di posteggia&#8221;, molte delle quali composte tra fine Ottocento e primi Novecento.</p>
-        <p>La formula acustica permette un ascolto ravvicinato e coinvolgente, ideale per teatri, rassegne e spazi non convenzionali, dove la narrazione musicale alterna intensit&#224;, leggerezza e partecipazione del pubblico.</p>
-        <p>La musica prende vita in una formula essenziale: la voce intensa e calda di <strong>Irene Lungo</strong> si intreccia con il violino di <strong>Marco Ghezzo</strong> e la fisarmonica di <strong>Bruno Galeone</strong>. Una parte del repertorio si ispira alla tradizione musicale rom e il progetto studia ulteriori contaminazioni in base al contesto, allo spazio e alla linea curatoriale mantenendo una forte identit&#224; artistica.</p>
+    <!-- Video principale -->
+    <section class="video-sec" aria-labelledby="lbl-video">
+      <div class="sec-wrap">
+        <p class="video-lbl" id="lbl-video" data-lang="it">Guarda il video</p>
+        <p class="video-lbl" data-lang="en">Watch the video</p>
       </div>
-
-      <div data-lang="en">
-        <p class="lead">The project originates from Neapolitan serenades, also known as &#8220;posteggia&#8221; songs, many of which were composed between the late nineteenth and early twentieth centuries. The acoustic format allows for an intimate and immersive listening experience, ideal for theatres, festivals, and unconventional spaces, where musical storytelling alternates intensity, lightness, and audience participation.</p>
-        <p>The music comes to life in an essential and engaging form: the intense and warm voice of <strong>Irene Lungo</strong> intertwines with <strong>Marco Ghezzo</strong>&#8217;s violin and <strong>Bruno Galeone</strong>&#8217;s accordion.</p>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- VIDEO PRINCIPALE -->
-  <div class="video-sec">
-    <div class="sec-wrap">
-      <div data-lang="it"><p class="video-lbl">Guarda il video</p></div>
-      <div data-lang="en"><p class="video-lbl">Watch the video</p></div>
-    </div>
-    <div style="max-width:70%; margin:0 auto;">
-    <div class="video-wrap">
-      <iframe src="https://www.youtube.com/embed/7cPGLhehUpI" title="Serenate – video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-    </div>
-    </div>
-  </div>
-
-  <!-- SECTION 3 &#8212; PDF p.4 (testo + due immagini in fondo) -->
-  <div class="sec sec-img-btm">
-    <div class="sec-wrap">
-
-      <div data-lang="it">
-        <p>La formazione &#232; modulabile e pu&#242; includere altri musicisti in base alle esigenze di produzione.</p>
-        <p>L&#8217;evento pu&#242; prevedere la presenza di una voce narrante, interpretata da <strong>Giuseppe Semeraro</strong>, per alternare alla musica delicati momenti di poesie d&#8217;amore.</p>
-      </div>
-
-      <div data-lang="en">
-        <p>Part of the repertoire draws inspiration from Romani musical tradition, and the project explores further cross-cultural influences depending on the context, the venue, and the curatorial line, while maintaining a strong artistic identity.</p>
-        <p>The ensemble is flexible and may include additional musicians according to production needs.</p>
-        <p>The event may also feature a narrator, performed by <strong>Giuseppe Semeraro</strong>, alternating the music with delicate moments of love poetry.</p>
-      </div>
-
-    </div>
-    <img class="sec-img-full" src="img/extracted_live_p4_img0_web.jpg" alt="Serenate" loading="lazy" />
-    <img class="sec-img-full" src="img/extracted_live_p4_img1_web.jpg" alt="Serenate" loading="lazy" />
-  </div>
-
-  <!-- SECTION 4 &#8212; PDF p.5 (testo + immagine in fondo) -->
-  <div class="sec sec-alt sec-img-btm">
-    <div class="sec-wrap">
-
-      <div data-lang="it">
-        <p class="lead">Fra i brani del grande repertorio napoletano, antiche canzoni d&#8217;amore con alcune &#8220;perle&#8221; entrate nel cuore di tutti nel dopoguerra.</p>
-        <p>Sono serenate e classici senza tempo, da <em>I&#8217; te vurria vas&#224;</em> (1900) a <em>Nun t&#8217;affacci&#224;!</em> (1908), da <em>Dicitencello vuje</em> (1930) a <em>Malafemmena</em> (1951) e <em>Indifferentemente</em> (1963).</p>
-        <p>Il live diventa un percorso teatrale: ogni brano &#232; un quadro, una dedica, un cambio di luce che passa dall&#8217;intimit&#224; della serenata a momenti pi&#249; aperti e partecipati, fino a un finale brillante, dove il pubblico viene accompagnato naturalmente verso una dimensione pi&#249; festosa.</p>
-        <p class="video-links-lbl">Guarda anche</p>
-        <ul class="video-links">
-          <li><a href="https://www.youtube.com/watch?v=Sdd9V_xn_rY&amp;list=RDSdd9V_xn_rY&amp;start_radio=1" target="_blank" rel="noopener"><div class="yt-thumb"><img src="https://i.ytimg.com/vi/Sdd9V_xn_rY/hqdefault.jpg" alt="Dicitincell' vuje"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E" alt="" class="yt-play" style="width:44px; height:31px;" /></div>Serenate canzoni d&apos;amore e d&apos;occasione &ldquo;Dicitincell&apos; vuje&rdquo;</a></li>
-          <li><a href="https://www.youtube.com/watch?v=hBHLMDIlMtY&amp;list=RDhBHLMDIlMtY&amp;start_radio=1" target="_blank" rel="noopener"><div class="yt-thumb"><img src="https://i.ytimg.com/vi/hBHLMDIlMtY/hqdefault.jpg" alt="Indifferentemente"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E" alt="" class="yt-play" style="width:44px; height:31px;" /></div>Serenate, canzoni d&apos;amore e d&apos;occasione &ndash; Indifferentemente</a></li>
-          <li><a href="https://www.youtube.com/watch?v=wZiZEGY-0bE&amp;list=RDwZiZEGY-0bE&amp;start_radio=1" target="_blank" rel="noopener"><div class="yt-thumb"><img src="https://i.ytimg.com/vi/wZiZEGY-0bE/hqdefault.jpg" alt="Maruzzella"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E" alt="" class="yt-play" style="width:44px; height:31px;" /></div>Serenate, canzoni d&apos;amore e d&apos;occasione &ldquo;Maruzzella&rdquo;</a></li>
-        </ul>
-      </div>
-
-      <div data-lang="en">
-        <p class="lead">Among the great Neapolitan repertoire, timeless love songs alongside a few &#8220;gems&#8221; that captured everyone&#8217;s hearts in the post-war years.</p>
-        <p>These are serenades and timeless classics, from <em>I&#8217; te vurria vas&#224;</em> (1900) to <em>Nun t&#8217;affacci&#224;!</em> (1908), from <em>Dicitencello vuje</em> (1930) to <em>Malafemmena</em> (1951) and <em>Indifferentemente</em> (1963).</p>
-        <p>The live performance becomes a theatrical journey: each song is a tableau, a dedication, a change of light. It moves from the intimacy of the serenade to more open and engaging moments, culminating in a brilliant finale where the audience is naturally led into a more festive dimension.</p>
-        <p class="video-links-lbl">See also</p>
-        <ul class="video-links">
-          <li><a href="https://www.youtube.com/watch?v=Sdd9V_xn_rY&amp;list=RDSdd9V_xn_rY&amp;start_radio=1" target="_blank" rel="noopener"><div class="yt-thumb"><img src="https://i.ytimg.com/vi/Sdd9V_xn_rY/hqdefault.jpg" alt="Dicitincell' vuje"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E" alt="" class="yt-play" style="width:44px; height:31px;" /></div>Serenate canzoni d&apos;amore e d&apos;occasione &ldquo;Dicitincell&apos; vuje&rdquo;</a></li>
-          <li><a href="https://www.youtube.com/watch?v=hBHLMDIlMtY&amp;list=RDhBHLMDIlMtY&amp;start_radio=1" target="_blank" rel="noopener"><div class="yt-thumb"><img src="https://i.ytimg.com/vi/hBHLMDIlMtY/hqdefault.jpg" alt="Indifferentemente"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E" alt="" class="yt-play" style="width:44px; height:31px;" /></div>Serenate, canzoni d&apos;amore e d&apos;occasione &ndash; Indifferentemente</a></li>
-          <li><a href="https://www.youtube.com/watch?v=wZiZEGY-0bE&amp;list=RDwZiZEGY-0bE&amp;start_radio=1" target="_blank" rel="noopener"><div class="yt-thumb"><img src="https://i.ytimg.com/vi/wZiZEGY-0bE/hqdefault.jpg" alt="Maruzzella"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E" alt="" class="yt-play" style="width:44px; height:31px;" /></div>Serenate, canzoni d&apos;amore e d&apos;occasione &ldquo;Maruzzella&rdquo;</a></li>
-        </ul>
-      </div>
-
-    </div>
-    <img class="sec-img-full" src="img/extracted_live_p5_img1_web.jpg" alt="Serenate" loading="lazy" />
-  </div>
-
-  <!-- SECTION 5 &#8212; PDF p.6 (specs + contatti, sfondo scuro) -->
-  <div class="sec-specs">
-    <div class="sec-wrap">
-
-      <div data-lang="it">
-        <table class="specs-table">
-          <tr><td class="td-lbl">Durata</td><td class="td-val">1:30&#8217;</td></tr>
-          <tr><td class="td-lbl">Formazione</td><td class="td-val">Irene Lungo (voce)<br>Marco Ghezzo (violino)<br>Bruno Galeone (Fisa)<br>ampliabile</td></tr>
-          <tr><td class="td-lbl">Repertorio</td><td class="td-val">nucleo napoletano / aperture ad altre tradizioni popolari / sezione balkan</td></tr>
-        </table>
-        <div class="specs-credits">
-          &#200; una produzione AltraMarea<br>
-          <a href="mailto:altramarea.produzioni@gmail.com">altramarea.produzioni@gmail.com</a><br>
-          mob. +39 347 8157272 Marinella Mazzotta<br>
-          mob. +39 327 7372824 Raffaella Romano
+      <div style="max-width:70%; margin:0 auto;">
+        <div class="video-wrap">
+          <iframe
+            src="https://www.youtube.com/embed/7cPGLhehUpI"
+            title="Serenate Live – video"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin">
+          </iframe>
         </div>
       </div>
+    </section>
 
-      <div data-lang="en">
-        <table class="specs-table">
-          <tr><td class="td-lbl">Duration</td><td class="td-val">1:30&#8217;</td></tr>
-          <tr><td class="td-lbl">Line-up</td><td class="td-val">Irene Lungo (vocals)<br>Marco Ghezzo (violin)<br>Bruno Galeone (accordion)</td></tr>
-          <tr><td class="td-lbl">Repertoire</td><td class="td-val">Neapolitan core / openings to other folk traditions / Balkan section</td></tr>
-          <tr><td class="td-lbl">Production</td><td class="td-val">AltraMarea</td></tr>
-        </table>
-        <div class="specs-credits">
-          <a href="mailto:altramarea.produzioni@gmail.com">altramarea.produzioni@gmail.com</a><br>
-          mob. +39 347 8157272 Marinella Mazzotta<br>
-          mob. +39 327 7372824 Raffaella Romano
+    <!-- Section 3 – formazione + due immagini in fondo -->
+    <section class="sec sec-img-btm" aria-labelledby="lbl-live-form">
+      <div class="sec-wrap">
+
+        <div data-lang="it">
+          <p id="lbl-live-form">La formazione è modulabile e può includere altri musicisti in base alle esigenze di produzione.</p>
+          <p>L'evento può prevedere la presenza di una voce narrante, interpretata da <strong>Giuseppe Semeraro</strong>, per alternare alla musica delicati momenti di poesie d'amore.</p>
         </div>
+
+        <div data-lang="en">
+          <p>Part of the repertoire draws inspiration from Romani musical tradition, and the project explores further cross-cultural influences depending on the context, the venue, and the curatorial line, while maintaining a strong artistic identity.</p>
+          <p>The ensemble is flexible and may include additional musicians according to production needs.</p>
+          <p>The event may also feature a narrator, performed by <strong>Giuseppe Semeraro</strong>, alternating the music with delicate moments of love poetry.</p>
+        </div>
+
       </div>
+      <picture>
+        <source type="image/webp" srcset="img/extracted_live_p4_img0_web.webp" />
+        <source type="image/jpeg" srcset="img/extracted_live_p4_img0_web.jpg" />
+        <img class="sec-img-full" src="img/extracted_live_p4_img0_web.jpg" alt="Serenate Live – formazione" loading="lazy" />
+      </picture>
+      <picture>
+        <source type="image/webp" srcset="img/extracted_live_p4_img1_web.webp" />
+        <source type="image/jpeg" srcset="img/extracted_live_p4_img1_web.jpg" />
+        <img class="sec-img-full" src="img/extracted_live_p4_img1_web.jpg" alt="Serenate Live – formazione 2" loading="lazy" />
+      </picture>
+    </section>
 
-      <div class="specs-footer">
-        <img class="specs-logo" src="logo_white.png" alt="Serenate" loading="lazy" /><br><br>
-        <a class="specs-url" href="https://www.altramareaproduzioni.it" target="_blank" rel="noopener">www.altramareaproduzioni.it</a>
+    <!-- Section 4 – repertorio + video links + immagine in fondo -->
+    <section class="sec sec-alt sec-img-btm" aria-labelledby="lbl-live-rep">
+      <div class="sec-wrap">
+
+        <div data-lang="it">
+          <p class="lead" id="lbl-live-rep">Fra i brani del grande repertorio napoletano, antiche canzoni d'amore con alcune "perle" entrate nel cuore di tutti nel dopoguerra.</p>
+          <p>Sono serenate e classici senza tempo, da <em>I' te vurria vasà</em> (1900) a <em>Nun t'affaccià!</em> (1908), da <em>Dicitencello vuje</em> (1930) a <em>Malafemmena</em> (1951) e <em>Indifferentemente</em> (1963).</p>
+          <p>Il live diventa un percorso teatrale: ogni brano è un quadro, una dedica, un cambio di luce che passa dall'intimità della serenata a momenti più aperti e partecipati, fino a un finale brillante, dove il pubblico viene accompagnato naturalmente verso una dimensione più festosa.</p>
+          <p class="video-links-lbl" data-lang="it">Guarda anche</p>
+          <ul class="video-links">
+            <li>
+              <a href="https://www.youtube.com/watch?v=Sdd9V_xn_rY&amp;list=RDSdd9V_xn_rY&amp;start_radio=1" target="_blank" rel="noopener noreferrer" aria-label="Guarda: Dicitincell' vuje (apre YouTube)">
+                <div class="yt-thumb">
+                  <img src="https://i.ytimg.com/vi/Sdd9V_xn_rY/hqdefault.jpg" alt="Serenate – Dicitincell' vuje" loading="lazy" />
+                  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E" alt="" class="yt-play" width="44" height="31" />
+                </div>
+                Serenate &ldquo;Dicitincell&apos; vuje&rdquo;
+              </a>
+            </li>
+            <li>
+              <a href="https://www.youtube.com/watch?v=hBHLMDIlMtY&amp;list=RDhBHLMDIlMtY&amp;start_radio=1" target="_blank" rel="noopener noreferrer" aria-label="Guarda: Indifferentemente (apre YouTube)">
+                <div class="yt-thumb">
+                  <img src="https://i.ytimg.com/vi/hBHLMDIlMtY/hqdefault.jpg" alt="Serenate – Indifferentemente" loading="lazy" />
+                  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E" alt="" class="yt-play" width="44" height="31" />
+                </div>
+                Serenate &ndash; Indifferentemente
+              </a>
+            </li>
+            <li>
+              <a href="https://www.youtube.com/watch?v=wZiZEGY-0bE&amp;list=RDwZiZEGY-0bE&amp;start_radio=1" target="_blank" rel="noopener noreferrer" aria-label="Guarda: Maruzzella (apre YouTube)">
+                <div class="yt-thumb">
+                  <img src="https://i.ytimg.com/vi/wZiZEGY-0bE/hqdefault.jpg" alt="Serenate – Maruzzella" loading="lazy" />
+                  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E" alt="" class="yt-play" width="44" height="31" />
+                </div>
+                Serenate &ldquo;Maruzzella&rdquo;
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div data-lang="en">
+          <p class="lead">Among the great Neapolitan repertoire, timeless love songs alongside a few "gems" that captured everyone's hearts in the post-war years.</p>
+          <p>These are serenades and timeless classics, from <em>I' te vurria vasà</em> (1900) to <em>Nun t'affaccià!</em> (1908), from <em>Dicitencello vuje</em> (1930) to <em>Malafemmena</em> (1951) and <em>Indifferentemente</em> (1963).</p>
+          <p>The live performance becomes a theatrical journey: each song is a tableau, a dedication, a change of light. It moves from the intimacy of the serenade to more open and engaging moments, culminating in a brilliant finale where the audience is naturally led into a more festive dimension.</p>
+          <p class="video-links-lbl">See also</p>
+          <ul class="video-links">
+            <li>
+              <a href="https://www.youtube.com/watch?v=Sdd9V_xn_rY&amp;list=RDSdd9V_xn_rY&amp;start_radio=1" target="_blank" rel="noopener noreferrer" aria-label="Watch: Dicitincell' vuje (opens YouTube)">
+                <div class="yt-thumb">
+                  <img src="https://i.ytimg.com/vi/Sdd9V_xn_rY/hqdefault.jpg" alt="Serenate – Dicitincell' vuje" loading="lazy" />
+                  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E" alt="" class="yt-play" width="44" height="31" />
+                </div>
+                Serenate &ldquo;Dicitincell&apos; vuje&rdquo;
+              </a>
+            </li>
+            <li>
+              <a href="https://www.youtube.com/watch?v=hBHLMDIlMtY&amp;list=RDhBHLMDIlMtY&amp;start_radio=1" target="_blank" rel="noopener noreferrer" aria-label="Watch: Indifferentemente (opens YouTube)">
+                <div class="yt-thumb">
+                  <img src="https://i.ytimg.com/vi/hBHLMDIlMtY/hqdefault.jpg" alt="Serenate – Indifferentemente" loading="lazy" />
+                  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E" alt="" class="yt-play" width="44" height="31" />
+                </div>
+                Serenate &ndash; Indifferentemente
+              </a>
+            </li>
+            <li>
+              <a href="https://www.youtube.com/watch?v=wZiZEGY-0bE&amp;list=RDwZiZEGY-0bE&amp;start_radio=1" target="_blank" rel="noopener noreferrer" aria-label="Watch: Maruzzella (opens YouTube)">
+                <div class="yt-thumb">
+                  <img src="https://i.ytimg.com/vi/wZiZEGY-0bE/hqdefault.jpg" alt="Serenate – Maruzzella" loading="lazy" />
+                  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E" alt="" class="yt-play" width="44" height="31" />
+                </div>
+                Serenate &ldquo;Maruzzella&rdquo;
+              </a>
+            </li>
+          </ul>
+        </div>
+
       </div>
+      <picture>
+        <source type="image/webp" srcset="img/extracted_live_p5_img1_web.webp" />
+        <source type="image/jpeg" srcset="img/extracted_live_p5_img1_web.jpg" />
+        <img class="sec-img-full" src="img/extracted_live_p5_img1_web.jpg" alt="Serenate Live – concerto finale" loading="lazy" />
+      </picture>
+    </section>
 
-    </div>
-  </div>
+    <!-- Section 5 – specs + contatti (sfondo scuro) -->
+    <section class="sec-specs" aria-labelledby="lbl-live-specs">
+      <div class="sec-wrap">
 
-  <script>
+        <div data-lang="it">
+          <table class="specs-table" id="lbl-live-specs">
+            <tr><td class="td-lbl">Durata</td><td class="td-val">1:30'</td></tr>
+            <tr><td class="td-lbl">Formazione</td><td class="td-val">Irene Lungo (voce)<br />Marco Ghezzo (violino)<br />Bruno Galeone (Fisa)<br />ampliabile</td></tr>
+            <tr><td class="td-lbl">Repertorio</td><td class="td-val">nucleo napoletano / aperture ad altre tradizioni popolari / sezione balkan</td></tr>
+          </table>
+          <div class="specs-credits">
+            È una produzione AltraMarea<br />
+            <a href="mailto:altramarea.produzioni@gmail.com" aria-label="Scrivi a AltraMarea Produzioni">altramarea.produzioni@gmail.com</a><br />
+            mob. +39 347 8157272 Marinella Mazzotta<br />
+            mob. +39 327 7372824 Raffaella Romano
+          </div>
+        </div>
+
+        <div data-lang="en">
+          <table class="specs-table">
+            <tr><td class="td-lbl">Duration</td><td class="td-val">1:30'</td></tr>
+            <tr><td class="td-lbl">Line-up</td><td class="td-val">Irene Lungo (vocals)<br />Marco Ghezzo (violin)<br />Bruno Galeone (accordion)</td></tr>
+            <tr><td class="td-lbl">Repertoire</td><td class="td-val">Neapolitan core / openings to other folk traditions / Balkan section</td></tr>
+            <tr><td class="td-lbl">Production</td><td class="td-val">AltraMarea</td></tr>
+          </table>
+          <div class="specs-credits">
+            <a href="mailto:altramarea.produzioni@gmail.com" aria-label="Write to AltraMarea Produzioni">altramarea.produzioni@gmail.com</a><br />
+            mob. +39 347 8157272 Marinella Mazzotta<br />
+            mob. +39 327 7372824 Raffaella Romano
+          </div>
+        </div>
+
+        <div class="specs-footer">
+          <img class="specs-logo" src="logo_white.png" alt="Serenate – AltraMarea Produzioni" loading="lazy" width="180" height="62" /><br /><br />
+          <a class="specs-url" href="https://www.altramareaproduzioni.it" target="_blank" rel="noopener noreferrer" aria-label="Sito AltraMarea Produzioni (apre in una nuova finestra)">www.altramareaproduzioni.it</a>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Language script -->
+  <script type="module" src="assets/js/lang.js"></script>
+  <script nomodule>
     function setLang(lang) {
-      document.querySelectorAll('.lang-btn').forEach(function(btn) {
-        btn.classList.toggle('active', btn.textContent.toLowerCase().startsWith(lang === 'it' ? 'ita' : 'eng'));
-      });
+      try { localStorage.setItem('lang', lang); } catch(_) {}
+      document.documentElement.lang = lang;
       document.querySelectorAll('[data-lang]').forEach(function(el) {
-        el.style.display = el.getAttribute('data-lang') === lang ? '' : 'none';
+        el.hidden = el.dataset.lang !== lang;
+        if (el.style.display) el.style.display = '';
       });
-      document.documentElement.lang = lang === 'it' ? 'it' : 'en';
+      document.querySelectorAll('.lang-btn').forEach(function(btn) {
+        var t = btn.dataset.langTarget || (btn.textContent.trim().toLowerCase().startsWith('ita') ? 'it' : 'en');
+        btn.classList.toggle('active', t === lang);
+        btn.setAttribute('aria-pressed', t === lang ? 'true' : 'false');
+      });
     }
-    setLang('it');
+    var stored = 'it'; try { stored = localStorage.getItem('lang') || 'it'; } catch(_) {}
+    setLang(stored);
   </script>
-
 </body>
 </html>
