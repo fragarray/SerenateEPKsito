@@ -186,6 +186,9 @@ tasks = [
     ('presskit_live.html',    'live',    LIVE_VARS),
 ]
 
+OUT_FOLDER = FOLDER / 'presskit_static'
+OUT_FOLDER.mkdir(exist_ok=True)
+
 for filename, name, vars_map in tasks:
     for lang in ['it', 'en']:
         print(f'\n[{name.upper()} / {lang.upper()}]')
@@ -193,7 +196,7 @@ for filename, name, vars_map in tasks:
             FOLDER / filename,
             lang,
             vars_map,
-            FOLDER / f'presskit_{name}_{lang}.html',
+            OUT_FOLDER / f'presskit_{name}_{lang}.html',
         )
 
 print('\nDone.')
