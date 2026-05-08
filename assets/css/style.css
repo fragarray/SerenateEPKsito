@@ -726,7 +726,7 @@ body.live .specs-url { color: var(--acc-lt); }
   line-height: 1.3;
 }
 .video-links a:hover { text-decoration: underline; }
-.video-links a img {
+.video-links a img:not(.yt-play) {
   width: 100%;
   aspect-ratio: 16 / 9;
   height: auto;
@@ -735,7 +735,7 @@ body.live .specs-url { color: var(--acc-lt); }
   display: block;
 }
 @supports not (aspect-ratio: 16/9) {
-  .video-links a img { height: 90px; }
+  .video-links a img:not(.yt-play) { height: 90px; }
 }
 .yt-thumb { position: relative; display: block; line-height: 0; }
-.yt-play  { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; }
+.yt-play  { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none; width: 44px; height: auto; }
