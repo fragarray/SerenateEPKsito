@@ -1,0 +1,9 @@
+# Cache breve per HTML (1 ora) — forza aggiornamento rapido dopo ogni deploy
+<FilesMatch "\.(html)$">
+  Header set Cache-Control "max-age=3600, must-revalidate"
+</FilesMatch>
+
+# Cache lunga per asset statici (immagini, CSS, JS) — 1 settimana
+<FilesMatch "\.(css|js|jpg|jpeg|webp|png|ico|svg|woff2?)$">
+  Header set Cache-Control "max-age=604800, public"
+</FilesMatch>
