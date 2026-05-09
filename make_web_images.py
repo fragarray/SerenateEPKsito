@@ -39,12 +39,16 @@ WEB = [
     'extracted_live_p4_img0.jpeg',
     'extracted_live_p4_img1.jpeg',
     'extracted_live_p5_img1.jpeg',
+    'niuri_te_sule_1.jpg',
+    'niuri_te_sule_2.jpg',
+    'niuri_te_sule_3.jpg',
 ]
 
 # ── Card thumbnail (visibili a ~350px) ────────────────────────────
 THUMB = [
     'extracted_wed_p1_img0.jpeg',
     'extracted_live_p1_img0.jpeg',
+    'niuri_te_sule_1.jpg',
 ]
 
 print('=== Web images (max 1400px, q80) ===')
