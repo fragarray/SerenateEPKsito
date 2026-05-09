@@ -13,6 +13,10 @@ VIDEOS = {
     "thumb_live_dicitincello":     "Sdd9V_xn_rY",
     "thumb_live_indifferentemente": "hBHLMDIlMtY",
     "thumb_live_maruzzella":       "wZiZEGY-0bE",
+    # Niuri Te Sule
+    "thumb_nts_sternatia":         "VwqRA_xXvwA",
+    "thumb_nts_novello1":          "n6PVBn8_4fM",
+    "thumb_nts_novello2":          "dhrcsLyCbls",
 }
 
 def download_thumbnail(video_id: str) -> Image.Image:
