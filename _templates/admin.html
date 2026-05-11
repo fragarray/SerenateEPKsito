@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generatore Artisti – AltraMarea Produzioni</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <!-- JSZip – generazione archivio ZIP lato client -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <style>
+    /* ── RESET ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
+
+    /* ── ROOT ──────────────────────────────────────────────────── */
+    :root {
+      --cream:   #faf7f2;
+      --light:   #f2ede4;
+      --ink:     #1c1a17;
+      --muted:   #5a5248;
+      --gold:    #9b7b2f;
+      --gold-lt: #c9a84c;
+      --border:  #e4ddd0;
+      --err:     #c0392b;
+      --ok:      #2d7a4f;
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      display: flex; flex-direction: column;
+      background: var(--cream); color: var(--ink);
+      font-family: 'Lato', Arial, sans-serif; font-size: 14px; line-height: 1.6;
+    }
+
+    /* ── HEADER ────────────────────────────────────────────────── */
+    .adm-header {
+      flex-shrink: 0; background: var(--ink);
+      padding: 14px 28px;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+      border-bottom: 2px solid var(--gold); z-index: 100;
+    }
+    .adm-header-titles { flex: 1; }
+    .adm-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.2rem, 2vw, 1.7rem);
+      font-weight: 300; letter-spacing: 0.16em; text-transform: uppercase; color: #fff; line-height: 1.1;
+    }
+    .adm-subtitle { font-size: 0.6rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold-lt); margin-top: 4px; }
+    .header-actions { display: flex; gap: 10px; flex-shrink: 0; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 22px; background: var(--gold); color: #fff; border: none;
+      font-family: 'Lato', Arial, sans-serif; font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: background .2s; white-space: nowrap;
+    }
+    .btn-primary:hover { background: var(--gold-lt); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 18px; background: transparent; color: var(--gold-lt);
+      border: 1px solid var(--gold-lt);
+      font-family: 'Lato', Arial, sans-serif; font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all .2s; white-space: nowrap;
+    }
+    .btn-secondary:hover { background: var(--gold-lt); color: var(--ink); }
+
+    /* ── TWO-COLUMN BODY ───────────────────────────────────────── */
+    .adm-body { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── LEFT PANEL ────────────────────────────────────────────── */
+    .adm-left {
+      width: 50%; flex-shrink: 0;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+
+    /* ── PANEL DIVIDER ─────────────────────────────────────────── */
+    .panel-divider { display: none; }
+    .adm-progress {
+      flex-shrink: 0; background: var(--light); border-bottom: 1px solid var(--border);
+      padding: 0 20px; display: flex; gap: 0; overflow-x: auto;
+    }
+    .progress-step {
+      padding: 11px 14px 9px;
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase;
+      color: var(--muted); border-bottom: 2px solid transparent;
+      white-space: nowrap; cursor: pointer; text-decoration: none;
+      transition: color .2s, border-color .2s;
+    }
+    .progress-step:hover { color: var(--gold); }
+    .progress-step.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .adm-form-scroll { flex: 1; overflow-y: auto; padding: 0 24px 100px; }
+
+    /* ── RIGHT PANEL ───────────────────────────────────────────── */
+    .adm-right { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #d4cfc7; }
+    .preview-topbar {
+      flex-shrink: 0; background: var(--ink); padding: 8px 16px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      border-bottom: 1px solid #3a3730;
+    }
+    .preview-topbar-title { font-size: 0.6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold-lt); }
+    .preview-topbar-actions { display: flex; gap: 8px; align-items: center; }
+    .preview-status { font-size: 0.62rem; color: #a09b93; }
+    .btn-refresh {
+      padding: 6px 14px; background: none; border: 1px solid #3a3730; color: #a09b93;
+      font-family: 'Lato', Arial, sans-serif; font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase;
+      cursor: pointer; transition: all .15s;
+    }
+    .btn-refresh:hover { border-color: var(--gold-lt); color: var(--gold-lt); }
+    .preview-wrap { flex: 1; overflow: hidden; padding: 12px; }
+    #preview-frame { width: 100%; height: 100%; border: none; background: #fff; border-radius: 2px; box-shadow: 0 2px 12px rgba(0,0,0,.25); }
+
+    /* ── BOTTOM OUTPUT BAR ─────────────────────────────────────── */
+    .output-bar {
+      position: fixed; bottom: 0; left: 0; width: 44%; /* updated by JS */
+      background: var(--ink); border-top: 2px solid var(--gold);
+      padding: 12px 24px; display: flex; align-items: center; gap: 16px; z-index: 200;
+    }
+    .output-status { flex: 1; font-size: 0.75rem; color: #a09b93; line-height: 1.4; }
+    .output-status.ok  { color: #6dcf9a; }
+    .output-status.err { color: #e07070; }
+
+    /* ── FORM SECTIONS ─────────────────────────────────────────── */
+    .sec-block { padding: 32px 0 28px; border-bottom: 1px solid var(--border); }
+    .sec-block:last-of-type { border-bottom: none; }
+    .sec-label { font-size: 0.58rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+    .sec-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.5rem; font-weight: 300; color: var(--ink); margin-bottom: 4px; }
+    .sec-desc { font-size: 0.8rem; color: var(--muted); margin-bottom: 22px; line-height: 1.65; }
+
+    /* ── FIELD GROUPS ──────────────────────────────────────────── */
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .field-row.cols-1 { grid-template-columns: 1fr; }
+    .field-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 0.6rem; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--muted); }
+    .field label .req { color: var(--gold); margin-left: 2px; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 9px 12px; border: 1px solid var(--border); background: #fff; color: var(--ink);
+      font-family: 'Lato', Arial, sans-serif; font-size: 0.85rem; font-weight: 300;
+      transition: border-color .15s, box-shadow .15s; appearance: none;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      outline: none; border-color: var(--gold); box-shadow: 0 0 0 2px rgba(155,123,47,.15);
+    }
+    .field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+    .field textarea.tall { min-height: 120px; }
+    .hint { font-size: 0.68rem; color: var(--muted); line-height: 1.4; }
+
+    /* ── SLUG PREVIEW ──────────────────────────────────────────── */
+    .slug-preview { font-size: 0.75rem; color: var(--muted); padding: 8px 12px; background: var(--light); border: 1px solid var(--border); font-family: monospace; }
+    .slug-preview span { color: var(--gold); font-weight: bold; }
+
+    /* ── LANG TABS ─────────────────────────────────────────────── */
+    .lang-tabs { display: flex; margin-bottom: 10px; }
+    .lang-tab {
+      padding: 6px 18px; font-size: 0.6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      border: 1px solid var(--border); background: var(--light); color: var(--muted); cursor: pointer; transition: all .15s;
+    }
+    .lang-tab:first-child { border-radius: 2px 0 0 2px; border-right: none; }
+    .lang-tab:last-child  { border-radius: 0 2px 2px 0; }
+    .lang-tab.active { background: var(--gold); color: #fff; border-color: var(--gold); }
+    .lang-panel { display: none; }
+    .lang-panel.active { display: block; }
+
+    /* ── PALETTE ───────────────────────────────────────────────── */
+    .palette-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+    .palette-option { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+    .palette-option input[type="radio"] { display: none; }
+    .palette-swatch {
+      width: 44px; height: 44px; border-radius: 50%; border: 3px solid transparent;
+      position: relative; overflow: hidden; transition: border-color .15s, transform .15s;
+    }
+    .palette-swatch::after { content: ''; position: absolute; left: 50%; top: 0; width: 50%; height: 100%; background: var(--lt); }
+    .palette-option input:checked + .palette-swatch { border-color: var(--ink); transform: scale(1.12); }
+    .palette-name { font-size: 0.58rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+    .custom-color-row {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      background: var(--light); border: 1px solid var(--border); margin-top: 4px; flex-wrap: wrap;
+    }
+    .custom-color-row label { font-size: 0.6rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+    .custom-color-row input[type="color"] { width: 52px; height: 36px; padding: 2px 4px; border: 1px solid var(--border); cursor: pointer; }
+
+    /* ── DYNAMIC ITEMS ─────────────────────────────────────────── */
+    .dyn-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+    .dyn-item {
+      display: flex; gap: 8px; align-items: flex-start;
+      background: var(--light); border: 1px solid var(--border); padding: 12px 14px; border-radius: 2px;
+    }
+    .dyn-item-body { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .dyn-item-num { font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); min-width: 20px; padding-top: 10px; }
+    .btn-remove {
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      cursor: pointer; font-size: 0.9rem; line-height: 1; padding: 5px 8px;
+      transition: all .15s; align-self: flex-start; margin-top: 6px; flex-shrink: 0;
+    }
+    .btn-remove:hover { background: var(--err); border-color: var(--err); color: #fff; }
+    .btn-add {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border: 1px dashed var(--gold); background: none; color: var(--gold);
+      font-family: 'Lato', Arial, sans-serif; font-size: 0.6rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all .15s;
+    }
+    .btn-add:hover { background: var(--gold); color: #fff; border-style: solid; }
+
+    /* ── TOGGLE ────────────────────────────────────────────────── */
+    .toggle-field { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .toggle-field input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--gold); cursor: pointer; }
+    .toggle-field label { font-size: 0.72rem; color: var(--muted); cursor: pointer; }
+
+    /* ── DIVIDER & INNER TITLE ─────────────────────────────────── */
+    .inner-divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+    .inner-h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 300; font-size: 1.15rem; color: var(--ink); margin-bottom: 12px; }
+
+    /* ── CARD PREVIEW STRIP ────────────────────────────────────── */
+    .card-strip {
+      background: var(--light); border: 1px solid var(--border);
+      padding: 12px 16px; margin-bottom: 14px;
+      font-size: 0.68rem; color: var(--muted); line-height: 1.6;
+    }
+    .card-strip code { background: #e4ddd0; padding: 1px 5px; font-size: 0.7em; }
+    .card-strip strong { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+  <!-- ══ HEADER ════════════════════════════════════════════════ -->
+  <header class="adm-header">
+    <div class="adm-header-titles">
+      <p class="adm-title">Generatore Artisti</p>
+      <p class="adm-subtitle">AltraMarea Produzioni · Strumento di creazione pagine</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" onclick="refreshPreview()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Aggiorna Preview
+      </button>
+      <button class="btn-primary" onclick="generateAndDownload()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Genera &amp; Scarica ZIP
+      </button>
+    </div>
+  </header>
+
+  <!-- ══ BODY ══════════════════════════════════════════════════ -->
+  <div class="adm-body">
+
+    <!-- ══ LEFT: EDITOR ══════════════════════════════════════ -->
+    <div class="adm-left">
+
+      <nav class="adm-progress" aria-label="Sezioni">
+        <a class="progress-step active" href="#sec-identita">1·Identità</a>
+        <a class="progress-step" href="#sec-stile">2·Stile</a>
+        <a class="progress-step" href="#sec-hero">3·Hero</a>
+        <a class="progress-step" href="#sec-testi">4·Testi</a>
+        <a class="progress-step" href="#sec-foto">5·Foto</a>
+        <a class="progress-step" href="#sec-video">6·Video</a>
+        <a class="progress-step" href="#sec-scheda">7·Scheda</a>
+        <a class="progress-step" href="#sec-contatti">8·Contatti</a>
+      </nav>
+
+      <!-- FORM -->
+      <form class="adm-form-scroll" id="artistForm" onsubmit="return false;">
+
+        <!-- ════ 1. IDENTITÀ ════════════════════════════════════ -->
+        <section class="sec-block" id="sec-identita">
+          <p class="sec-label">Sezione 1</p>
+          <h2 class="sec-title">Identità</h2>
+          <p class="sec-desc">Dati base: nome, slug del file, meta description per SEO.</p>
+
+          <div class="field-row">
+            <div class="field">
+              <label>Nome Artista <span class="req">*</span></label>
+              <input type="text" id="f-name" placeholder="es. Serenate" oninput="autoSlug()" required />
+            </div>
+            <div class="field">
+              <label>Sottotitolo – Italiano</label>
+              <input type="text" id="f-subtitle-it" placeholder="es. Canti e Incanti della Taranta" oninput="onFormChange()" />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Subtitle – English</label>
+              <input type="text" id="f-subtitle-en" placeholder="es. Songs and Spells of the Taranta" oninput="onFormChange()" />
+            </div>
+            <div class="field">
+              <label>Genere Musicale</label>
+              <input type="text" id="f-genre" placeholder="es. Pizzica · Musica popolare salentina" oninput="onFormChange()" />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Slug file output <span class="req">*</span></label>
+              <input type="text" id="f-slug" placeholder="es. serenate" required oninput="onFormChange()" />
+              <span class="hint">Minuscolo, solo lettere/numeri/trattini, niente spazi.</span>
+            </div>
+            <div class="field">
+              <label>Anteprima URL</label>
+              <div class="slug-preview">…/<span id="slug-preview-text">nome-artista</span>.html</div>
+            </div>
+          </div>
+          <hr class="inner-divider" />
+          <div class="field-row cols-1">
+            <div class="field">
+              <label>Meta description – Italiano <span class="req">*</span></label>
+              <textarea id="f-meta-it" rows="2" placeholder="max 160 caratteri." oninput="onMetaCount('f-meta-it','meta-it-count');onFormChange()"></textarea>
+              <span class="hint" id="meta-it-count">0 / 160</span>
+            </div>
+          </div>
+          <div class="field-row cols-1">
+            <div class="field">
+              <label>Meta description – English</label>
+              <textarea id="f-meta-en" rows="2" placeholder="max 160 chars." oninput="onMetaCount('f-meta-en','meta-en-count');onFormChange()"></textarea>
+              <span class="hint" id="meta-en-count">0 / 160</span>
+            </div>
+          </div>
+
+          <!-- ── CARD PER INDEX.HTML ── -->
+          <hr class="inner-divider" />
+          <p class="inner-h3">Card per index.html</p>
+          <div class="card-strip">
+            Questi dati generano il blocco <code>&lt;article class="prod-card"&gt;</code> pronto da incollare nella griglia
+            di <strong>index.html</strong>. Viene incluso come <strong>card_artista.html</strong> nel ZIP.
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label>Thumbnail JPG <span class="hint">(card: 600×400)</span></label>
+              <input type="text" id="f-card-thumb-jpg" placeholder="img/artista_thumb.jpg" oninput="onFormChange()" />
+            </div>
+            <div class="field">
+              <label>Thumbnail WebP</label>
+              <input type="text" id="f-card-thumb-webp" placeholder="img/artista_thumb.webp" oninput="onFormChange()" />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Tag card – Italiano</label>
+              <input type="text" id="f-card-tag-it" placeholder="es. Pizzica · Musica popolare · Taranta" oninput="onFormChange()" />
+              <span class="hint">Se vuoto usa il campo Genere Musicale.</span>
+            </div>
+            <div class="field">
+              <label>Tag card – English</label>
+              <input type="text" id="f-card-tag-en" placeholder="es. Pizzica · Folk Music · Taranta" oninput="onFormChange()" />
+            </div>
+          </div>
+          <div class="field-row cols-1">
+            <div class="field">
+              <label>Descrizione card – Italiano <span class="req">*</span></label>
+              <textarea id="f-card-desc-it" rows="3" placeholder="Breve testo (2-3 frasi) per la card nella homepage." oninput="onFormChange()"></textarea>
+            </div>
+          </div>
+          <div class="field-row cols-1">
+            <div class="field">
+              <label>Card description – English</label>
+              <textarea id="f-card-desc-en" rows="3" placeholder="Short text (2-3 sentences) for the homepage card." oninput="onFormChange()"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- ════ 2. STILE ═══════════════════════════════════════ -->
+        <section class="sec-block" id="sec-stile">
+          <p class="sec-label">Sezione 2</p>
+          <h2 class="sec-title">Palette &amp; Header</h2>
+          <p class="sec-desc">Il colore scelto viene iniettato come variabile CSS, sostituendo gli accenti su link, etichette, video-lbl e specs-credits.</p>
+
+          <div class="palette-grid">
+            <label class="palette-option"><input type="radio" name="palette" value="gold" checked onchange="onFormChange()" /><span class="palette-swatch" style="background:#9b7b2f;--lt:#c9a84c;"></span><span class="palette-name">Gold</span></label>
+            <label class="palette-option"><input type="radio" name="palette" value="burgundy" onchange="onFormChange()" /><span class="palette-swatch" style="background:#6b2737;--lt:#9c3d52;"></span><span class="palette-name">Borgogna</span></label>
+            <label class="palette-option"><input type="radio" name="palette" value="ocean" onchange="onFormChange()" /><span class="palette-swatch" style="background:#1e4d6b;--lt:#2e7aad;"></span><span class="palette-name">Oceano</span></label>
+            <label class="palette-option"><input type="radio" name="palette" value="forest" onchange="onFormChange()" /><span class="palette-swatch" style="background:#2d5a27;--lt:#4a8c40;"></span><span class="palette-name">Bosco</span></label>
+            <label class="palette-option"><input type="radio" name="palette" value="terracotta" onchange="onFormChange()" /><span class="palette-swatch" style="background:#8b3a2a;--lt:#c4573f;"></span><span class="palette-name">Terracotta</span></label>
+            <label class="palette-option"><input type="radio" name="palette" value="slate" onchange="onFormChange()" /><span class="palette-swatch" style="background:#3d4f6b;--lt:#5a7299;"></span><span class="palette-name">Ardesia</span></label>
+            <label class="palette-option"><input type="radio" name="palette" value="custom" onchange="toggleCustomColor();onFormChange()" /><span class="palette-swatch" id="custom-swatch" style="background:#888;--lt:#aaa;"></span><span class="palette-name">Custom</span></label>
+          </div>
+          <div class="custom-color-row" id="custom-color-row" hidden>
+            <label>Colore principale</label>
+            <input type="color" id="f-color-main" value="#888888" oninput="updateCustomSwatch();onFormChange()" />
+            <label>Colore chiaro</label>
+            <input type="color" id="f-color-light" value="#aaaaaa" oninput="updateCustomSwatch();onFormChange()" />
+          </div>
+
+          <hr class="inner-divider" />
+          <div class="field-row">
+            <div class="field">
+              <label>Tipo header</label>
+              <select id="f-header-type" onchange="toggleLogoField();onFormChange()">
+                <option value="text">Solo testo (nome + tagline)</option>
+                <option value="logo">Logo SVG/PNG + testo</option>
+              </select>
+            </div>
+            <div class="field" id="header-logo-field" hidden>
+              <label>URL Logo</label>
+              <input type="text" id="f-logo-url" placeholder="es. img/logo_artista.svg" oninput="onFormChange()" />
+            </div>
+          </div>
+        </section>
+
+        <!-- ════ 3. HERO ════════════════════════════════════════ -->
+        <section class="sec-block" id="sec-hero">
+          <p class="sec-label">Sezione 3</p>
+          <h2 class="sec-title">Immagine Hero</h2>
+          <p class="sec-desc">Immagine a tutta larghezza posizionata fuori dal <code>&lt;main&gt;</code>. Incolla l'URL direttamente, oppure scegli un file locale da includere nel ZIP.</p>
+
+          <div class="field-row cols-3">
+            <div class="field">
+              <label>URL JPG <span class="req">*</span></label>
+              <input type="text" id="f-hero-jpg" placeholder="img/artista_hero_web.jpg" required oninput="onFormChange()" />
+            </div>
+            <div class="field">
+              <label>URL WebP</label>
+              <input type="text" id="f-hero-webp" placeholder="img/artista_hero_web.webp" oninput="onFormChange()" />
+              <span class="hint">Compilato auto se scegli un file locale.</span>
+            </div>
+            <div class="field">
+              <label>Proporzioni</label>
+              <select id="f-hero-dims" onchange="onFormChange()">
+                <option value="1400 934">1400×934 — 3:2</option>
+                <option value="1400 788">1400×788 — 16:9</option>
+                <option value="1400 700">1400×700 — 2:1</option>
+                <option value="1400 1050">1400×1050 — 4:3</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Alt text – Italiano <span class="req">*</span></label>
+              <input type="text" id="f-hero-alt-it" placeholder="es. Serenate – gruppo sul palco" required oninput="onFormChange()" />
+            </div>
+            <div class="field">
+              <label>Alt text – English</label>
+              <input type="text" id="f-hero-alt-en" placeholder="es. Serenate – folk ensemble on stage" oninput="onFormChange()" />
+            </div>
+          </div>
+        </section>
+
+        <!-- ════ 4. TESTI ═══════════════════════════════════════ -->
+        <section class="sec-block" id="sec-testi">
+          <p class="sec-label">Sezione 4</p>
+          <h2 class="sec-title">Testi</h2>
+          <p class="sec-desc">Il <strong>Lead</strong> apre la sezione intro. I <strong>Sub</strong> sono paragrafi secondari. Le <strong>Sezioni Aggiuntive</strong> generano blocchi <code>.sec</code>.</p>
+
+          <p class="inner-h3">Paragrafo Lead (intro)</p>
+          <div class="lang-tabs">
+            <button type="button" class="lang-tab active" onclick="switchTab('lead','it',this)">ITA</button>
+            <button type="button" class="lang-tab" onclick="switchTab('lead','en',this)">ENG</button>
+          </div>
+          <div class="lang-panel active" id="lead-it-panel">
+            <div class="field"><label>Lead – Italiano <span class="req">*</span></label>
+              <textarea id="f-lead-it" class="tall" required placeholder="Paragrafo principale." oninput="onFormChange()"></textarea>
+            </div>
+          </div>
+          <div class="lang-panel" id="lead-en-panel">
+            <div class="field"><label>Lead – English</label>
+              <textarea id="f-lead-en" class="tall" placeholder="Main paragraph in English." oninput="onFormChange()"></textarea>
+            </div>
+          </div>
+
+          <hr class="inner-divider" />
+          <p class="inner-h3">Paragrafi Sub</p>
+          <div class="lang-tabs">
+            <button type="button" class="lang-tab active" onclick="switchTab('sub','it',this)">ITA</button>
+            <button type="button" class="lang-tab" onclick="switchTab('sub','en',this)">ENG</button>
+          </div>
+          <div class="lang-panel active" id="sub-it-panel">
+            <div class="dyn-list" id="sub-it-list">
+              <div class="dyn-item">
+                <span class="dyn-item-num">1</span>
+                <div class="dyn-item-body"><textarea placeholder="Paragrafo Sub 1 – Italiano" oninput="onFormChange()"></textarea></div>
+                <button type="button" class="btn-remove" onclick="removeDynItem(this)">&#x2715;</button>
+              </div>
+            </div>
+            <button type="button" class="btn-add" onclick="addSubPara('it')">+ Aggiungi paragrafo ITA</button>
+          </div>
+          <div class="lang-panel" id="sub-en-panel">
+            <div class="dyn-list" id="sub-en-list">
+              <div class="dyn-item">
+                <span class="dyn-item-num">1</span>
+                <div class="dyn-item-body"><textarea placeholder="Sub Paragraph 1 – English" oninput="onFormChange()"></textarea></div>
+                <button type="button" class="btn-remove" onclick="removeDynItem(this)">&#x2715;</button>
+              </div>
+            </div>
+            <button type="button" class="btn-add" onclick="addSubPara('en')">+ Add ENG paragraph</button>
+          </div>
+
+          <hr class="inner-divider" />
+          <p class="inner-h3">Sezioni Testo Aggiuntive</p>
+          <p style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;">Genera blocchi <code>&lt;section class="sec"&gt;</code> dopo le foto (come "Il repertorio" in Porto Madera).</p>
+          <div class="dyn-list" id="extra-sections-list"></div>
+          <button type="button" class="btn-add" onclick="addExtraSection()">+ Aggiungi sezione testo</button>
+        </section>
+
+        <!-- ════ 5. FOTO AGGIUNTIVE ═════════════════════════════ -->
+        <section class="sec-block" id="sec-foto">
+          <p class="sec-label">Sezione 5</p>
+          <h2 class="sec-title">Foto Aggiuntive</h2>
+          <p class="sec-desc">Foto editoriali a tutta larghezza (<code>figure.cover-photo-wrap</code>) tra intro e sezioni testo. Inserisci l'URL oppure scegli un file locale da includere nel ZIP.</p>
+          <div class="dyn-list" id="photo-extra-list"></div>
+          <button type="button" class="btn-add" onclick="addExtraPhoto()">+ Aggiungi foto</button>
+        </section>
+
+        <!-- ════ 6. VIDEO ════════════════════════════════════════ -->
+        <section class="sec-block" id="sec-video">
+          <p class="sec-label">Sezione 6</p>
+          <h2 class="sec-title">Video</h2>
+          <p class="sec-desc">Sezione video opzionale (<code>.video-sec</code>). YouTube ID = la parte dopo <code>?v=</code>.</p>
+          <div class="toggle-field">
+            <input type="checkbox" id="toggle-video" onchange="toggleVideoSection();onFormChange()" />
+            <label for="toggle-video">Includi sezione video</label>
+          </div>
+          <div id="video-fields" hidden>
+            <div class="field-row">
+              <div class="field">
+                <label>YouTube ID <span class="req">*</span></label>
+                <input type="text" id="f-video-id" placeholder="es. VwqRA_xXvwA" oninput="onFormChange()" />
+              </div>
+              <div class="field">
+                <label>Titolo video – Italiano</label>
+                <input type="text" id="f-video-title-it" placeholder="es. Notte della Taranta 2025" oninput="onFormChange()" />
+              </div>
+            </div>
+            <div class="field-row cols-1">
+              <div class="field">
+                <label>Titolo video – English</label>
+                <input type="text" id="f-video-title-en" placeholder="es. Notte della Taranta 2025" oninput="onFormChange()" />
+              </div>
+            </div>
+            <p class="inner-h3" style="margin-top:8px">Video aggiuntivi</p>
+            <div class="dyn-list" id="extra-videos-list"></div>
+            <button type="button" class="btn-add" onclick="addExtraVideo()">+ Aggiungi video</button>
+          </div>
+        </section>
+
+        <!-- ════ 7. SCHEDA TECNICA ══════════════════════════════ -->
+        <section class="sec-block" id="sec-scheda">
+          <p class="sec-label">Sezione 7</p>
+          <h2 class="sec-title">Scheda Tecnica</h2>
+          <p class="sec-desc">Tabella <code>.sec-specs</code> su sfondo scuro con i dati tecnici dello spettacolo.</p>
+
+          <div class="field-row">
+            <div class="field"><label>Nome (tabella)</label><input type="text" id="f-spec-name" placeholder="es. Serenate" oninput="onFormChange()" /></div>
+            <div class="field"><label>Sottotitolo (tabella)</label><input type="text" id="f-spec-subtitle" placeholder="es. Canti e Incanti della Taranta" oninput="onFormChange()" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Genere</label><input type="text" id="f-spec-genre" placeholder="es. Pizzica · Musica popolare salentina" oninput="onFormChange()" /></div>
+            <div class="field"><label>Durata</label><input type="text" id="f-spec-duration" placeholder="es. Oltre due ore" oninput="onFormChange()" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Anno fondazione</label><input type="text" id="f-spec-year" placeholder="es. 2000" oninput="onFormChange()" /></div>
+            <div class="field"><label>Città fondazione</label><input type="text" id="f-spec-city" placeholder="es. Siena" oninput="onFormChange()" /></div>
+          </div>
+          <div class="field-row cols-1">
+            <div class="field"><label>Discografia</label><input type="text" id="f-spec-discography" placeholder="es. Sony · Redland · Swithmuse" oninput="onFormChange()" /></div>
+          </div>
+          <hr class="inner-divider" />
+          <div class="field-row cols-1">
+            <div class="field">
+              <label>Formazione – Italiano <span class="hint">(un membro per riga: Nome – Strumento)</span></label>
+              <textarea id="f-spec-members-it" class="tall" placeholder="Demis Lofari – Voce, chitarra&#10;Giorgio Doveri – Violino" oninput="onFormChange()"></textarea>
+            </div>
+          </div>
+          <div class="field-row cols-1">
+            <div class="field">
+              <label>Members – English</label>
+              <textarea id="f-spec-members-en" class="tall" placeholder="Demis Lofari – Voice, guitar&#10;Giorgio Doveri – Violin" oninput="onFormChange()"></textarea>
+            </div>
+          </div>
+          <div class="field-row cols-1">
+            <div class="field">
+              <label>Collaborazioni (una per riga)</label>
+              <textarea id="f-spec-collab" rows="3" placeholder="Giovanni Trono&#10;Giuseppe Campa" oninput="onFormChange()"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- ════ 8. CONTATTI ════════════════════════════════════ -->
+        <section class="sec-block" id="sec-contatti">
+          <p class="sec-label">Sezione 8</p>
+          <h2 class="sec-title">Contatti</h2>
+          <p class="sec-desc">Footer scuro: due colonne Artista / Social.</p>
+
+          <div class="field-row">
+            <div class="field"><label>Nome referente artista</label><input type="text" id="f-contact-name" placeholder="es. Demis Lofari" oninput="onFormChange()" /></div>
+            <div class="field"><label>Email artista</label><input type="email" id="f-contact-email" placeholder="es. artista@email.it" oninput="onFormChange()" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Telefono</label><input type="tel" id="f-contact-phone" placeholder="es. +39 338 1976447" oninput="onFormChange()" /></div>
+            <div class="field"><label>Sito web artista</label><input type="url" id="f-contact-website" placeholder="https://www.artista.it" oninput="onFormChange()" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Instagram (senza @)</label><input type="text" id="f-contact-ig" placeholder="es. serenatefolk" oninput="onFormChange()" /></div>
+            <div class="field"><label>YouTube (senza @)</label><input type="text" id="f-contact-yt" placeholder="es. SerenateMusic" oninput="onFormChange()" /></div>
+          </div>
+        </section>
+
+      </form>
+
+      <!-- Fixed bottom bar -->
+      <div class="output-bar">
+        <p class="output-status" id="output-status">Compila il form, poi clicca "Genera &amp; Scarica ZIP"</p>
+        <button class="btn-primary" onclick="generateAndDownload()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Genera ZIP
+        </button>
+      </div>
+
+    </div><!-- /adm-left -->
+
+    <!-- Drag handle -->
+    <div class="panel-divider" id="panel-divider" title="Trascina per ridimensionare" role="separator" aria-label="Ridimensiona pannelli"></div>
+
+    <!-- ══ RIGHT: PREVIEW ════════════════════════════════════ -->
+    <div class="adm-right">
+      <div class="preview-topbar">
+        <span class="preview-topbar-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          Anteprima live
+        </span>
+        <div class="preview-topbar-actions">
+          <span class="preview-status" id="preview-status">in attesa di input…</span>
+          <button class="btn-refresh" onclick="refreshPreview()">&#8635; Forza aggiornamento</button>
+        </div>
+      </div>
+      <div class="preview-wrap">
+        <iframe id="preview-frame" title="Anteprima pagina artista" sandbox="allow-same-origin allow-scripts"></iframe>
+      </div>
+    </div>
+
+  </div><!-- /adm-body -->
+
+  <!-- ══════════════════════════════════════════════════════════════
+       JAVASCRIPT
+  ════════════════════════════════════════════════════════════════ -->
+  <script>
+  'use strict';
+
+  /* ── PALETTE MAP ──────────────────────────────────────────────── */
+  var PALETTES = {
+    gold:       { main: '#9b7b2f', lt: '#c9a84c' },
+    burgundy:   { main: '#6b2737', lt: '#9c3d52' },
+    ocean:      { main: '#1e4d6b', lt: '#2e7aad' },
+    forest:     { main: '#2d5a27', lt: '#4a8c40' },
+    terracotta: { main: '#8b3a2a', lt: '#c4573f' },
+    slate:      { main: '#3d4f6b', lt: '#5a7299' }
+  };
+
+  /* ── STATE ────────────────────────────────────────────────────── */
+  var cachedCSS    = '';
+  var previewTimer = null;
+  var photoCounter = 0;   // unique key counter for extra photos
+
+  /* ── INIT ─────────────────────────────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', function() {
+    loadSiteCSS();
+    initScrollSpy();
+    setTimeout(updatePreview, 300);
+  });
+
+  function loadSiteCSS() {
+    fetch('../assets/css/style.css')
+      .then(function(r) { if (!r.ok) throw new Error(); return r.text(); })
+      .then(function(css) {
+        cachedCSS = css;
+        setPreviewStatus('CSS caricato \u2713');
+        updatePreview();
+      })
+      .catch(function() { setPreviewStatus('CSS non caricato (usa un server locale per preview fedele)'); });
+  }
+
+  /* ── HELPERS ──────────────────────────────────────────────────── */
+  function $(id) { return document.getElementById(id); }
+  function val(id) { var el = $(id); return el ? el.value.trim() : ''; }
+  function esc(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function onMetaCount(tid, cid) {
+    var l = $(tid).value.length;
+    $(cid).textContent = l + ' / 160';
+    $(cid).style.color = l > 160 ? '#c0392b' : '';
+  }
+
+  /* ── SLUG ─────────────────────────────────────────────────────── */
+  function autoSlug() {
+    var slug = val('f-name').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    $('f-slug').value = slug;
+    $('slug-preview-text').textContent = slug || 'nome-artista';
+    onFormChange();
+  }
+  $('f-slug').addEventListener('input', function() {
+    $('slug-preview-text').textContent = val('f-slug') || 'nome-artista';
+    onFormChange();
+  });
+
+  /* ── PALETTE ──────────────────────────────────────────────────── */
+  function toggleCustomColor() {
+    $('custom-color-row').hidden = document.querySelector('input[name="palette"]:checked').value !== 'custom';
+  }
+  function updateCustomSwatch() {
+    var s = $('custom-swatch');
+    s.style.background = $('f-color-main').value;
+    s.style.setProperty('--lt', $('f-color-light').value);
+  }
+  function getActiveColors() {
+    var sel = document.querySelector('input[name="palette"]:checked').value;
+    if (sel === 'custom') return { main: $('f-color-main').value, lt: $('f-color-light').value };
+    return PALETTES[sel] || PALETTES.gold;
+  }
+
+  /* ── UI TOGGLES ───────────────────────────────────────────────── */
+  function toggleLogoField() { $('header-logo-field').hidden = val('f-header-type') !== 'logo'; }
+  function toggleVideoSection() { $('video-fields').hidden = !$('toggle-video').checked; }
+
+  /* ── LANG TABS ────────────────────────────────────────────────── */
+  function switchTab(group, lang, btn) {
+    ['it','en'].forEach(function(l) {
+      var p = $(group+'-'+l+'-panel'); if (p) p.classList.toggle('active', l===lang);
+    });
+    btn.closest('.lang-tabs').querySelectorAll('.lang-tab').forEach(function(t) { t.classList.remove('active'); });
+    btn.classList.add('active');
+    onFormChange();
+  }
+
+  /* ── DYNAMIC LISTS ────────────────────────────────────────────── */
+  function removeDynItem(btn) {
+    btn.closest('.dyn-item').remove();
+    renumber(btn.closest('.dyn-list'));
+    onFormChange();
+  }
+  function renumber(list) {
+    if (!list) return;
+    list.querySelectorAll('.dyn-item-num').forEach(function(el,i) { el.textContent = i+1; });
+  }
+
+  function addSubPara(lang) {
+    var list = $('sub-'+lang+'-list');
+    var n = list.children.length + 1;
+    var ph = lang==='it' ? 'Paragrafo Sub '+n+' \u2013 Italiano' : 'Sub Paragraph '+n+' \u2013 English';
+    var d = document.createElement('div'); d.className = 'dyn-item';
+    d.innerHTML = '<span class="dyn-item-num">'+n+'</span><div class="dyn-item-body"><textarea placeholder="'+ph+'" oninput="onFormChange()"></textarea></div><button type="button" class="btn-remove" onclick="removeDynItem(this)">&#x2715;</button>';
+    list.appendChild(d);
+  }
+
+  function addExtraPhoto() {
+    var list = $('photo-extra-list');
+    var n = list.children.length + 1;
+    ++photoCounter;
+    var d = document.createElement('div'); d.className = 'dyn-item';
+    d.innerHTML =
+      '<span class="dyn-item-num">'+n+'</span>'+
+      '<div class="dyn-item-body">'+
+        '<div class="field-row cols-3">'+
+          '<div class="field"><label>URL JPG</label>'+
+            '<input type="text" class="photo-jpg" placeholder="img/artista_foto'+n+'_web.jpg" oninput="onFormChange()" /></div>'+
+          '<div class="field"><label>URL WebP</label><input type="text" class="photo-webp" placeholder="img/artista_foto'+n+'_web.webp" oninput="onFormChange()" /></div>'+
+          '<div class="field"><label>Alt text</label><input type="text" class="photo-alt" placeholder="Descrizione immagine" oninput="onFormChange()" /></div>'+
+        '</div>'+
+      '</div>'+
+      '<button type="button" class="btn-remove" onclick="removeDynItem(this)">&#x2715;</button>';
+    list.appendChild(d);
+  }
+
+  function addExtraSection() {
+    var list = $('extra-sections-list');
+    var n = list.children.length + 1;
+    var d = document.createElement('div'); d.className = 'dyn-item';
+    d.innerHTML =
+      '<span class="dyn-item-num">'+n+'</span>'+
+      '<div class="dyn-item-body">'+
+        '<div class="field-row">'+
+          '<div class="field"><label>Titolo \u2013 Italiano</label><input type="text" class="sec-title-it" placeholder="es. Il repertorio" oninput="onFormChange()" /></div>'+
+          '<div class="field"><label>Title \u2013 English</label><input type="text" class="sec-title-en" placeholder="es. The Repertoire" oninput="onFormChange()" /></div>'+
+        '</div>'+
+        '<div class="lang-tabs" style="margin-top:4px">'+
+          '<button type="button" class="lang-tab active" onclick="switchSecTab(this,\'it\')">ITA</button>'+
+          '<button type="button" class="lang-tab" onclick="switchSecTab(this,\'en\')">ENG</button>'+
+        '</div>'+
+        '<div class="lang-panel active"><div class="field"><label>Testo \u2013 Italiano</label><textarea class="sec-body-it tall" placeholder="Doppio a-capo = nuovo paragrafo." oninput="onFormChange()"></textarea></div></div>'+
+        '<div class="lang-panel"><div class="field"><label>Text \u2013 English</label><textarea class="sec-body-en tall" placeholder="Double line-break = new paragraph." oninput="onFormChange()"></textarea></div></div>'+
+        '<div style="margin-top:8px"><label style="font-size:0.6rem;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;">'+
+          '<input type="checkbox" class="sec-alt-check" style="accent-color:var(--gold);width:15px;height:15px;" onchange="onFormChange()" /> Sfondo alternato (sec-alt)'+
+        '</label></div>'+
+      '</div>'+
+      '<button type="button" class="btn-remove" onclick="removeDynItem(this)">&#x2715;</button>';
+    list.appendChild(d);
+  }
+
+  function switchSecTab(btn, lang) {
+    var body = btn.closest('.dyn-item-body');
+    var tabs = btn.closest('.lang-tabs').querySelectorAll('.lang-tab');
+    var panels = body.querySelectorAll('.lang-panel');
+    var idx = lang==='it' ? 0 : 1;
+    tabs.forEach(function(t,i){ t.classList.toggle('active', i===idx); });
+    panels.forEach(function(p,i){ p.classList.toggle('active', i===idx); });
+    onFormChange();
+  }
+
+  function addExtraVideo() {
+    var list = $('extra-videos-list');
+    var n = list.children.length + 1;
+    var d = document.createElement('div'); d.className = 'dyn-item';
+    d.innerHTML =
+      '<span class="dyn-item-num">'+n+'</span>'+
+      '<div class="dyn-item-body"><div class="field-row cols-3">'+
+        '<div class="field"><label>YouTube ID</label><input type="text" class="vid-id" placeholder="es. n6PVBn8_4fM" oninput="onFormChange()" /></div>'+
+        '<div class="field"><label>Titolo \u2013 Italiano</label><input type="text" class="vid-title-it" placeholder="" oninput="onFormChange()" /></div>'+
+        '<div class="field"><label>Title \u2013 English</label><input type="text" class="vid-title-en" placeholder="" oninput="onFormChange()" /></div>'+
+      '</div></div>'+
+      '<button type="button" class="btn-remove" onclick="removeDynItem(this)">&#x2715;</button>';
+    list.appendChild(d);
+  }
+
+  /* ── COLLECT DATA ─────────────────────────────────────────────── */
+  function collectSubParas(lang) {
+    return Array.from($('sub-'+lang+'-list').querySelectorAll('textarea'))
+      .map(function(t){ return t.value.trim(); }).filter(Boolean);
+  }
+  function collectExtraPhotos() {
+    return Array.from($('photo-extra-list').querySelectorAll('.dyn-item')).map(function(item) {
+      return {
+        jpg:  (item.querySelector('.photo-jpg')  || {value:''}).value.trim(),
+        webp: (item.querySelector('.photo-webp') || {value:''}).value.trim(),
+        alt:  (item.querySelector('.photo-alt')  || {value:''}).value.trim()
+      };
+    }).filter(function(p){ return p.jpg; });
+  }
+  function collectExtraSections() {
+    return Array.from($('extra-sections-list').querySelectorAll('.dyn-item')).map(function(item) {
+      var chk = item.querySelector('.sec-alt-check');
+      return {
+        titleIt: (item.querySelector('.sec-title-it') || {value:''}).value.trim(),
+        titleEn: (item.querySelector('.sec-title-en') || {value:''}).value.trim(),
+        bodyIt:  (item.querySelector('.sec-body-it')  || {value:''}).value.trim(),
+        bodyEn:  (item.querySelector('.sec-body-en')  || {value:''}).value.trim(),
+        alt:     chk ? chk.checked : false
+      };
+    }).filter(function(s){ return s.bodyIt||s.bodyEn; });
+  }
+  function collectExtraVideos() {
+    return Array.from($('extra-videos-list').querySelectorAll('.dyn-item')).map(function(item) {
+      return {
+        id:      (item.querySelector('.vid-id')       || {value:''}).value.trim(),
+        titleIt: (item.querySelector('.vid-title-it') || {value:''}).value.trim(),
+        titleEn: (item.querySelector('.vid-title-en') || {value:''}).value.trim()
+      };
+    }).filter(function(v){ return v.id; });
+  }
+
+  /* ── BUILDERS ─────────────────────────────────────────────────── */
+  function membersToHTML(raw) {
+    return raw.split('\n').map(function(l){ return l.trim(); }).filter(Boolean).join('<br />\n                ');
+  }
+  function bodyToParas(raw) {
+    return raw.split(/\n\s*\n/).map(function(b) {
+      var t = b.replace(/\n/g,' ').trim();
+      return t ? '          <p>' + esc(t) + '</p>' : '';
+    }).filter(Boolean).join('\n');
+  }
+  function buildSpecsRows(lang) {
+    var isEn = lang==='en';
+    var specName  = val('f-spec-name') || val('f-name');
+    var specSub   = isEn ? (val('f-subtitle-en')||val('f-spec-subtitle')) : val('f-spec-subtitle');
+    var specGenre = val('f-spec-genre') || val('f-genre');
+    var specDur   = val('f-spec-duration');
+    var specYear  = val('f-spec-year');
+    var specCity  = val('f-spec-city');
+    var specDisc  = val('f-spec-discography');
+    var mbRaw  = isEn ? (val('f-spec-members-en')||val('f-spec-members-it')) : val('f-spec-members-it');
+    var colRaw = val('f-spec-collab');
+    var rows = [];
+    if (specName)  rows.push('<tr><td class="td-lbl">'+(isEn?'Name':'Nome')+'</td><td class="td-val">'+esc(specName)+'</td></tr>');
+    if (specSub)   rows.push('<tr><td class="td-lbl">'+(isEn?'Subtitle':'Sottotitolo')+'</td><td class="td-val">'+esc(specSub)+'</td></tr>');
+    if (specGenre) rows.push('<tr><td class="td-lbl">'+(isEn?'Genre':'Genere')+'</td><td class="td-val">'+esc(specGenre)+'</td></tr>');
+    if (specDur)   rows.push('<tr><td class="td-lbl">'+(isEn?'Duration':'Durata')+'</td><td class="td-val">'+esc(specDur)+'</td></tr>');
+    if (mbRaw)     rows.push('<tr><td class="td-lbl">'+(isEn?'Members':'Formazione')+'</td><td class="td-val">'+membersToHTML(mbRaw)+'</td></tr>');
+    if (colRaw)    rows.push('<tr><td class="td-lbl">'+(isEn?'Collaborators':'Collaborazioni')+'</td><td class="td-val">'+esc(colRaw.split('\n').map(function(l){return l.trim();}).filter(Boolean).join(' \u00b7 '))+'</td></tr>');
+    if (specDisc)  rows.push('<tr><td class="td-lbl">'+(isEn?'Discography':'Discografia')+'</td><td class="td-val">'+esc(specDisc)+'</td></tr>');
+    if (specYear||specCity) rows.push('<tr><td class="td-lbl">'+(isEn?'Founded':'Fondazione')+'</td><td class="td-val">'+esc([specYear,specCity].filter(Boolean).join(' \u2013 '))+'</td></tr>');
+    return rows.join('\n            ');
+  }
+  function buildCreditsBlock() {
+    var cEmail=val('f-contact-email'), cPhone=val('f-contact-phone');
+    var cIg=val('f-contact-ig'), cYt=val('f-contact-yt'), cWeb=val('f-contact-website');
+    var name=val('f-name');
+    var lines=[];
+    if (cEmail) lines.push('<a href="mailto:'+esc(cEmail)+'" aria-label="Scrivi a '+esc(name)+'">'+esc(cEmail)+'</a>');
+    if (cPhone) lines.push('mob. '+esc(cPhone));
+    if (cIg)    lines.push('Instagram: <a href="https://www.instagram.com/'+esc(cIg)+'" target="_blank" rel="noopener noreferrer">@'+esc(cIg)+'</a>');
+    if (cYt)    lines.push('YouTube: <a href="https://www.youtube.com/@'+esc(cYt)+'" target="_blank" rel="noopener noreferrer">youtube.com/@'+esc(cYt)+'</a>');
+    if (cWeb)   lines.push('<a href="'+esc(cWeb)+'" target="_blank" rel="noopener noreferrer">'+esc(cWeb)+'</a>');
+    if (!lines.length) return '';
+    return '<div class="specs-credits">\n            '+lines.join('<br />\n            ')+'\n          </div>';
+  }
+
+  /* ── CARD HTML BUILDER ────────────────────────────────────────── */
+  function buildCardHTML() {
+    var name      = val('f-name') || 'Nome Artista';
+    var slug      = val('f-slug') || 'nome-artista';
+    var thumbJpg  = val('f-card-thumb-jpg') || val('f-hero-jpg') || 'img/artista_thumb.jpg';
+    var thumbWebp = val('f-card-thumb-webp');
+    var tagIt     = val('f-card-tag-it') || val('f-genre') || '';
+    var tagEn     = val('f-card-tag-en') || val('f-genre') || '';
+    var descIt    = val('f-card-desc-it');
+    var descEn    = val('f-card-desc-en') || descIt;
+    var webpLine  = thumbWebp ? '                <source type="image/webp" srcset="'+esc(thumbWebp)+'" />\n' : '';
+
+    return '<!-- Copia e incolla questo blocco dentro .productions-grid in index.html -->\n\n' +
+      '          <article class="prod-card">\n' +
+      '            <div class="prod-card-img">\n' +
+      '              <picture>\n' +
+      webpLine +
+      '                <source type="image/jpeg" srcset="'+esc(thumbJpg)+'" />\n' +
+      '                <img src="'+esc(thumbJpg)+'" alt="'+esc(name)+' \u2013 foto" loading="lazy" width="600" height="400" />\n' +
+      '              </picture>\n' +
+      '            </div>\n' +
+      '            <div class="prod-card-body">\n' +
+      (tagIt ? '              <p class="prod-card-tag" data-lang="it">'+esc(tagIt)+'</p>\n' : '') +
+      (tagEn ? '              <p class="prod-card-tag" data-lang="en" hidden>'+esc(tagEn)+'</p>\n' : '') +
+      '              <h2 class="prod-card-title">'+esc(name)+'</h2>\n' +
+      (descIt ? '              <p class="prod-card-desc" data-lang="it">'+esc(descIt)+'</p>\n' : '') +
+      (descEn ? '              <p class="prod-card-desc" data-lang="en" hidden>'+esc(descEn)+'</p>\n' : '') +
+      '              <a class="prod-card-link" href="'+esc(slug)+'.html" data-lang="it" aria-label="Scopri '+esc(name)+'">Scopri \u2192</a>\n' +
+      '              <a class="prod-card-link" href="'+esc(slug)+'.html" data-lang="en" hidden aria-label="Discover '+esc(name)+'">Discover \u2192</a>\n' +
+      '            </div>\n' +
+      '          </article>';
+  }
+
+  /* ── INSTRUCTIONS BUILDER ────────────────────────────────────── */
+  function buildInstructions(slug) {
+    var name = val('f-name') || slug;
+    var date = new Date().toLocaleDateString('it-IT', { day:'2-digit', month:'long', year:'numeric' });
+    return [
+      'ARTISTA: '+name,
+      'File generati il '+date,
+      '',
+      '══════════════════════════════════════════════',
+      ' CONTENUTO DEL PACCHETTO',
+      '══════════════════════════════════════════════',
+      '',
+      slug+'.html',
+      '  \u2192 Copia nella root del sito (stesso livello di index.html)',
+      '',
+      'card_artista.html',
+      '  \u2192 Apri, copia il blocco <article> e incollalo',
+      '    dentro .productions-grid in index.html',
+      '',
+      '══════════════════════════════════════════════',
+      '  AltraMarea Produzioni \u2013 Generatore Artisti',
+      '══════════════════════════════════════════════'
+    ].join('\r\n');
+  }
+
+  /* ── MAIN HTML BUILDER ────────────────────────────────────────── */
+  function buildHTML(forPreview) {
+    var name      = val('f-name') || 'Nome Artista';
+    var slug      = val('f-slug') || 'nome-artista';
+    var subIt     = val('f-subtitle-it');
+    var subEn     = val('f-subtitle-en');
+    var metaIt    = val('f-meta-it') || (name+(subIt?' \u2013 '+subIt:'')+'. Una produzione AltraMarea Produzioni.');
+    var metaEn    = val('f-meta-en') || metaIt;
+    var heroJpg   = val('f-hero-jpg') || 'img/hero.jpg';
+    var heroWebp  = val('f-hero-webp');
+    var heroAltIt = val('f-hero-alt-it') || name;
+    var heroAltEn = val('f-hero-alt-en') || heroAltIt;
+    var heroDims  = val('f-hero-dims').split(' ');
+    var leadIt    = val('f-lead-it');
+    var leadEn    = val('f-lead-en');
+    var colors    = getActiveColors();
+    var parasIt   = collectSubParas('it');
+    var parasEn   = collectSubParas('en');
+    var photos    = collectExtraPhotos();
+    var sections  = collectExtraSections();
+    var hasVideo  = $('toggle-video').checked;
+    var videoId   = hasVideo ? val('f-video-id') : '';
+    var vidTitIt  = val('f-video-title-it') || name;
+    var vidTitEn  = val('f-video-title-en') || name;
+    var extraVids = hasVideo ? collectExtraVideos() : [];
+    var cName=val('f-contact-name'), cEmail=val('f-contact-email'), cPhone=val('f-contact-phone');
+    var cIg=val('f-contact-ig'), cYt=val('f-contact-yt'), cWeb=val('f-contact-website');
+
+    /* Header */
+    var hType=val('f-header-type'), logoUrl=val('f-logo-url'), headerBlock='';
+    if (hType==='logo'&&logoUrl) {
+      headerBlock='\n    <div style="display:flex;align-items:center;justify-content:center;gap:28px;">'+
+        '\n      <img src="'+esc(logoUrl)+'" alt="'+esc(name)+'" style="height:100px;width:auto;filter:invert(1);" />'+
+        '\n      <div style="text-align:left;"><p style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:#fff;line-height:1.1;margin:0;">'+esc(name)+'</p>'+
+        (subIt?'\n        <p style="font-family:\'Lato\',Arial,sans-serif;font-size:clamp(.65rem,1.2vw,.85rem);font-weight:400;letter-spacing:3px;text-transform:uppercase;color:'+esc(colors.lt)+';margin-top:8px;">'+esc(subIt)+'</p>':'')+
+        '\n      </div>\n    </div>';
+    } else {
+      headerBlock='\n    <h1 class="agency-name">'+esc(name)+'</h1>'+
+        (subIt?'\n    <p class="agency-tagline" data-lang="it">'+esc(subIt)+'</p>':'')+
+        (subEn?'\n    <p class="agency-tagline" data-lang="en" hidden>'+esc(subEn)+'</p>':'');
+    }
+    var heroWebpLine=heroWebp?'\n        <source type="image/webp" srcset="'+esc(heroWebp)+'" />':'';
+    var subHtmlIt=parasIt.map(function(p){ return '        <p class="sub" data-lang="it">'+esc(p)+'</p>'; }).join('\n');
+    var subHtmlEn=parasEn.map(function(p){ return '        <p class="sub" data-lang="en" hidden>'+esc(p)+'</p>'; }).join('\n');
+    var photosHtml='';
+    photos.forEach(function(p,i) {
+      var wl=p.webp?'\n        <source type="image/webp" srcset="'+esc(p.webp)+'" />':'';
+      photosHtml+='\n    <figure class="cover-photo-wrap" aria-label="'+esc(p.alt||name+' \u2013 foto '+(i+2))+'">'+
+        '\n      <picture>'+wl+'\n        <source type="image/jpeg" srcset="'+esc(p.jpg)+'" />'+
+        '\n        <img class="cover-photo" src="'+esc(p.jpg)+'" alt="'+esc(p.alt)+'" width="1400" height="934" loading="lazy" />'+
+        '\n      </picture>\n    </figure>\n';
+    });
+    var sectionsHtml='';
+    sections.forEach(function(s,idx) {
+      var cls=s.alt?'sec sec-alt':'sec';
+      sectionsHtml+='\n    <section class="'+cls+'">'+
+        '\n      <div class="sec-wrap">'+
+        '\n        <div data-lang="it">'+(s.titleIt?'\n          <p class="lead" id="lbl-sec-'+idx+'">'+esc(s.titleIt)+'</p>':'')+'\n'+bodyToParas(s.bodyIt)+'\n        </div>'+
+        '\n        <div data-lang="en" hidden>'+(s.titleEn?'\n          <p class="lead">'+esc(s.titleEn)+'</p>':'')+'\n'+bodyToParas(s.bodyEn)+'\n        </div>'+
+        '\n      </div>\n    </section>\n';
+    });
+    var videoHtml='';
+    if (hasVideo&&videoId) {
+      var ytSvg="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E";
+      var evHTML=extraVids.map(function(v){
+        return '\n              <li><a href="https://www.youtube.com/watch?v='+esc(v.id)+'" target="_blank" rel="noopener noreferrer">'+
+          '\n                <div class="yt-thumb"><img src="https://i.ytimg.com/vi/'+esc(v.id)+'/hqdefault.jpg" alt="'+esc(v.titleIt)+'" loading="lazy" />'+
+          '<img src="'+ytSvg+'" alt="" class="yt-play" width="44" height="31" /></div>'+
+          '\n                <span data-lang="it">'+esc(v.titleIt)+'</span><span data-lang="en" hidden>'+esc(v.titleEn||v.titleIt)+'</span></a></li>';
+      }).join('');
+      videoHtml='\n    <section class="video-sec" aria-labelledby="lbl-video">'+
+        '\n      <div class="sec-wrap"><p class="video-lbl" id="lbl-video" data-lang="it">Guarda il video</p>'+
+        '\n      <p class="video-lbl" data-lang="en" hidden>Watch the video</p></div>'+
+        '\n      <div style="max-width:70%;margin:0 auto;"><div class="video-wrap">'+
+        '\n        <iframe src="https://www.youtube.com/embed/'+esc(videoId)+'" title="'+esc(vidTitIt)+'" loading="lazy" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>'+
+        '\n      </div></div>'+
+        (extraVids.length?'\n      <div class="sec-wrap" style="margin-top:2rem;"><div data-lang="it"><p class="video-links-lbl">Guarda anche</p><ul class="video-links">'+evHTML+'</ul></div><div data-lang="en" hidden><p class="video-links-lbl">See also</p><ul class="video-links">'+evHTML+'</ul></div></div>':'')+
+        '\n    </section>\n';
+    }
+    var creditsHtml=buildCreditsBlock();
+    var specsIt=buildSpecsRows('it'), specsEn=buildSpecsRows('en');
+    var footerHtml=
+      '\n        <div class="contact-group">'+
+      '\n          <h2 data-lang="it">Artista</h2><h2 data-lang="en" hidden>Artist</h2>'+
+      (cName?'\n          <p>'+esc(cName)+'</p>':'')+
+      (cEmail?'\n          <a class="mailto" href="mailto:'+esc(cEmail)+'">'+esc(cEmail)+'</a>':'')+
+      (cPhone?'\n          <p>'+esc(cPhone)+'</p>':'')+
+      '\n        </div>'+
+      '\n        <div class="contact-group">'+
+      '\n          <h2 data-lang="it">Social</h2><h2 data-lang="en" hidden>Social</h2>'+
+      (cIg?'\n          <p><a href="https://www.instagram.com/'+esc(cIg)+'" target="_blank" rel="noopener noreferrer">Instagram: @'+esc(cIg)+'</a></p>':'')+
+      (cYt?'\n          <p><a href="https://www.youtube.com/@'+esc(cYt)+'" target="_blank" rel="noopener noreferrer">YouTube: @'+esc(cYt)+'</a></p>':'')+
+      (cWeb?'\n          <p><a href="'+esc(cWeb)+'" target="_blank" rel="noopener noreferrer">'+esc(cWeb)+'</a></p>':'')+
+      '\n        </div>';
+    var colorStyle='\n  <style>\n    :root {\n      --gold:    '+colors.main+';\n      --gold-lt: '+colors.lt+';\n      --acc:     '+colors.main+';\n      --acc-lt:  '+colors.lt+';\n    }\n  </style>';
+
+    var headExtra='';
+    if (forPreview) {
+      var baseUrl='';
+      try {
+        var u=new URL(window.location.href);
+        var pts=u.pathname.split('/').filter(Boolean);
+        baseUrl=u.origin+'/'+(pts.slice(0,-2).length?pts.slice(0,-2).join('/')+'/':'');
+      } catch(e){}
+      headExtra='<base href="'+esc(baseUrl)+'" />\n  '+
+        '<link rel="preconnect" href="https://fonts.googleapis.com" />\n  '+
+        '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n  '+
+        '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />\n  ';
+      headExtra += cachedCSS ? '<style>'+cachedCSS+'</style>' : '<link rel="stylesheet" href="assets/css/style.css" />';
+    } else {
+      headExtra='  <link rel="preconnect" href="https://fonts.googleapis.com" />\n'+
+        '  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n'+
+        '  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />\n'+
+        '  <link rel="stylesheet" href="assets/css/style.css" />';
+    }
+
+    return '<!DOCTYPE html>\n<html lang="it">\n<head>\n'+
+      '  <meta charset="UTF-8" />\n  <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n'+
+      '  <title>'+esc(name)+' \u2013 AltraMarea Produzioni</title>\n'+
+      '  <meta name="description" content="'+esc(metaIt)+'" />\n'+
+      '  <meta property="og:type" content="website" />\n'+
+      '  <meta property="og:url" content="https://www.altramareaproduzioni.it/'+esc(slug)+'.html" />\n'+
+      '  <meta property="og:title" content="'+esc(name)+' \u2013 AltraMarea Produzioni" />\n'+
+      '  <meta property="og:description" content="'+esc(metaEn)+'" />\n'+
+      '  <meta property="og:image" content="https://www.altramareaproduzioni.it/'+esc(heroJpg)+'" />\n'+
+      '  <link rel="icon" type="image/png" href="img/logo_sito.png" />\n'+
+      headExtra+colorStyle+'\n</head>\n<body>\n\n'+
+      '  <a href="#main" class="skip-link">Skip to content</a>\n'+
+      (forPreview ? '  <a class="home-link" href="index.html" aria-label="Torna alla homepage" style="display:none">\n' : '  <a class="home-link" href="index.html" aria-label="Torna alla homepage">\n')+
+      '    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>\n'+
+      '  </a>\n'+
+      '  <nav class="lang-bar" role="navigation" aria-label="Seleziona lingua">\n'+
+      '    <button class="lang-btn" data-lang-target="it" aria-pressed="true" aria-current="true">ITA</button>\n'+
+      '    <button class="lang-btn" data-lang-target="en" aria-pressed="false">ENG</button>\n'+
+      '  </nav>\n'+
+      '  <header class="cover-header">'+headerBlock+'\n  </header>\n\n'+
+      '  <section class="hero" aria-label="Immagine di copertina '+esc(name)+'">\n'+
+      '    <picture>'+heroWebpLine+'\n      <source type="image/jpeg" srcset="'+esc(heroJpg)+'" />\n'+
+      '      <img src="'+esc(heroJpg)+'" alt="'+esc(heroAltIt)+'" width="'+(heroDims[0]||1400)+'" height="'+(heroDims[1]||934)+'" />\n'+
+      '    </picture>\n    <div class="hero-overlay" aria-hidden="true"></div>\n'+
+      '    <div class="hero-caption">\n'+
+      '      <h1 data-lang="it">'+esc(name)+'</h1>\n      <h1 data-lang="en" hidden>'+esc(name)+'</h1>\n'+
+      (subIt?'      <p data-lang="it">'+esc(subIt)+'</p>\n':'')+
+      (subEn?'      <p data-lang="en" hidden>'+esc(subEn)+'</p>\n':'')+
+      '    </div>\n  </section>\n\n  <main id="main">\n\n'+
+      '    <section class="intro" aria-labelledby="lbl-intro">\n      <div class="wrap">\n'+
+      (leadIt?'        <p class="lead" id="lbl-intro" data-lang="it">'+esc(leadIt)+'</p>\n':'')+
+      (leadEn?'        <p class="lead" data-lang="en" hidden>'+esc(leadEn)+'</p>\n':'')+
+      (subHtmlIt?'\n'+subHtmlIt+'\n':'')+(subHtmlEn?subHtmlEn+'\n':'')+
+      '      </div>\n    </section>\n'+
+      photosHtml+sectionsHtml+videoHtml+
+      '    <section class="sec-specs" aria-labelledby="lbl-specs">\n      <div class="sec-wrap">\n'+
+      '        <div data-lang="it"><table class="specs-table" id="lbl-specs">\n            '+specsIt+'\n          </table>\n          '+creditsHtml+'\n        </div>\n'+
+      '        <div data-lang="en" hidden><table class="specs-table">\n            '+specsEn+'\n          </table>\n          '+creditsHtml+'\n        </div>\n'+
+      '      </div>\n    </section>\n\n  </main>\n\n'+
+      '  <footer class="contacts" aria-labelledby="lbl-contacts">\n    <div class="wrap">\n'+
+      '      <p class="contacts-label" id="lbl-contacts" data-lang="it">Contatti</p>\n'+
+      '      <p class="contacts-label" data-lang="en" hidden>Contact</p>\n'+
+      '      <div class="contacts-grid">'+footerHtml+'\n      </div>\n'+
+      '      <div class="contacts-footer"><a href="https://www.altramareaproduzioni.it" target="_blank" rel="noopener noreferrer">www.altramareaproduzioni.it</a></div>\n'+
+      '    </div>\n  </footer>\n\n'+
+      '  <script type="module" src="assets/js/lang.js"><\/script>\n'+
+      '  <script nomodule>\n'+
+      '    function setLang(lang){\n      try{localStorage.setItem(\'lang\',lang);}catch(_){}\n'+
+      '      document.documentElement.lang=lang;\n'+
+      '      document.querySelectorAll(\'[data-lang]\').forEach(function(el){el.hidden=el.dataset.lang!==lang;});\n'+
+      '      document.querySelectorAll(\'.lang-btn\').forEach(function(btn){\n        var t=btn.dataset.langTarget;\n        btn.classList.toggle(\'active\',t===lang);\n        btn.setAttribute(\'aria-pressed\',t===lang?\'true\':\'false\');\n      });\n    }\n'+
+      '    document.querySelectorAll(\'.lang-btn\').forEach(function(btn){\n      btn.addEventListener(\'click\',function(){setLang(btn.dataset.langTarget);});\n    });\n'+
+      '    var stored=\'it\';try{stored=localStorage.getItem(\'lang\')||\'it\';}catch(_){}\n    setLang(stored);\n'+
+      '  <\/script>\n</body>\n</html>';
+  }
+
+  /* ── PREVIEW ──────────────────────────────────────────────────── */
+  function onFormChange() {
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(updatePreview, 700);
+  }
+  function updatePreview() {
+    setPreviewStatus('Aggiornamento\u2026');
+    try {
+      $('preview-frame').srcdoc = buildHTML(true);
+      setPreviewStatus('Preview aggiornata');
+    } catch(e) { setPreviewStatus('Errore: '+e.message); }
+  }
+  function refreshPreview() { clearTimeout(previewTimer); updatePreview(); }
+  function setPreviewStatus(msg) { $('preview-status').textContent = msg; }
+
+  /* ── DOWNLOAD AS ZIP ──────────────────────────────────────────── */
+  function generateAndDownload() {
+    var name   = val('f-name');
+    var slug   = val('f-slug');
+    var heroJpg = val('f-hero-jpg');
+    var leadIt  = val('f-lead-it');
+
+    if (!name || !slug || !heroJpg || !leadIt) {
+      setStatus('\u26a0 Campi obbligatori mancanti: Nome, Slug, Hero JPG, Lead Italiano.', 'err');
+      return;
+    }
+
+    if (typeof JSZip === 'undefined') {
+      // Fallback: download only HTML
+      try {
+        var html = buildHTML(false);
+        var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        var url  = URL.createObjectURL(blob);
+        var a    = document.createElement('a'); a.href=url; a.download=slug+'.html'; a.click();
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 8000);
+        setStatus('\u26a0 JSZip non disponibile (nessuna connessione?). Scaricato solo '+slug+'.html', 'err');
+      } catch(e) { setStatus('Errore: '+e.message,'err'); }
+      return;
+    }
+
+    setStatus('Generazione ZIP\u2026', '');
+    try {
+      var zip = new JSZip();
+
+      // 1. Artist HTML page
+      zip.file(slug+'.html', buildHTML(false));
+
+      // 2. Card snippet for index.html
+      zip.file('card_artista.html', buildCardHTML());
+
+      // 3. Instructions
+      zip.file('ISTRUZIONI.txt', buildInstructions(slug));
+
+      zip.generateAsync({ type:'blob', compression:'DEFLATE', compressionOptions:{ level:6 } })
+        .then(function(blob) {
+          var url = URL.createObjectURL(blob);
+          var a   = document.createElement('a'); a.href=url; a.download=slug+'.zip'; a.click();
+          setTimeout(function(){ URL.revokeObjectURL(url); }, 10000);
+          setStatus('\u2713 '+slug+'.zip scaricato', 'ok');
+        })
+        .catch(function(e) { setStatus('Errore ZIP: '+e.message,'err'); });
+
+    } catch(e) { setStatus('Errore: '+e.message,'err'); }
+  }
+
+  function setStatus(msg, type) {
+    var el = $('output-status');
+    el.textContent = msg;
+    el.className = 'output-status'+(type?' '+type:'');
+  }
+
+
+
+  /* ── SCROLL SPY ───────────────────────────────────────────────── */
+  function initScrollSpy() {
+    var scroll   = document.querySelector('.adm-form-scroll');
+    var sections = document.querySelectorAll('.sec-block');
+    var links    = document.querySelectorAll('.progress-step');
+    if (!('IntersectionObserver' in window)) return;
+    var obs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) {
+          links.forEach(function(l){ l.classList.remove('active'); });
+          var lnk = document.querySelector('.progress-step[href="#'+e.target.id+'"]');
+          if (lnk) lnk.classList.add('active');
+        }
+      });
+    }, { root: scroll, threshold: 0.3 });
+    sections.forEach(function(s){ obs.observe(s); });
+  }
+
+  </script>
+</body>
+</html>

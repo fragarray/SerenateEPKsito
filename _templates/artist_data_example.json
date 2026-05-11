@@ -1,0 +1,35 @@
+// File: _templates/artist_data_example.json
+// Questo file JSON contiene i dati per un artista di esempio.
+// Ogni artista avrà il suo set di dati in un file JSON separato.
+
+{
+  "artist_name": "Nuovo Artista Fantastico",
+  "slug": "nuovo-artista-fantastico",
+  "genre": "World Music",
+  "tag": "Nuovi Arrivi",
+  "class": "artist-new",
+  "images": {
+    "hero_jpg": "img/nuovo_artista_hero.jpg",
+    "hero_webp": "img/nuovo_artista_hero.webp",
+    "presskit_jpg": "img/nuovo_artista_presskit.jpg",
+    "presskit_webp": "img/nuovo_artista_presskit.webp"
+  },
+  "content": {
+    "intro_it": "Questo è il paragrafo introduttivo per il nuovo artista. Qui si racconta la storia, l'ispirazione e il viaggio che li ha portati qui.",
+    "intro_en": "This is the introductory paragraph for the new artist. Here we tell the story, the inspiration, and the journey that brought them here.",
+    "sub_it": "Il loro stile è un mix unico di [ELEMENTO 1] e [ELEMENTO 2], perfetto per ogni tipo di evento.",
+    "sub_en": "Their style is a unique mix of [ELEMENT 1] and [ELEMENT 2], perfect for any type of event."
+  },
+  "services": [
+    {
+      "title_it": "Eventi Privati",
+      "description_it": "Ideali per matrimoni o anniversari, offriamo un'esperienza su misura.",
+      "title_en": "Private Events",
+      "description_en": "Ideal for weddings or anniversaries, we offer a tailor-made experience."
+    }
+  ],
+  "presskit": {
+    "descrizione_breve_it": "Un'esperienza musicale unica che emoziona e coinvolge il pubblico.",
+    "descrizione_breve_en": "A unique musical experience that moves and involves the audience."
+  }
+}

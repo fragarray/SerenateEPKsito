@@ -1,0 +1,125 @@
+// File: _templates/artist_template.html
+// Questo è il template HTML base che verrà compilato per ogni nuovo artista.
+// Dovrai sostituire i placeholder come [ARTIST_NAME], [ARTIST_SLOGAN], ecc.
+// con i dati reali dell'artista.
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>[ARTIST_NAME] – AltraMarea Produzioni</title>
+
+  <!-- SEO -->
+  <meta name="description" content="[ARTIST_NAME] – [ARTIST_GENRE]. [DESCRIZIONE BREVE].">
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="[ARTIST_SLUG].html" />
+  <meta property="og:title"       content="[ARTIST_NAME] – AltraMarea Produzioni" />
+  <meta property="og:description" content="[ARTIST_SLOGAN]" />
+  <meta property="og:image"       content="[ARTIST_IMAGE_URL]" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="img/logo_sito.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+
+  <!-- Shared stylesheet -->
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body class="artist-page [ARTIST_CLASS]">
+
+  <!-- Skip to content -->
+  <a href="#main" class="skip-link" aria-label="Salta al contenuto principale">Skip to content</a>
+
+  <!-- Home link -->
+  <a class="home-link" href="index.html" aria-label="Torna alla homepage">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/><polyline points="9 21 9 12 15 12 15 21"/></svg>
+  </a>
+
+  <!-- Lang bar -->
+  <nav class="lang-bar" role="navigation" aria-label="Seleziona lingua">
+    <button class="lang-btn" data-lang-target="it" aria-pressed="true"  aria-current="true">ITA</button>
+    <button class="lang-btn" data-lang-target="en" aria-pressed="false">ENG</button>
+  </nav>
+
+  <!-- Header -->
+  <header class="cover-header">
+    <h1 class="agency-name">AltraMarea Produzioni</h1>
+  </header>
+
+  <main id="main">
+
+    <!-- Hero -->
+    <section class="hero" aria-label="Immagine di copertina [ARTIST_NAME]">
+      <picture>
+        <source type="image/webp" srcset="[ARTIST_IMAGE_WEBP]" />
+        <source type="image/jpeg" srcset="[ARTIST_IMAGE_JPG]" />
+        <img src="[ARTIST_IMAGE_JPG]" alt="[ARTIST_NAME] – [DESCRIZIONE BREVE]" width="1400" height="934" />
+      </picture>
+      <div class="hero-overlay" aria-hidden="true"></div>
+      <div class="hero-caption">
+        <h1 data-lang="it">[ARTIST_NAME]</h1>
+        <h1 data-lang="en" hidden">[ARTIST_NAME]</h1>
+        <p data-lang="it">[ARTIST_SLOGAN]</p>
+        <p data-lang="en" hidden">[ARTIST_SLOGAN_EN]</p>
+      </div>
+    </section>
+
+    <!-- Intro -->
+    <section class="intro" aria-labelledby="lbl-intro">
+      <div class="wrap">
+        <p class="lead" id="lbl-intro" data-lang="it">[PARAGRAFO INTRODUZIONE ITALIANO]</p>
+        <p class="lead" data-lang="en" hidden>[INTRO PARAGRAPH ENGLISH]</p>
+
+        <p class="sub" data-lang="it">[PARAGRAFO SUB ITALIANO]</p>
+        <p class="sub" data-lang="en" hidden">[SUB PARAGRAPH ENGLISH]</p>
+      </div>
+    </section>
+
+    <!-- Sezione Dettagli/Servizi -->
+    <section class="section alt" aria-labelledby="lbl-services">
+      <div class="wrap">
+        <p class="section-label" id="lbl-services" data-lang="it">Cosa facciamo</p>
+        <p class="section-label" data-lang="en" hidden>What We Do</p>
+        <div class="services-grid">
+          <article class="service-item">
+            <h3 data-lang="it">[TITOLO SERVIZIO 1]</h3>
+            <p data-lang="it">[DESCRIZIONE SERVIZIO 1]</p>
+          </article>
+          <!-- Qui si possono aggiungere altri servizi in modo standardizzato -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Press Kit / Call to Action -->
+    <section class="cards" aria-labelledby="lbl-presskit">
+      <div class="wrap">
+        <p class="cards-label" id="lbl-presskit">Press Kit</p>
+        <div class="cards-grid">
+          <article class="card">
+            <div class="card-img">
+              <picture>
+                <source type="image/webp" srcset="[ARTIST_PRESSKIT_WEBP]" />
+                <source type="image/jpeg" srcset="[ARTIST_PRESSKIT_JPG]" />
+                <img src="[ARTIST_PRESSKIT_JPG]" alt="Press Kit [ARTIST_NAME]" loading="lazy" width="600" height="400" />
+              </picture>
+            </div>
+            <div class="card-body">
+              <p class="card-tag [ARTIST_TAG]">[TAG]</p>
+              <h2 class="card-title">[ARTIST_NAME]</h2>
+              <p class="card-desc" data-lang="it">[DESCRIZIONE BREVE PER PRESS KIT]</p>
+              <a class="card-link [ARTIST_TAG]" href="[ARTIST_PRESSKIT_SLUG].html" data-lang="it" aria-label="Apri il press kit [ARTIST_NAME]">Scopri →</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>
