@@ -89,7 +89,7 @@
     }
     .progress-step:hover { color: var(--gold); }
     .progress-step.active { color: var(--gold); border-bottom-color: var(--gold); }
-    .adm-form-scroll { flex: 1; overflow-y: auto; padding: 0 24px 100px; }
+    .adm-form-scroll { flex: 1; overflow-y: auto; padding: 0 24px 32px; }
 
     /* ── RIGHT PANEL ───────────────────────────────────────────── */
     .adm-right { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #d4cfc7; }
@@ -112,13 +112,16 @@
 
     /* ── BOTTOM OUTPUT BAR ─────────────────────────────────────── */
     .output-bar {
-      position: fixed; bottom: 0; left: 0; width: 44%; /* updated by JS */
+      flex-shrink: 0;
       background: var(--ink); border-top: 2px solid var(--gold);
-      padding: 12px 24px; display: flex; align-items: center; gap: 16px; z-index: 200;
+      padding: 12px 24px; display: flex; align-items: center; gap: 16px;
     }
     .output-status { flex: 1; font-size: 0.75rem; color: #a09b93; line-height: 1.4; }
     .output-status.ok  { color: #6dcf9a; }
     .output-status.err { color: #e07070; }
+    .field-error input, .field-error textarea {
+      border-color: var(--err) !important; box-shadow: 0 0 0 2px rgba(192,57,43,.25);
+    }
 
     /* ── FORM SECTIONS ─────────────────────────────────────────── */
     .sec-block { padding: 32px 0 28px; border-bottom: 1px solid var(--border); }
@@ -653,6 +656,13 @@
     loadSiteCSS();
     initScrollSpy();
     setTimeout(updatePreview, 300);
+    // Clear field-error highlight when user starts typing
+    ['f-name','f-slug','f-hero-jpg','f-lead-it'].forEach(function(id) {
+      var el = $(id);
+      if (el) el.addEventListener('input', function() {
+        el.closest('.field').classList.remove('field-error');
+      });
+    });
   });
 
   function loadSiteCSS() {
@@ -927,6 +937,189 @@
       '          </article>';
   }
 
+  /* ── PRESSKIT BUILDER (email-safe static HTML) ─────────────── */
+  function buildPresskit(lang) {
+    var isEn    = lang === 'en';
+    var name    = val('f-name') || 'Artista';
+    var subtitle= isEn ? (val('f-subtitle-en')||val('f-subtitle-it')) : val('f-subtitle-it');
+    var heroJpg = val('f-hero-jpg') || '';
+    var heroAlt = isEn ? (val('f-hero-alt-en')||val('f-hero-alt-it')||name)
+                       : (val('f-hero-alt-it')||name);
+    var lead    = isEn ? (val('f-lead-en')||val('f-lead-it')) : val('f-lead-it');
+    var subsIt  = collectSubParas('it');
+    var subsEnR = collectSubParas('en');
+    var subs    = (isEn && subsEnR.length) ? subsEnR : subsIt;
+    var xSecs   = collectExtraSections();
+    var photos  = collectExtraPhotos();
+    var hasVid  = !!($('toggle-video') && $('toggle-video').checked);
+    var mainVid = val('f-video-id');
+    var vidTit  = isEn ? (val('f-video-title-en')||val('f-video-title-it'))
+                       : val('f-video-title-it');
+    var xVids   = collectExtraVideos();
+    var colors  = getActiveColors();
+    var accent  = colors.main;
+    var lt      = colors.lt;
+    var logoUrl = val('f-logo-url');
+    var useLogo = val('f-header-type') === 'logo' && logoUrl;
+    var cName   = val('f-contact-name');
+    var cEmail  = val('f-contact-email');
+    var cPhone  = val('f-contact-phone');
+    var cIg     = val('f-contact-ig');
+    var cYt     = val('f-contact-yt');
+    var cWeb    = val('f-contact-website');
+    var spName  = val('f-spec-name')  || name;
+    var spSub   = isEn ? (val('f-subtitle-en')||val('f-spec-subtitle')) : val('f-spec-subtitle');
+    var spGenre = val('f-spec-genre') || val('f-genre');
+    var spDur   = val('f-spec-duration');
+    var spYear  = val('f-spec-year');
+    var spCity  = val('f-spec-city');
+    var spDisc  = val('f-spec-discography');
+    var mbRaw   = isEn ? (val('f-spec-members-en')||val('f-spec-members-it'))
+                       : val('f-spec-members-it');
+    var colRaw  = val('f-spec-collab');
+
+    /* ── inline style constants ── */
+    var TDLBL = 'padding:14px 0;vertical-align:top;font-family:Arial,Helvetica,sans-serif;font-size:0.72rem;color:'+accent+';text-transform:uppercase;letter-spacing:2px;font-weight:700;white-space:nowrap;padding-right:28px !important;width:1%';
+    var TDVAL    = 'padding:14px 0;vertical-align:top;font-family:Arial,Helvetica,sans-serif;font-size:0.9rem;color:#d8d2c8';
+    var TDVAL_MB = 'padding:14px 0;vertical-align:top;font-family:Arial,Helvetica,sans-serif;font-size:0.9rem;color:#d8d2c8;line-height:1.7';
+    var SEC_W = 'padding:64px 48px;border-bottom:1px solid #dbd5c5';
+    var SEC_A = 'padding:64px 48px;border-bottom:1px solid #dbd5c5;background:#e8e3d6';
+    var WRAP  = 'max-width:820px;margin:0 auto';
+    var LBL   = 'font-family:Arial,Helvetica,sans-serif;font-size:0.72rem;font-weight:700;color:'+accent+';letter-spacing:2.5px;text-transform:uppercase;margin-bottom:24px !important';
+    var LEAD  = 'font-family:Georgia,serif;font-size:1.32rem;font-weight:400;line-height:1.75;margin-bottom:1.3em !important;color:#1c1a17';
+    var BODY  = 'font-family:Georgia,serif;font-size:1.17rem;font-weight:300;line-height:1.85;margin-bottom:1.3em !important;color:#5a5248';
+    var BODYL = 'font-family:Georgia,serif;font-size:1.17rem;font-weight:300;line-height:1.85;margin-bottom:0 !important;color:#5a5248';
+    var IMG   = 'display:block;width:100%;height:auto;max-width:100%;';
+
+    /* ── spec table rows ── */
+    var rows = []; var spFirst = true;
+    function specRow(lbl, html, multiLine) {
+      var rs = spFirst
+        ? 'border-bottom:1px solid #3a3730;border-top:1px solid #3a3730'
+        : 'border-bottom:1px solid #3a3730';
+      rows.push('<tr style="'+rs+'">\n  <td class="td-lbl" style="'+TDLBL+'" valign="top" width="1%">'+esc(lbl)+'</td>\n  <td class="td-val" style="'+(multiLine?TDVAL_MB:TDVAL)+'" valign="top">'+html+'</td>\n</tr>');
+      spFirst = false;
+    }
+    if (spName)  specRow(isEn?'Name':'Nome', esc(spName));
+    if (spSub)   specRow(isEn?'Subtitle':'Sottotitolo', esc(spSub));
+    if (spGenre) specRow(isEn?'Genre':'Genere', esc(spGenre));
+    if (spDur)   specRow(isEn?'Duration':'Durata', esc(spDur));
+    if (mbRaw) {
+      var mbLines = mbRaw.split('\n').map(function(l) {
+        var t = l.trim(); if (!t) return '';
+        var idx = t.indexOf(' \u2013 ');
+        if (idx > 0) return '<strong style="color:#e8e2d8;font-weight:600">'+esc(t.slice(0,idx))+'</strong> \u2013 '+esc(t.slice(idx+3));
+        return esc(t);
+      }).filter(Boolean);
+      specRow(isEn?'Members':'Formazione', mbLines.join('<br/>\n    '), true);
+    }
+    if (colRaw) {
+      var colStr = colRaw.split('\n').map(function(l){return l.trim();}).filter(Boolean).join(' \u00b7 ');
+      specRow(isEn?'Collaborators':'Collaborazioni', esc(colStr));
+    }
+    if (spDisc) specRow(isEn?'Discography':'Discografia', esc(spDisc));
+    if (spYear||spCity) specRow(isEn?'Founded':'Fondazione', esc([spYear,spCity].filter(Boolean).join(' \u2013 ')));
+
+    /* ── contact credits ── */
+    var creds = [];
+    if (cName && cPhone) creds.push(esc(cName)+'&nbsp;&nbsp;'+esc(cPhone));
+    else if (cName)  creds.push(esc(cName));
+    else if (cPhone) creds.push(esc(cPhone));
+    if (cEmail) creds.push('<a href="mailto:'+esc(cEmail)+'" style="color:'+accent+';text-decoration:none">'+esc(cEmail)+'</a>');
+    if (cWeb)   creds.push('<a href="'+esc(cWeb)+'" rel="noopener" style="color:'+accent+';text-decoration:none" target="_blank">'+esc(cWeb)+'</a>');
+    if (cIg)    creds.push('Instagram: <a href="https://www.instagram.com/'+esc(cIg)+'" rel="noopener" style="color:'+accent+';text-decoration:none" target="_blank">@'+esc(cIg)+'</a>');
+    if (cYt)    creds.push('YouTube: <a href="https://www.youtube.com/@'+esc(cYt)+'" rel="noopener" style="color:'+accent+';text-decoration:none" target="_blank">youtube.com/@'+esc(cYt)+'</a>');
+
+    /* ── assemble HTML ── */
+    var o = [];
+
+    /* head */
+    o.push('<!DOCTYPE html>\n\n<html lang="'+lang+'" style="scroll-behavior:smooth">\n<head>\n<meta charset="utf-8"/>\n<meta content="width=device-width, initial-scale=1.0" name="viewport"/>\n<title>'+esc(name)+' \u2013 Press Kit</title>\n<style>*::before {box-sizing:border-box !important;margin:0 !important;padding:0 !important}\n*::after {box-sizing:border-box !important;margin:0 !important;padding:0 !important}\n.specs-credits a:hover {text-decoration:underline !important}\n.specs-url:hover {text-decoration:underline !important}</style>\n</head>\n<body style="background:#f3f0e7; color:#1c1a17; font-family:Georgia, serif; font-size:17px; line-height:1.8">\n\n');
+
+    /* cover */
+    o.push('<!-- COVER -->\n<div align="center" class="cover-header" style="background:#1c1a17; text-align:center; padding:44px 24px 40px">\n<div style="display:inline-flex; align-items:center; justify-content:center; gap:28px;">\n');
+    if (useLogo) o.push('  <img alt="'+esc(name)+'" src="'+esc(logoUrl)+'" style="height:100px; width:auto; display:inline-block; filter:invert(1)" />\n');
+    o.push('  <div style="text-align:left;">\n    <p style="font-family:Georgia,serif; font-size:2.6rem; font-weight:300; letter-spacing:0.18em; text-transform:uppercase; color:#ffffff; line-height:1.1; margin:0;">'+esc(name)+'</p>\n');
+    if (subtitle) o.push('    <p style="font-family:Arial,Helvetica,sans-serif; font-size:0.78rem; font-weight:400; letter-spacing:3px; text-transform:uppercase; color:'+lt+'; margin-top:8px;">'+esc(subtitle)+'</p>\n');
+    o.push('  </div>\n</div>\n</div>\n');
+
+    /* hero */
+    if (heroJpg) o.push('<img alt="'+esc(heroAlt)+'" src="'+esc(heroJpg)+'" style="'+IMG+'" width="100%"/>\n\n');
+
+    /* section 1 – lead + sub paragraphs */
+    if (lead || subs.length) {
+      o.push('<!-- SECTION 1 -->\n<div class="sec" style="'+SEC_W+'">\n<div class="sec-wrap" style="'+WRAP+'">\n<div>\n');
+      if (subtitle) o.push('<p style="'+LBL+'">'+esc(subtitle)+'</p>\n');
+      if (lead) o.push('<p class="lead" style="'+LEAD+'">'+esc(lead)+'</p>\n');
+      subs.forEach(function(t, i) {
+        o.push('<p style="'+(i < subs.length-1 ? BODY : BODYL)+'">'+esc(t)+'</p>\n');
+      });
+      o.push('</div>\n</div>\n</div>\n\n');
+    }
+
+    /* extra text sections – each paired with the matching extra photo */
+    xSecs.forEach(function(sec, i) {
+      var tit   = isEn ? (sec.titleEn||sec.titleIt) : sec.titleIt;
+      var body  = isEn ? (sec.bodyEn||sec.bodyIt)   : sec.bodyIt;
+      var photo = photos[i] || null;
+      var sg    = (sec.alt ? SEC_A : SEC_W) + (photo ? ';padding-bottom:0' : '');
+      var paras = body ? body.split(/\n\s*\n/).map(function(b){return b.replace(/\n/g,' ').trim();}).filter(Boolean) : [];
+      o.push('<!-- SECTION '+(i+2)+' -->\n<div class="sec" style="'+sg+'">\n<div class="sec-wrap" style="'+WRAP+(photo?';padding-bottom:52px !important':'')+'">\n<div>\n');
+      if (tit) o.push('<p style="'+LBL+'">'+esc(tit)+'</p>\n');
+      paras.forEach(function(t, j) {
+        o.push('<p style="'+(j < paras.length-1 ? BODY : BODYL)+'">'+esc(t)+'</p>\n');
+      });
+      o.push('</div>\n</div>\n');
+      if (photo && photo.jpg) o.push('<img alt="'+esc(photo.alt||name)+'" src="'+esc(photo.jpg)+'" style="'+IMG+'" width="100%"/>\n');
+      o.push('</div>\n\n');
+    });
+
+    /* remaining photos (not paired with a section) */
+    for (var pi = xSecs.length; pi < photos.length; pi++) {
+      if (photos[pi].jpg) o.push('<img alt="'+esc(photos[pi].alt||name)+'" src="'+esc(photos[pi].jpg)+'" style="'+IMG+'" width="100%"/>\n\n');
+    }
+
+    /* video section */
+    if (hasVid && mainVid) {
+      var seeAlso = isEn ? 'See also' : 'Guarda anche';
+      var watchOn = isEn ? 'Watch on YouTube' : 'Guarda il video su YouTube';
+      o.push('<!-- VIDEO -->\n<div class="sec" style="'+SEC_W+'">\n<div class="sec-wrap" style="'+WRAP+'">\n<div>\n');
+      o.push('<p style="'+LBL+'">Video</p>\n');
+      o.push('<a href="https://www.youtube.com/watch?v='+esc(mainVid)+'" rel="noopener" style="display:block; line-height:0; margin-bottom:12px !important" target="_blank">\n<img alt="'+esc(watchOn)+(vidTit?' \u2013 '+esc(vidTit):'')+'" src="https://i.ytimg.com/vi/'+esc(mainVid)+'/hqdefault.jpg" style="display:block; width:100%; height:auto;"/>\n</a>\n');
+      if (vidTit) o.push('<p style="font-family:Arial,Helvetica,sans-serif; font-size:0.85rem; color:#5a5248; margin-bottom:32px !important">'+esc(vidTit)+' &rarr; <a href="https://www.youtube.com/watch?v='+esc(mainVid)+'" rel="noopener" style="color:'+accent+'; text-decoration:none" target="_blank">youtube.com/watch?v='+esc(mainVid)+'</a></p>\n');
+      if (xVids.length) {
+        o.push('<p style="font-family:Arial,Helvetica,sans-serif; font-size:0.72rem; font-weight:700; color:#5a5248; letter-spacing:2px; text-transform:uppercase; margin-bottom:16px !important">'+esc(seeAlso)+'</p>\n<table style="width:100%; border-collapse:collapse" width="100%">\n');
+        for (var vi = 0; vi < xVids.length; vi += 2) {
+          var va = xVids[vi], vb = xVids[vi+1];
+          var ta = isEn ? (va.titleEn||va.titleIt) : va.titleIt;
+          var tb = vb ? (isEn ? (vb.titleEn||vb.titleIt) : vb.titleIt) : '';
+          o.push('<tr>\n<td style="width:50%; padding-right:10px; vertical-align:top" valign="top" width="50%"><a href="https://www.youtube.com/watch?v='+esc(va.id)+'" rel="noopener" style="display:block; text-decoration:none; color:'+accent+'" target="_blank"><img src="https://i.ytimg.com/vi/'+esc(va.id)+'/hqdefault.jpg" alt="'+esc(ta||va.id)+'" style="display:block; width:100%; height:auto; border-radius:3px" width="100%"/>'+(ta?'<span style="display:block; font-family:Arial,Helvetica,sans-serif; font-size:0.78rem; color:'+accent+'; margin-top:6px !important; line-height:1.3">'+esc(ta)+'</span>':'')+'</a></td>\n');
+          o.push('<td style="width:50%; padding-left:10px; vertical-align:top" valign="top" width="50%">');
+          if (vb) o.push('<a href="https://www.youtube.com/watch?v='+esc(vb.id)+'" rel="noopener" style="display:block; text-decoration:none; color:'+accent+'" target="_blank"><img src="https://i.ytimg.com/vi/'+esc(vb.id)+'/hqdefault.jpg" alt="'+esc(tb||vb.id)+'" style="display:block; width:100%; height:auto; border-radius:3px" width="100%"/>'+(tb?'<span style="display:block; font-family:Arial,Helvetica,sans-serif; font-size:0.78rem; color:'+accent+'; margin-top:6px !important; line-height:1.3">'+esc(tb)+'</span>':'')+'</a>');
+          o.push('</td>\n</tr>\n');
+        }
+        o.push('</table>\n');
+      }
+      o.push('</div>\n</div>\n</div>\n\n');
+    }
+
+    /* specs + contacts (dark section) */
+    o.push('<!-- SPECS -->\n<div class="sec-specs" style="background:#1c1a17; color:#e8e2d8; padding:72px 48px; border-bottom:none">\n<div class="sec-wrap" style="'+WRAP+'">\n<div>\n');
+    if (rows.length) {
+      o.push('<table class="specs-table" style="width:100%; border-collapse:collapse; margin-bottom:36px !important" width="100%">\n');
+      o.push(rows.join('\n'));
+      o.push('\n</table>\n');
+    }
+    if (creds.length) {
+      o.push('<div class="specs-credits" style="font-family:Arial,Helvetica,sans-serif; font-size:0.9rem; line-height:1.9; color:#a09b93; margin-top:36px !important; padding-top:32px !important; border-top:1px solid #3a3730">\n  ');
+      o.push(creds.join('<br/>\n  '));
+      o.push('\n</div>\n');
+    }
+    o.push('</div>\n<div align="center" class="specs-footer" style="margin-top:56px !important; padding-top:44px !important; border-top:1px solid #3a3730; text-align:center">\n<a class="specs-url" href="https://www.altramareaproduzioni.it" rel="noopener" style="font-family:Arial,Helvetica,sans-serif; font-size:0.85rem; letter-spacing:0.08em; color:'+accent+'; text-decoration:none" target="_blank">www.altramareaproduzioni.it</a>\n</div>\n</div>\n</div>\n\n</body>\n</html>');
+
+    return o.join('');
+  }
+
   /* ── INSTRUCTIONS BUILDER ────────────────────────────────────── */
   function buildInstructions(slug) {
     var name = val('f-name') || slug;
@@ -945,6 +1138,11 @@
       'card_artista.html',
       '  \u2192 Apri, copia il blocco <article> e incollalo',
       '    dentro .productions-grid in index.html',
+      '',
+      'presskit_static/'+slug+'_it.html',
+      'presskit_static/'+slug+'_en.html',
+      '  \u2192 Press Kit email-safe (ITA + ENG)',
+      '    Inviare via mail come allegato HTML.',
       '',
       '══════════════════════════════════════════════',
       '  AltraMarea Produzioni \u2013 Generatore Artisti',
@@ -1146,8 +1344,28 @@
     var heroJpg = val('f-hero-jpg');
     var leadIt  = val('f-lead-it');
 
-    if (!name || !slug || !heroJpg || !leadIt) {
-      setStatus('\u26a0 Campi obbligatori mancanti: Nome, Slug, Hero JPG, Lead Italiano.', 'err');
+    var required = [
+      { id: 'f-name',    label: 'Nome' },
+      { id: 'f-slug',    label: 'Slug' },
+      { id: 'f-hero-jpg', label: 'Hero JPG' },
+      { id: 'f-lead-it', label: 'Lead Italiano' }
+    ];
+    // Clear previous errors
+    required.forEach(function(f) {
+      var el = $(f.id); if (el) el.closest('.field').classList.remove('field-error');
+    });
+    var missing = required.filter(function(f) { return !val(f.id); });
+    if (missing.length) {
+      missing.forEach(function(f) {
+        var el = $(f.id); if (el) el.closest('.field').classList.add('field-error');
+      });
+      // Scroll to and focus the first missing field
+      var first = $(missing[0].id);
+      if (first) {
+        first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        first.focus();
+      }
+      setStatus('\u26a0 Campi obbligatori mancanti: ' + missing.map(function(f){return f.label;}).join(', ') + '.', 'err');
       return;
     }
 
@@ -1176,6 +1394,10 @@
 
       // 3. Instructions
       zip.file('ISTRUZIONI.txt', buildInstructions(slug));
+
+      // 4. Press Kit static (ITA + ENG)
+      zip.file('presskit_static/'+slug+'_it.html', buildPresskit('it'));
+      zip.file('presskit_static/'+slug+'_en.html', buildPresskit('en'));
 
       zip.generateAsync({ type:'blob', compression:'DEFLATE', compressionOptions:{ level:6 } })
         .then(function(blob) {
