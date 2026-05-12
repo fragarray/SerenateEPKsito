@@ -72,10 +72,31 @@
     .adm-left {
       width: 50%; flex-shrink: 0;
       display: flex; flex-direction: column; overflow: hidden;
+      transition: width .25s ease;
     }
 
     /* ── PANEL DIVIDER ─────────────────────────────────────────── */
     .panel-divider { display: none; }
+
+    /* ── DETACHED STATE ────────────────────────────────────────── */
+    .adm-body.preview-detached .adm-left  { width: 100%; }
+    .adm-body.preview-detached .adm-right { display: none; }
+
+    /* ── FLOATING REATTACH BUTTON ──────────────────────────────── */
+    .btn-reattach-float {
+      display: none;
+      position: fixed; bottom: 72px; right: 24px; z-index: 500;
+      align-items: center; gap: 8px;
+      padding: 11px 20px;
+      background: var(--ink); border: 1px solid var(--gold);
+      color: var(--gold-lt);
+      font-family: 'Lato', Arial, sans-serif; font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      cursor: pointer; box-shadow: 0 4px 18px rgba(0,0,0,.45);
+      transition: background .2s, color .2s;
+    }
+    .btn-reattach-float:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
+    .btn-reattach-float.visible { display: inline-flex; }
     .adm-progress {
       flex-shrink: 0; background: var(--light); border-bottom: 1px solid var(--border);
       padding: 0 20px; display: flex; gap: 0; overflow-x: auto;
@@ -222,6 +243,36 @@
     }
     .card-strip code { background: #e4ddd0; padding: 1px 5px; font-size: 0.7em; }
     .card-strip strong { color: var(--gold); }
+
+    /* ── DETACH / TOPBAR EXTRA BUTTONS ─────────────────────────── */
+    .btn-detach {
+      padding: 6px 14px; background: none; border: 1px solid #3a3730; color: #a09b93;
+      font-family: 'Lato', Arial, sans-serif; font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase;
+      cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+    }
+    .btn-detach:hover { border-color: var(--gold-lt); color: var(--gold-lt); }
+    .btn-detach.active { border-color: var(--gold); color: var(--gold); }
+
+    /* ── DETACHED OVERLAY ──────────────────────────────────────── */
+    .preview-detached-overlay {
+      display: none;
+      position: absolute; inset: 0;
+      flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+      background: #1c1a17;
+    }
+    .preview-detached-overlay.visible { display: flex; }
+    .preview-detached-overlay p {
+      font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--gold-lt); text-align: center; line-height: 1.7;
+    }
+    .btn-reattach {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 10px 22px; background: none; color: var(--gold-lt);
+      border: 1px solid var(--gold-lt);
+      font-family: 'Lato', Arial, sans-serif; font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all .2s;
+    }
+    .btn-reattach:hover { background: var(--gold-lt); color: var(--ink); }
   </style>
 </head>
 <body>
@@ -233,6 +284,16 @@
       <p class="adm-subtitle">AltraMarea Produzioni · Strumento di creazione pagine</p>
     </div>
     <div class="header-actions">
+      <!-- hidden file input for project loading -->
+      <input type="file" id="project-file-input" accept=".json" style="display:none" />
+      <button class="btn-secondary" onclick="openProject()" title="Apri un file di progetto salvato (.json)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Apri Progetto
+      </button>
+      <button class="btn-secondary" onclick="saveProject()" title="Salva tutti i dati del form in un file .json">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Salva Progetto
+      </button>
       <button class="btn-secondary" onclick="refreshPreview()">
         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
         Aggiorna Preview
@@ -620,6 +681,10 @@
         </span>
         <div class="preview-topbar-actions">
           <span class="preview-status" id="preview-status">in attesa di input…</span>
+          <button class="btn-detach" id="btn-detach" onclick="detachPreview()" title="Apri l'anteprima in una finestra separata">
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+            Scollega
+          </button>
           <button class="btn-refresh" onclick="refreshPreview()">&#8635; Forza aggiornamento</button>
         </div>
       </div>
@@ -629,6 +694,12 @@
     </div>
 
   </div><!-- /adm-body -->
+
+  <!-- floating reattach button (shown only when preview is detached) -->
+  <button class="btn-reattach-float" id="btn-reattach-float" onclick="reattachPreview()" title="Ricollega l'anteprima al pannello">
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    Ricollega preview
+  </button>
 
   <!-- ══════════════════════════════════════════════════════════════
        JAVASCRIPT
@@ -651,6 +722,21 @@
   var previewTimer = null;
   var photoCounter = 0;   // unique key counter for extra photos
 
+  /* ── DETACH / SCROLL STATE ────────────────────────────────────── */
+  var detachedWindow    = null;
+  var lastEditedSection = null;
+  var closePoller       = null;
+  var SECTION_MAP = {
+    'sec-identita': null,
+    'sec-stile':    '.cover-header',
+    'sec-hero':     '.hero',
+    'sec-testi':    '.intro',
+    'sec-foto':     '.cover-photo-wrap',
+    'sec-video':    '.video-sec',
+    'sec-scheda':   '.sec-specs',
+    'sec-contatti': '.contacts'
+  };
+
   /* ── INIT ─────────────────────────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', function() {
     loadSiteCSS();
@@ -662,6 +748,34 @@
       if (el) el.addEventListener('input', function() {
         el.closest('.field').classList.remove('field-error');
       });
+    });
+    // Track last edited section for scroll-to-edit in preview
+    var form = document.getElementById('artistForm');
+    function trackSection(e) {
+      var block = e.target.closest('.sec-block');
+      if (block && SECTION_MAP.hasOwnProperty(block.id)) {
+        lastEditedSection = SECTION_MAP[block.id];
+      }
+    }
+    form.addEventListener('input',  trackSection, true);
+    form.addEventListener('change', trackSection, true);
+    // Wire up project file input
+    $('project-file-input').addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        try {
+          var data = JSON.parse(ev.target.result);
+          loadProjectData(data);
+          setStatus('\u2713 Progetto caricato: ' + file.name, 'ok');
+        } catch(err) {
+          setStatus('\u2717 Errore caricamento: ' + err.message, 'err');
+        }
+      };
+      reader.readAsText(file);
+      // Reset so the same file can be reopened
+      e.target.value = '';
     });
   });
 
@@ -1330,12 +1444,286 @@
   function updatePreview() {
     setPreviewStatus('Aggiornamento\u2026');
     try {
-      $('preview-frame').srcdoc = buildHTML(true);
-      setPreviewStatus('Preview aggiornata');
-    } catch(e) { setPreviewStatus('Errore: '+e.message); }
+      var html = buildHTML(true);
+      var targetSel = lastEditedSection; // capture current value for closure
+
+      if (detachedWindow && !detachedWindow.closed) {
+        // Write to detached window
+        try {
+          detachedWindow.document.open();
+          detachedWindow.document.write(html);
+          detachedWindow.document.close();
+          if (targetSel) {
+            setTimeout(function() {
+              try {
+                var el = detachedWindow.document.querySelector(targetSel);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              } catch(ex) {}
+            }, 150);
+          }
+        } catch(ex) {
+          detachedWindow = null;
+          updateDetachBtn();
+        }
+        setPreviewStatus('Preview aggiornata \u2192 finestra separata');
+      } else {
+        var frame = $('preview-frame');
+        // Set onload handler to scroll after the iframe reloads
+        frame.onload = function() {
+          frame.onload = null;
+          if (!targetSel) return;
+          try {
+            var el = frame.contentDocument.querySelector(targetSel);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } catch(ex) {}
+        };
+        frame.srcdoc = html;
+        setPreviewStatus('Preview aggiornata');
+      }
+    } catch(e) { setPreviewStatus('Errore: ' + e.message); }
   }
   function refreshPreview() { clearTimeout(previewTimer); updatePreview(); }
   function setPreviewStatus(msg) { $('preview-status').textContent = msg; }
+
+  /* ── DETACH PREVIEW ────────────────────────────────────────────── */
+  function detachPreview() {
+    if (detachedWindow && !detachedWindow.closed) {
+      detachedWindow.focus();
+      return;
+    }
+    detachedWindow = window.open('', 'AmAdminPreview', 'width=1100,height=820,resizable=yes,scrollbars=yes');
+    if (!detachedWindow) {
+      alert('Impossibile aprire la finestra.\nVerifica che i popup siano consentiti per questa pagina.');
+      return;
+    }
+    updateDetachUI();
+    updatePreview();
+    // Poll to detect when the user closes the detached window
+    if (closePoller) clearInterval(closePoller);
+    closePoller = setInterval(function() {
+      if (detachedWindow && detachedWindow.closed) {
+        detachedWindow = null;
+        clearInterval(closePoller);
+        closePoller = null;
+        updateDetachUI();
+        updatePreview(); // restore iframe
+      }
+    }, 1000);
+  }
+  function reattachPreview() {
+    if (detachedWindow && !detachedWindow.closed) {
+      detachedWindow.close();
+    }
+    detachedWindow = null;
+    if (closePoller) { clearInterval(closePoller); closePoller = null; }
+    updateDetachUI();
+    updatePreview();
+  }
+  function updateDetachUI() {
+    var isDetached = !!(detachedWindow && !detachedWindow.closed);
+    // Expand / collapse layout
+    document.querySelector('.adm-body').classList.toggle('preview-detached', isDetached);
+    // Floating reattach button
+    $('btn-reattach-float').classList.toggle('visible', isDetached);
+    // Topbar detach button
+    var btn = $('btn-detach');
+    if (!btn) return;
+    if (isDetached) {
+      btn.classList.add('active');
+      btn.title = 'Porta la finestra in primo piano';
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg> In primo piano';
+    } else {
+      btn.classList.remove('active');
+      btn.title = 'Apri l\'anteprima in una finestra separata';
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg> Scollega';
+    }
+  }
+
+  /* ── SAVE / OPEN PROJECT ──────────────────────────────────────── */
+  function collectProjectData() {
+    var fieldIds = [
+      'f-name','f-subtitle-it','f-subtitle-en','f-genre','f-slug',
+      'f-meta-it','f-meta-en',
+      'f-card-thumb-jpg','f-card-thumb-webp','f-card-tag-it','f-card-tag-en',
+      'f-card-desc-it','f-card-desc-en',
+      'f-hero-jpg','f-hero-webp','f-hero-dims','f-hero-alt-it','f-hero-alt-en',
+      'f-lead-it','f-lead-en',
+      'f-video-id','f-video-title-it','f-video-title-en',
+      'f-spec-name','f-spec-subtitle','f-spec-genre','f-spec-duration',
+      'f-spec-year','f-spec-city','f-spec-discography',
+      'f-spec-members-it','f-spec-members-en','f-spec-collab',
+      'f-contact-name','f-contact-email','f-contact-phone',
+      'f-contact-website','f-contact-ig','f-contact-yt',
+      'f-header-type','f-logo-url','f-color-main','f-color-light'
+    ];
+    var fields = {};
+    fieldIds.forEach(function(id) { fields[id] = val(id); });
+    return {
+      version: 1,
+      fields: fields,
+      palette:      document.querySelector('input[name="palette"]:checked').value,
+      toggleVideo:  !!($('toggle-video') && $('toggle-video').checked),
+      subParasIt:   collectSubParas('it'),
+      subParasEn:   collectSubParas('en'),
+      extraPhotos:  collectExtraPhotos(),
+      extraSections: collectExtraSections(),
+      extraVideos:  collectExtraVideos()
+    };
+  }
+
+  function saveProject() {
+    var data = collectProjectData();
+    var slug = val('f-slug') || 'progetto';
+    try {
+      var json = JSON.stringify(data, null, 2);
+      var blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+      var url  = URL.createObjectURL(blob);
+      var a    = document.createElement('a');
+      a.href = url; a.download = slug + '.altramarea.json'; a.click();
+      setTimeout(function() { URL.revokeObjectURL(url); }, 6000);
+      setStatus('\u2713 Progetto salvato come ' + slug + '.altramarea.json', 'ok');
+    } catch(e) { setStatus('Errore salvataggio: ' + e.message, 'err'); }
+  }
+
+  function openProject() {
+    $('project-file-input').click();
+  }
+
+  function loadProjectData(data) {
+    if (!data || !data.version) { setStatus('File non valido.', 'err'); return; }
+    var fields = data.fields || {};
+
+    // Restore all simple input / textarea / select fields
+    Object.keys(fields).forEach(function(id) {
+      var el = $(id);
+      if (el) el.value = fields[id];
+    });
+
+    // Sync derived UI elements
+    $('slug-preview-text').textContent = fields['f-slug'] || 'nome-artista';
+    onMetaCount('f-meta-it', 'meta-it-count');
+    onMetaCount('f-meta-en', 'meta-en-count');
+
+    // Palette
+    var palKey = data.palette || 'gold';
+    var radio = document.querySelector('input[name="palette"][value="' + palKey + '"]');
+    if (radio) radio.checked = true;
+    toggleCustomColor();
+    updateCustomSwatch();
+
+    // Toggle-driven visibility
+    toggleLogoField();
+    $('toggle-video').checked = !!data.toggleVideo;
+    toggleVideoSection();
+
+    // ── Sub paragraphs ITA ──────────────────────────────────────
+    var subItList = $('sub-it-list');
+    subItList.innerHTML = '';
+    var parasIt = (data.subParasIt && data.subParasIt.length) ? data.subParasIt : [''];
+    parasIt.forEach(function(text, i) {
+      var n = i + 1;
+      var d = document.createElement('div'); d.className = 'dyn-item';
+      d.innerHTML =
+        '<span class="dyn-item-num">' + n + '</span>' +
+        '<div class="dyn-item-body"><textarea placeholder="Paragrafo Sub ' + n + ' \u2013 Italiano" oninput="onFormChange()"></textarea></div>' +
+        '<button type="button" class="btn-remove" onclick="removeDynItem(this)">&#x2715;</button>';
+      subItList.appendChild(d);
+      d.querySelector('textarea').value = text;
+    });
+
+    // ── Sub paragraphs ENG ──────────────────────────────────────
+    var subEnList = $('sub-en-list');
+    subEnList.innerHTML = '';
+    var parasEn = (data.subParasEn && data.subParasEn.length) ? data.subParasEn : [''];
+    parasEn.forEach(function(text, i) {
+      var n = i + 1;
+      var d = document.createElement('div'); d.className = 'dyn-item';
+      d.innerHTML =
+        '<span class="dyn-item-num">' + n + '</span>' +
+        '<div class="dyn-item-body"><textarea placeholder="Sub Paragraph ' + n + ' \u2013 English" oninput="onFormChange()"></textarea></div>' +
+        '<button type="button" class="btn-remove" onclick="removeDynItem(this)">&#x2715;</button>';
+      subEnList.appendChild(d);
+      d.querySelector('textarea').value = text;
+    });
+
+    // ── Extra photos ─────────────────────────────────────────────
+    var photoList = $('photo-extra-list');
+    photoList.innerHTML = '';
+    photoCounter = 0;
+    (data.extraPhotos || []).forEach(function(photo, i) {
+      ++photoCounter;
+      var n = i + 1;
+      var d = document.createElement('div'); d.className = 'dyn-item';
+      d.innerHTML =
+        '<span class="dyn-item-num">' + n + '</span>' +
+        '<div class="dyn-item-body"><div class="field-row cols-3">' +
+          '<div class="field"><label>URL JPG</label>' +
+            '<input type="text" class="photo-jpg" placeholder="img/artista_foto' + n + '_web.jpg" oninput="onFormChange()" /></div>' +
+          '<div class="field"><label>URL WebP</label><input type="text" class="photo-webp" placeholder="img/artista_foto' + n + '_web.webp" oninput="onFormChange()" /></div>' +
+          '<div class="field"><label>Alt text</label><input type="text" class="photo-alt" placeholder="Descrizione immagine" oninput="onFormChange()" /></div>' +
+        '</div></div>' +
+        '<button type="button" class="btn-remove" onclick="removeDynItem(this)">&#x2715;</button>';
+      photoList.appendChild(d);
+      d.querySelector('.photo-jpg').value  = photo.jpg  || '';
+      d.querySelector('.photo-webp').value = photo.webp || '';
+      d.querySelector('.photo-alt').value  = photo.alt  || '';
+    });
+
+    // ── Extra text sections ──────────────────────────────────────
+    var secList = $('extra-sections-list');
+    secList.innerHTML = '';
+    (data.extraSections || []).forEach(function(sec, i) {
+      var n = i + 1;
+      var d = document.createElement('div'); d.className = 'dyn-item';
+      d.innerHTML =
+        '<span class="dyn-item-num">' + n + '</span>' +
+        '<div class="dyn-item-body">' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Titolo \u2013 Italiano</label><input type="text" class="sec-title-it" placeholder="es. Il repertorio" oninput="onFormChange()" /></div>' +
+            '<div class="field"><label>Title \u2013 English</label><input type="text" class="sec-title-en" placeholder="es. The Repertoire" oninput="onFormChange()" /></div>' +
+          '</div>' +
+          '<div class="lang-tabs" style="margin-top:4px">' +
+            '<button type="button" class="lang-tab active" onclick="switchSecTab(this,\'it\')">ITA</button>' +
+            '<button type="button" class="lang-tab" onclick="switchSecTab(this,\'en\')">ENG</button>' +
+          '</div>' +
+          '<div class="lang-panel active"><div class="field"><label>Testo \u2013 Italiano</label><textarea class="sec-body-it tall" placeholder="Doppio a-capo = nuovo paragrafo." oninput="onFormChange()"></textarea></div></div>' +
+          '<div class="lang-panel"><div class="field"><label>Text \u2013 English</label><textarea class="sec-body-en tall" placeholder="Double line-break = new paragraph." oninput="onFormChange()"></textarea></div></div>' +
+          '<div style="margin-top:8px"><label style="font-size:0.6rem;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;">' +
+            '<input type="checkbox" class="sec-alt-check" style="accent-color:var(--gold);width:15px;height:15px;" onchange="onFormChange()" /> Sfondo alternato (sec-alt)' +
+          '</label></div>' +
+        '</div>' +
+        '<button type="button" class="btn-remove" onclick="removeDynItem(this)">&#x2715;</button>';
+      secList.appendChild(d);
+      d.querySelector('.sec-title-it').value = sec.titleIt || '';
+      d.querySelector('.sec-title-en').value = sec.titleEn || '';
+      d.querySelector('.sec-body-it').value  = sec.bodyIt  || '';
+      d.querySelector('.sec-body-en').value  = sec.bodyEn  || '';
+      if (sec.alt) d.querySelector('.sec-alt-check').checked = true;
+    });
+
+    // ── Extra videos ─────────────────────────────────────────────
+    var vidList = $('extra-videos-list');
+    vidList.innerHTML = '';
+    (data.extraVideos || []).forEach(function(vid, i) {
+      var n = i + 1;
+      var d = document.createElement('div'); d.className = 'dyn-item';
+      d.innerHTML =
+        '<span class="dyn-item-num">' + n + '</span>' +
+        '<div class="dyn-item-body"><div class="field-row cols-3">' +
+          '<div class="field"><label>YouTube ID</label><input type="text" class="vid-id" placeholder="es. n6PVBn8_4fM" oninput="onFormChange()" /></div>' +
+          '<div class="field"><label>Titolo \u2013 Italiano</label><input type="text" class="vid-title-it" oninput="onFormChange()" /></div>' +
+          '<div class="field"><label>Title \u2013 English</label><input type="text" class="vid-title-en" oninput="onFormChange()" /></div>' +
+        '</div></div>' +
+        '<button type="button" class="btn-remove" onclick="removeDynItem(this)">&#x2715;</button>';
+      vidList.appendChild(d);
+      d.querySelector('.vid-id').value       = vid.id      || '';
+      d.querySelector('.vid-title-it').value = vid.titleIt || '';
+      d.querySelector('.vid-title-en').value = vid.titleEn || '';
+    });
+
+    lastEditedSection = null; // reset scroll target after load
+    updatePreview();
+  }
 
   /* ── DOWNLOAD AS ZIP ──────────────────────────────────────────── */
   function generateAndDownload() {
