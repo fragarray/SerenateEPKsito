@@ -97,6 +97,22 @@
     }
     .btn-reattach-float:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
     .btn-reattach-float.visible { display: inline-flex; }
+
+    /* ── IMAGE UPLOAD INPUTS ───────────────────────────────────── */
+    .img-input-row { display: flex; gap: 6px; align-items: stretch; }
+    .img-input-row input { flex: 1; min-width: 0; }
+    .btn-img-upload {
+      flex-shrink: 0; padding: 0 11px;
+      background: none; border: 1px solid var(--border); color: var(--muted);
+      font-family: 'Lato', Arial, sans-serif; font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase;
+      cursor: pointer; white-space: nowrap; transition: all .15s;
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn-img-upload:hover { border-color: var(--gold); color: var(--gold); background: rgba(155,123,47,.06); }
+    .btn-img-upload.delete-mode { border-color: var(--err); color: var(--err); }
+    .btn-img-upload.delete-mode:hover { background: var(--err); border-color: var(--err); color: #fff; }
+    .btn-img-upload.busy { opacity: .55; pointer-events: none; }
+    .img-drag-over { border-color: var(--gold) !important; box-shadow: 0 0 0 2px rgba(155,123,47,.3) !important; background: rgba(155,123,47,.04) !important; }
     .adm-progress {
       flex-shrink: 0; background: var(--light); border-bottom: 1px solid var(--border);
       padding: 0 20px; display: flex; gap: 0; overflow-x: auto;
@@ -389,11 +405,11 @@
           <div class="field-row">
             <div class="field">
               <label>Thumbnail JPG <span class="hint">(card: 600×400)</span></label>
-              <input type="text" id="f-card-thumb-jpg" placeholder="img/artista_thumb.jpg" oninput="onFormChange()" />
+              <input type="text" id="f-card-thumb-jpg" data-img-upload="1" placeholder="img/artista_thumb.jpg" oninput="onFormChange()" />
             </div>
             <div class="field">
               <label>Thumbnail WebP</label>
-              <input type="text" id="f-card-thumb-webp" placeholder="img/artista_thumb.webp" oninput="onFormChange()" />
+              <input type="text" id="f-card-thumb-webp" data-img-upload="1" placeholder="img/artista_thumb.webp" oninput="onFormChange()" />
             </div>
           </div>
           <div class="field-row">
@@ -454,7 +470,7 @@
             </div>
             <div class="field" id="header-logo-field" hidden>
               <label>URL Logo</label>
-              <input type="text" id="f-logo-url" placeholder="es. img/logo_artista.svg" oninput="onFormChange()" />
+              <input type="text" id="f-logo-url" data-img-upload="1" placeholder="es. img/logo_artista.svg" oninput="onFormChange()" />
             </div>
           </div>
         </section>
@@ -468,11 +484,11 @@
           <div class="field-row cols-3">
             <div class="field">
               <label>URL JPG <span class="req">*</span></label>
-              <input type="text" id="f-hero-jpg" placeholder="img/artista_hero_web.jpg" required oninput="onFormChange()" />
+              <input type="text" id="f-hero-jpg" data-img-upload="1" placeholder="img/artista_hero_web.jpg" required oninput="onFormChange()" />
             </div>
             <div class="field">
               <label>URL WebP</label>
-              <input type="text" id="f-hero-webp" placeholder="img/artista_hero_web.webp" oninput="onFormChange()" />
+              <input type="text" id="f-hero-webp" data-img-upload="1" placeholder="img/artista_hero_web.webp" oninput="onFormChange()" />
               <span class="hint">Compilato auto se scegli un file locale.</span>
             </div>
             <div class="field">
@@ -737,11 +753,20 @@
     'sec-contatti': '.contacts'
   };
 
+  /* ── UPLOAD CONFIG ────────────────────────────────────────────── */
+  // Funziona solo quando admin.html è servito via web server (non file://).
+  // Il token deve corrispondere a UPLOAD_TOKEN in upload.php.
+  var UPLOAD_CFG = {
+    endpoint: '../upload.php',       // relativo a _templates/admin.html
+    token:    'tokensegretoaltramareaproduzioni'  // token segreto condiviso con upload.php
+  };
+
   /* ── INIT ─────────────────────────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', function() {
     loadSiteCSS();
     initScrollSpy();
     setTimeout(updatePreview, 300);
+    initUploadButtons();
     // Clear field-error highlight when user starts typing
     ['f-name','f-slug','f-hero-jpg','f-lead-it'].forEach(function(id) {
       var el = $(id);
@@ -877,13 +902,14 @@
       '<div class="dyn-item-body">'+
         '<div class="field-row cols-3">'+
           '<div class="field"><label>URL JPG</label>'+
-            '<input type="text" class="photo-jpg" placeholder="img/artista_foto'+n+'_web.jpg" oninput="onFormChange()" /></div>'+
-          '<div class="field"><label>URL WebP</label><input type="text" class="photo-webp" placeholder="img/artista_foto'+n+'_web.webp" oninput="onFormChange()" /></div>'+
+            '<input type="text" class="photo-jpg" data-img-upload="1" placeholder="img/artista_foto'+n+'_web.jpg" oninput="onFormChange()" /></div>'+
+          '<div class="field"><label>URL WebP</label><input type="text" class="photo-webp" data-img-upload="1" placeholder="img/artista_foto'+n+'_web.webp" oninput="onFormChange()" /></div>'+
           '<div class="field"><label>Alt text</label><input type="text" class="photo-alt" placeholder="Descrizione immagine" oninput="onFormChange()" /></div>'+
         '</div>'+
       '</div>'+
       '<button type="button" class="btn-remove" onclick="removeDynItem(this)">&#x2715;</button>';
     list.appendChild(d);
+    initUploadButtons(d);
   }
 
   function addExtraSection() {
@@ -1436,6 +1462,151 @@
       '  <\/script>\n</body>\n</html>';
   }
 
+  /* ── IMAGE UPLOAD ─────────────────────────────────────────────── */
+  var SVG_UPLOAD = '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
+  var SVG_DELETE = '<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>';
+
+  function setUploadBtnState(btn, input, mode) {
+    // mode: 'upload' | 'delete'
+    if (mode === 'delete') {
+      btn.classList.add('delete-mode');
+      btn.title = 'Elimina questo file dal server';
+      btn.innerHTML = SVG_DELETE + ' Elimina';
+      btn.onclick = function() { doDelete(input, btn); };
+    } else {
+      btn.classList.remove('delete-mode');
+      btn.title = 'Carica immagine sul server (richiede connessione al server)';
+      btn.innerHTML = SVG_UPLOAD + ' Carica';
+      btn.onclick = function() { pickAndUpload(input, btn); };
+    }
+  }
+
+  function doUpload(file, inputEl, btn) {
+    var allowed = ['image/jpeg', 'image/webp', 'image/png'];
+    if (allowed.indexOf(file.type) < 0) {
+      setStatus('\u26a0 Tipo non supportato: ' + file.type, 'err');
+      return;
+    }
+    setStatus('Caricamento \u201c' + file.name + '\u201d\u2026', '');
+    if (btn) btn.classList.add('busy');
+    var fd = new FormData();
+    fd.append('action', 'upload');
+    fd.append('file', file);
+    fd.append('token', UPLOAD_CFG.token);
+    fetch(UPLOAD_CFG.endpoint, { method: 'POST', body: fd })
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(data) {
+        if (btn) btn.classList.remove('busy');
+        if (data.ok) {
+          inputEl.value = data.path;
+          inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+          setStatus('\u2713 Caricato: ' + data.path, 'ok');
+          if (btn) setUploadBtnState(btn, inputEl, 'delete');
+        } else {
+          setStatus('\u2717 Upload: ' + (data.error || 'errore sconosciuto'), 'err');
+        }
+      })
+      .catch(function(e) {
+        if (btn) btn.classList.remove('busy');
+        setStatus('\u2717 Upload fallito (' + e.message + '). Assicurati di aprire la pagina tramite server web.', 'err');
+      });
+  }
+
+  function doDelete(inputEl, btn) {
+    var path = inputEl.value.trim();
+    if (!path) {
+      inputEl.value = '';
+      inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+      if (btn) setUploadBtnState(btn, inputEl, 'upload');
+      return;
+    }
+    if (!confirm('Eliminare il file dal server?\n' + path)) return;
+    if (btn) btn.classList.add('busy');
+    setStatus('Eliminazione ' + path + '\u2026', '');
+    var fd = new FormData();
+    fd.append('action', 'delete');
+    fd.append('path', path);
+    fd.append('token', UPLOAD_CFG.token);
+    fetch(UPLOAD_CFG.endpoint, { method: 'POST', body: fd })
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(data) {
+        if (btn) btn.classList.remove('busy');
+        if (data.ok) {
+          setStatus('\u2713 File eliminato: ' + path, 'ok');
+        } else {
+          setStatus('\u26a0 Eliminazione server: ' + (data.error || 'errore'), 'err');
+        }
+        // In ogni caso svuota il campo e torna in modalit\u00e0 upload
+        inputEl.value = '';
+        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+        if (btn) setUploadBtnState(btn, inputEl, 'upload');
+      })
+      .catch(function(e) {
+        if (btn) btn.classList.remove('busy');
+        setStatus('\u2717 Eliminazione fallita (' + e.message + ').', 'err');
+        // Svuota il campo comunque (file potrebbe non esistere pi\u00f9 sul server)
+        inputEl.value = '';
+        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+        if (btn) setUploadBtnState(btn, inputEl, 'upload');
+      });
+  }
+
+  function pickAndUpload(inputEl, btn) {
+    var picker = document.createElement('input');
+    picker.type = 'file';
+    picker.accept = 'image/jpeg,image/webp,image/png';
+    picker.onchange = function() {
+      if (picker.files[0]) doUpload(picker.files[0], inputEl, btn);
+    };
+    picker.click();
+  }
+
+  function initUploadButtons(root) {
+    var container = (root instanceof Element) ? root : document;
+    container.querySelectorAll('[data-img-upload]').forEach(function(input) {
+      if (input.dataset.uploadInit) return; // gi\u00e0 inizializzato
+      input.dataset.uploadInit = '1';
+      // Avvolgi input + bottone in un flex-row
+      var wrap = document.createElement('div');
+      wrap.className = 'img-input-row';
+      input.parentNode.insertBefore(wrap, input);
+      wrap.appendChild(input);
+      // Bottone upload/delete
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn-img-upload';
+      // Stato iniziale: se il campo ha gi\u00e0 un valore (es. progetto caricato) mostra Elimina
+      var initialMode = input.value.trim() ? 'delete' : 'upload';
+      setUploadBtnState(btn, input, initialMode);
+      wrap.appendChild(btn);
+      // Aggiorna stato bottone quando il valore viene modificato a mano
+      input.addEventListener('input', function() {
+        var mode = input.value.trim() ? 'delete' : 'upload';
+        setUploadBtnState(btn, input, mode);
+      });
+      // Drag-and-drop sull'input
+      input.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        input.classList.add('img-drag-over');
+      });
+      input.addEventListener('dragleave', function() {
+        input.classList.remove('img-drag-over');
+      });
+      input.addEventListener('drop', function(e) {
+        e.preventDefault();
+        input.classList.remove('img-drag-over');
+        var file = e.dataTransfer.files[0];
+        if (file) doUpload(file, input, btn);
+      });
+    });
+  }
+
   /* ── PREVIEW ──────────────────────────────────────────────────── */
   function onFormChange() {
     clearTimeout(previewTimer);
@@ -1658,8 +1829,8 @@
         '<span class="dyn-item-num">' + n + '</span>' +
         '<div class="dyn-item-body"><div class="field-row cols-3">' +
           '<div class="field"><label>URL JPG</label>' +
-            '<input type="text" class="photo-jpg" placeholder="img/artista_foto' + n + '_web.jpg" oninput="onFormChange()" /></div>' +
-          '<div class="field"><label>URL WebP</label><input type="text" class="photo-webp" placeholder="img/artista_foto' + n + '_web.webp" oninput="onFormChange()" /></div>' +
+            '<input type="text" class="photo-jpg" data-img-upload="1" placeholder="img/artista_foto' + n + '_web.jpg" oninput="onFormChange()" /></div>' +
+          '<div class="field"><label>URL WebP</label><input type="text" class="photo-webp" data-img-upload="1" placeholder="img/artista_foto' + n + '_web.webp" oninput="onFormChange()" /></div>' +
           '<div class="field"><label>Alt text</label><input type="text" class="photo-alt" placeholder="Descrizione immagine" oninput="onFormChange()" /></div>' +
         '</div></div>' +
         '<button type="button" class="btn-remove" onclick="removeDynItem(this)">&#x2715;</button>';
@@ -1667,6 +1838,7 @@
       d.querySelector('.photo-jpg').value  = photo.jpg  || '';
       d.querySelector('.photo-webp').value = photo.webp || '';
       d.querySelector('.photo-alt').value  = photo.alt  || '';
+      initUploadButtons(d);
     });
 
     // ── Extra text sections ──────────────────────────────────────
