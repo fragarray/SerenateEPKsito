@@ -1126,7 +1126,9 @@
     hero:      { jpg: '', webp: '', altIt: '', altEn: '',
                  dimW: 1400, dimH: 350, lockRatio: true,
                  overlayOpacity: '40', objectPosition: 'center',
-                 captionIt: '', captionEn: '' },
+                 captionIt: '', captionEn: '', captionColor: '#ffffff', captionSize: '1.4rem',
+                 captionGap: '0.5rem',
+                 subtitleIt: '', subtitleEn: '', subtitleColor: '', subtitleSize: '1.0rem' },
     lead:      { textIt: '', textEn: '', align: 'left' },
     paragraph: { textIt: '', textEn: '', align: 'left' },
     photo:     { jpg: '', webp: '', altIt: '', altEn: '',
@@ -1719,11 +1721,46 @@
         '</div>' +
       '</div>' +
       '<hr class="inner-divider"/>' +
-      '<p class="inner-h3">Caption (testo opzionale sull\u2019hero)</p>' +
+      '<p class="inner-h3">Caption</p>' +
       _fLangTabs(bid + 'hc',
         _fInput(block, 'captionIt', 'Caption IT', d.captionIt || '', 'es. Un progetto musicale unico'),
         _fInput(block, 'captionEn', 'Caption EN', d.captionEn || '', 'e.g. A unique musical project')
-      );
+      ) +
+      '<div class="field-row">' +
+        _fSelect(block, 'captionSize', 'Dimensione', d.captionSize || '1.4rem', [
+          {v:'0.8rem',l:'0.8 rem'},{v:'0.9rem',l:'0.9 rem'},{v:'1.0rem',l:'1.0 rem'},
+          {v:'1.1rem',l:'1.1 rem'},{v:'1.2rem',l:'1.2 rem'},{v:'1.4rem',l:'1.4 rem'},
+          {v:'1.6rem',l:'1.6 rem'},{v:'1.8rem',l:'1.8 rem'},{v:'2.0rem',l:'2.0 rem'},
+          {v:'2.4rem',l:'2.4 rem'},{v:'2.8rem',l:'2.8 rem'},{v:'3.2rem',l:'3.2 rem'}
+        ]) +
+        '<div class="field"><label>Colore caption</label>' +
+          '<input type="color" data-field="captionColor" value="' + escHtml(d.captionColor || '#ffffff') + '" style="width:48px;height:32px;padding:2px;cursor:pointer;border:1px solid var(--border);border-radius:4px;"/>' +
+        '</div>' +
+      '</div>' +
+      '<div class="field-row">' +
+        _fSelect(block, 'captionGap', 'Spazio caption–sottotitolo', d.captionGap || '0.5rem', [
+          {v:'0',l:'Nessuno'},{v:'0.25rem',l:'0.25 rem'},{v:'0.5rem',l:'0.5 rem'},
+          {v:'0.75rem',l:'0.75 rem'},{v:'1rem',l:'1 rem'},
+          {v:'1.5rem',l:'1.5 rem'},{v:'2rem',l:'2 rem'},{v:'3rem',l:'3 rem'}
+        ]) +
+      '</div>' +
+      '<hr class="inner-divider"/>' +
+      '<p class="inner-h3">Sottotitolo</p>' +
+      _fLangTabs(bid + 'hst',
+        _fInput(block, 'subtitleIt', 'Sottotitolo IT', d.subtitleIt || '', 'es. Disponibile per eventi e cerimonie'),
+        _fInput(block, 'subtitleEn', 'Sottotitolo EN', d.subtitleEn || '', 'e.g. Available for events and ceremonies')
+      ) +
+      '<div class="field-row">' +
+        _fSelect(block, 'subtitleSize', 'Dimensione', d.subtitleSize || '1.0rem', [
+          {v:'0.8rem',l:'0.8 rem'},{v:'0.9rem',l:'0.9 rem'},{v:'1.0rem',l:'1.0 rem'},
+          {v:'1.1rem',l:'1.1 rem'},{v:'1.2rem',l:'1.2 rem'},{v:'1.4rem',l:'1.4 rem'},
+          {v:'1.6rem',l:'1.6 rem'},{v:'1.8rem',l:'1.8 rem'},{v:'2.0rem',l:'2.0 rem'},
+          {v:'2.4rem',l:'2.4 rem'},{v:'2.8rem',l:'2.8 rem'},{v:'3.2rem',l:'3.2 rem'}
+        ]) +
+        '<div class="field"><label>Colore sottotitolo</label>' +
+          '<input type="color" data-field="subtitleColor" value="' + escHtml(d.subtitleColor || getActiveColors().lt) + '" style="width:48px;height:32px;padding:2px;cursor:pointer;border:1px solid var(--border);border-radius:4px;"/>' +
+        '</div>' +
+      '</div>';
   }
 
   function _fbLead(block) {
@@ -3661,9 +3698,31 @@
       return '<section class="hero" style="height:clamp(200px,24vw,380px);background:var(--light);display:flex;align-items:center;justify-content:center;">' +
         '<span style="color:var(--muted);font-size:.75rem;letter-spacing:2px;text-transform:uppercase;">Hero: nessuna immagine</span></section>';
     }
-    var capIt = d.captionIt || '', capEn = d.captionEn || capIt;
-    var captionHtml = (capIt || capEn) ? '<div style="position:absolute;bottom:0;left:0;right:0;padding:0 48px 24px;z-index:2;pointer-events:none;">' +
-      biEl('p','hero-caption-sub',capIt,capEn,lang) + '</div>' : '';
+    var capIt  = d.captionIt  || '', capEn  = d.captionEn  || capIt;
+    var subIt  = d.subtitleIt || '', subEn  = d.subtitleEn || subIt;
+    var capColor = escHtml(d.captionColor  || '#ffffff');
+    var subColor = escHtml(d.subtitleColor || getActiveColors().lt);
+    var capSize  = escHtml(d.captionSize   || '1.4rem');
+    var subSize  = escHtml(d.subtitleSize  || '1.0rem');
+    var capGap   = escHtml(d.captionGap    || '0.5rem');
+    var capSt = 'font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;margin:0 0 ' + capGap + ';color:' + capColor + ';font-size:' + capSize + ';line-height:1.3;';
+    var subSt = 'font-family:\'Lato\',Arial,sans-serif;margin:0;color:' + subColor + ';font-size:' + subSize + ';line-height:1.4;';
+    function styledBiP(style, it, en) {
+      if (!it && !en) return '';
+      var open = '<p style="' + style + '"';
+      if (lang !== 'both') {
+        var _t = lang === 'en' ? en : it;
+        return _t ? open + '>' + escHtml(_t) + '</p>' : '';
+      }
+      return (it ? open + ' data-lang="it">' + escHtml(it) + '</p>' : '') +
+             (en ? open + ' data-lang="en" hidden>' + escHtml(en) + '</p>' : '');
+    }
+    var captionHtml = (capIt || capEn || subIt || subEn)
+      ? '<div style="position:absolute;bottom:0;left:0;right:0;padding:0 48px 24px;z-index:2;pointer-events:none;display:flex;flex-direction:column;align-items:flex-start;">' +
+          styledBiP(capSt, capIt, capEn) +
+          styledBiP(subSt, subIt, subEn) +
+        '</div>'
+      : '';
     return (
       '<section class="hero" aria-label="' + escHtml(alt) + '" style="position:relative;height:' + dimH + 'px;">' +
       '<picture>' +
