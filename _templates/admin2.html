@@ -201,6 +201,7 @@
     .block-type-badge.t-separator { background: #f0f0f0; color: var(--type-separator); }
     .block-type-badge.t-card      { background: #e8f0f8; color: #4a80c4; }
     .block-type-badge.t-cardgrid   { background: #e8f4e8; color: #3a8a5c; }
+    .block-type-badge.t-links       { background: #f0e8f8; color: #7a4a9b; }
 
     .block-panel-title {
       flex: 1; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; color: var(--ink);
@@ -1044,6 +1045,14 @@
           <span class="btc-desc">Griglia N×M di card</span>
         </button>
 
+        <button class="block-type-card" onclick="addBlock('links');closeModal('modal-add-block')">
+          <div class="btc-icon" style="background:#f0e8f8;color:#7a4a9b;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <span class="btc-label">Link</span>
+          <span class="btc-desc">Griglia di link con logo e testo</span>
+        </button>
+
       </div><!-- /block-type-grid -->
 
       <div class="modal-footer">
@@ -1108,7 +1117,8 @@
     photo: 'Foto', gallery: 'Galleria', video: 'Video',
     section: 'Sezione testo', specs: 'Scheda tecnica', separator: 'Separatore',
     card: 'Card',
-    cardgrid: 'Griglia card'
+    cardgrid: 'Griglia card',
+    links:    'Link'
   };
 
   /* Default data shape for every block type */
@@ -1124,7 +1134,12 @@
                  textIt: '', textEn: '' },
     gallery:   { cols: '3', aspectRatio: '3/2', gap: 'normal', photos: [] },
     video:     { ytId: '', titleIt: '', titleEn: '',
-                 descIt: '', descEn: '', startAt: '', extraVideos: [] },
+                 descIt: '', descEn: '', startAt: '',
+                 size: 'medium', mode: 'player',
+                 watchLabelIt: '', watchLabelEn: '',
+                 seeAlsoLabelIt: '', seeAlsoLabelEn: '',
+                 extraCols: 2,
+                 extraVideos: [] },
     section:   { titleIt: '', titleEn: '', bodyIt: '', bodyEn: '', altBg: false,
                  ctaLabelIt: '', ctaLabelEn: '', ctaUrl: '' },
     specs:     { name: '', subtitle: '', genre: '', duration: '',
@@ -1139,7 +1154,8 @@
                  link: '',
                  ctaLabelIt: 'Scopri \u2192', ctaLabelEn: 'Discover \u2192',
                  align: 'center', width: 'medium', imgRatio: '3/2', altBg: false },
-    cardgrid:  { cols: 3, rows: 2, gap: 'normal', imgRatio: '3/2', altBg: false, cards: [] }
+    cardgrid:  { cols: 3, rows: 2, gap: 'normal', imgRatio: '3/2', altBg: false, cards: [] },
+    links:     { titleIt: '', titleEn: '', cols: 3, rows: 1, gap: 'normal', imgRatio: '1/1', altBg: false, items: [] }
   };
 
   /* Variants available per block type */
@@ -1594,7 +1610,8 @@
     var block = getBlock(blockId);
     if (!block) return;
     pushUndo();
-    block.data.photos.splice(idx, 1);
+    var removedPhoto = block.data.photos.splice(idx, 1)[0];
+    if (removedPhoto) { deleteServerFile(removedPhoto.jpg); deleteServerFile(removedPhoto.webp); }
     markDirty();
     var el = document.getElementById('gal-' + blockId.substring(0,8));
     if (el) el.innerHTML = _galItems(block);
@@ -1607,6 +1624,12 @@
     var evs = block.data.extraVideos || [];
     if (!evs.length) return '<p style="font-size:0.65rem;color:var(--muted);padding:4px 0;">Nessun video aggiuntivo.</p>';
     return evs.map(function(ev, i) {
+      var szOpts = [{v:'narrow',l:'Stretta (45%)'},{v:'medium',l:'Media (70%)'},{v:'wide',l:'Larga (85%)'},{v:'full',l:'Piena (100%)'}].map(function(o) {
+        return '<option value="' + o.v + '"' + ((ev.size||'medium') === o.v ? ' selected' : '') + '>' + o.l + '</option>';
+      }).join('');
+      var mdOpts = [{v:'player',l:'Player embed'},{v:'thumb',l:'Anteprima + link'}].map(function(o) {
+        return '<option value="' + o.v + '"' + ((ev.mode||'thumb') === o.v ? ' selected' : '') + '>' + o.l + '</option>';
+      }).join('');
       return '<div class="dyn-item">' +
         '<span class="dyn-item-num">' + (i+1) + '</span>' +
         '<div class="dyn-item-body">' +
@@ -1614,6 +1637,10 @@
           '<div class="field-row">' +
             '<div class="field"><label>Titolo IT</label><input type="text" data-vid-idx="' + i + '" data-vid-field="titleIt" value="' + escHtml(ev.titleIt||'') + '"/></div>' +
             '<div class="field"><label>Titolo EN</label><input type="text" data-vid-idx="' + i + '" data-vid-field="titleEn" value="' + escHtml(ev.titleEn||'') + '"/></div>' +
+          '</div>' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Dimensione</label><select data-vid-idx="' + i + '" data-vid-field="size">' + szOpts + '</select></div>' +
+            '<div class="field"><label>Modalit\u00e0</label><select data-vid-idx="' + i + '" data-vid-field="mode">' + mdOpts + '</select></div>' +
           '</div>' +
         '</div>' +
         '<button type="button" class="btn-remove" onclick="removeExtraVideo(\'' + block.id + '\',' + i + ')" title="Rimuovi">✕</button>' +
@@ -1625,7 +1652,7 @@
     var block = getBlock(blockId);
     if (!block) return;
     pushUndo();
-    block.data.extraVideos.push({ ytId: '', titleIt: '', titleEn: '' });
+    block.data.extraVideos.push({ ytId: '', titleIt: '', titleEn: '', size: 'medium', mode: 'thumb' });
     markDirty();
     var el = document.getElementById('vid-' + blockId.substring(0,8));
     if (el) el.innerHTML = _vidItems(block);
@@ -1794,13 +1821,48 @@
       '</div>' +
       _fInput(block, 'startAt', 'Parti da (secondi)', d.startAt || '', 'es. 90') +
       '<hr class="inner-divider"/>' +
+      '<p class="inner-h3">Dimensione</p>' +
+      '<div style="display:flex;gap:14px;flex-wrap:wrap;padding-top:4px;">' +
+        [{v:'narrow',l:'Stretta (45%)'},{v:'medium',l:'Media (70%)'},{v:'wide',l:'Larga (85%)'},{v:'full',l:'Piena (100%)'}].map(function(o) {
+          var chk = ((d.size || 'medium') === o.v) ? ' checked' : '';
+          return '<label style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--muted);cursor:pointer;">' +
+            '<input type="radio" name="vsize-' + bid + '" data-field="size" value="' + o.v + '"' + chk + '/>' + o.l + '</label>';
+        }).join('') +
+      '</div>' +
+      '<p class="inner-h3" style="margin-top:10px;margin-bottom:4px;">Modalit\u00e0</p>' +
+      '<div style="display:flex;gap:14px;flex-wrap:wrap;padding-top:4px;">' +
+        [{v:'player',l:'Player embed'},{v:'thumb',l:'Anteprima + link YouTube'}].map(function(o) {
+          var chk = ((d.mode || 'player') === o.v) ? ' checked' : '';
+          return '<label style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--muted);cursor:pointer;">' +
+            '<input type="radio" name="vmode-' + bid + '" data-field="mode" value="' + o.v + '"' + chk + '/>' + o.l + '</label>';
+        }).join('') +
+      '</div>' +
+      '<hr class="inner-divider"/>' +
       '<p class="inner-h3">Descrizione sotto il video</p>' +
       _fLangTabs(bid + 'vd',
         _fTextarea(block, 'descIt', 'Descrizione IT', d.descIt || ''),
         _fTextarea(block, 'descEn', 'Description EN', d.descEn || '')
       ) +
       '<hr class="inner-divider"/>' +
+      '<p class="inner-h3">Etichette personalizzate</p>' +
+      _fLangTabs(bid + 'vl',
+        _fInput(block, 'watchLabelIt',  'Etichetta video principale IT',  d.watchLabelIt  || '', 'Guarda il video') +
+        _fInput(block, 'seeAlsoLabelIt','Etichetta video aggiuntivi IT', d.seeAlsoLabelIt || '', 'Guarda anche'),
+        _fInput(block, 'watchLabelEn',  'Main video label EN',           d.watchLabelEn  || '', 'Watch the video') +
+        _fInput(block, 'seeAlsoLabelEn','Extra videos label EN',         d.seeAlsoLabelEn|| '', 'See also')
+      ) +
+      '<hr class="inner-divider"/>' +
       '<p class="inner-h3">Video aggiuntivi</p>' +
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">' +
+        '<label style="font-size:0.72rem;color:var(--muted);white-space:nowrap;">Per riga:</label>' +
+        '<div style="display:flex;gap:10px;">' +
+          [1,2,3,4].map(function(n) {
+            var chk = (parseInt(d.extraCols||2,10) === n) ? ' checked' : '';
+            return '<label style="display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;color:var(--muted);cursor:pointer;">' +
+              '<input type="radio" name="evcols-' + bid + '" data-field="extraCols" value="' + n + '"' + chk + '/>' + n + '</label>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
       '<div class="dyn-list" id="vid-' + bid + '">' + _vidItems(block) + '</div>' +
       '<button type="button" class="btn-add" onclick="addExtraVideo(\'' + block.id + '\')">+ Aggiungi video</button>';
   }
@@ -1931,7 +1993,10 @@
     var total = cols * rows;
     var cards = block.data.cards || [];
     while (cards.length < total) { cards.push(_cgCardDefaults()); }
-    if (cards.length > total) { cards.length = total; }
+    if (cards.length > total) {
+      var removedCards = cards.splice(total);
+      removedCards.forEach(function(c) { deleteServerFile(c.jpg); deleteServerFile(c.webp); });
+    }
     block.data.cards = cards;
     markDirty();
     var el = document.getElementById('cg-' + blockId.substring(0,8));
@@ -1976,6 +2041,121 @@
       '<hr class="inner-divider"/>' +
       '<p class="inner-h3">Card (' + (parseInt(d.cols||3,10) * parseInt(d.rows||2,10)) + ' totali)</p>' +
       '<div class="dyn-list" id="cg-' + bid + '">' + _cgItems(block) + '</div>';
+  }
+
+  function _lnItemDefaults() {
+    return { jpg: '', webp: '', textIt: '', textEn: '', subtextIt: '', subtextEn: '', link: '', border: false, logoSize: '80' };
+  }
+
+  function _lnItems(block) {
+    var items = block.data.items || [];
+    var cols  = parseInt(block.data.cols, 10) || 3;
+    var bid   = block.id.substring(0,8);
+    if (!items.length) return '<p style="font-size:0.65rem;color:var(--muted);padding:4px 0;">Aggiorna la griglia per popolare i link.</p>';
+    return items.map(function(c, i) {
+      var row = Math.floor(i / cols) + 1;
+      var col = (i % cols) + 1;
+      return '<div class="dyn-item" style="padding:8px 6px;">' +
+        '<span class="dyn-item-num">' + row + '\u00d7' + col + '</span>' +
+        '<div class="dyn-item-body">' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Logo JPG</label><div class="img-input-row">' +
+              '<input type="text" data-ln-idx="' + i + '" data-ln-field="jpg" value="' + escHtml(c.jpg||'') + '" placeholder="img/logo.jpg"/>' +
+              '<button type="button" class="btn-img-upload" onclick="triggerImgUpload(this)" title="Carica">\u21d1</button>' +
+            '</div></div>' +
+            '<div class="field"><label>Logo WebP</label><div class="img-input-row">' +
+              '<input type="text" data-ln-idx="' + i + '" data-ln-field="webp" value="' + escHtml(c.webp||'') + '" placeholder="img/logo.webp"/>' +
+              '<button type="button" class="btn-img-upload" onclick="triggerImgUpload(this)" title="Carica">\u21d1</button>' +
+            '</div></div>' +
+          '</div>' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Testo IT</label><input type="text" data-ln-idx="' + i + '" data-ln-field="textIt" value="' + escHtml(c.textIt||'') + '"/></div>' +
+            '<div class="field"><label>Testo EN</label><input type="text" data-ln-idx="' + i + '" data-ln-field="textEn" value="' + escHtml(c.textEn||'') + '"/></div>' +
+          '</div>' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Sottotesto IT</label><input type="text" data-ln-idx="' + i + '" data-ln-field="subtextIt" value="' + escHtml(c.subtextIt||'') + '"/></div>' +
+            '<div class="field"><label>Sottotesto EN</label><input type="text" data-ln-idx="' + i + '" data-ln-field="subtextEn" value="' + escHtml(c.subtextEn||'') + '"/></div>' +
+          '</div>' +
+          '<div class="field">' +
+            '<label>Link</label><input type="text" data-ln-idx="' + i + '" data-ln-field="link" value="' + escHtml(c.link||'') + '" placeholder="https://..."/>' +
+          '</div>' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Larghezza logo (px)</label>' +
+              '<input type="number" min="20" max="400" step="4" data-ln-idx="' + i + '" data-ln-field="logoSize" value="' + escHtml(String(c.logoSize || '80')) + '" style="width:80px;"/>' +
+            '</div>' +
+            '<div class="toggle-field" style="margin-top:auto;padding-bottom:4px;">' +
+              '<input type="checkbox" id="ln-border-' + bid + '-' + i + '" data-ln-idx="' + i + '" data-ln-field="border"' + (c.border ? ' checked' : '') + '/>' +
+              '<label for="ln-border-' + bid + '-' + i + '">Mostra bordo</label>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function syncLinksSize(blockId) {
+    var block = getBlock(blockId);
+    if (!block) return;
+    pushUndo();
+    var cols  = parseInt(block.data.cols, 10) || 3;
+    var rows  = parseInt(block.data.rows, 10) || 1;
+    var total = cols * rows;
+    var items = block.data.items || [];
+    while (items.length < total) { items.push(_lnItemDefaults()); }
+    if (items.length > total) {
+      var removedItems = items.splice(total);
+      removedItems.forEach(function(it) { deleteServerFile(it.jpg); deleteServerFile(it.webp); });
+    }
+    block.data.items = items;
+    markDirty();
+    var el = document.getElementById('ln-' + blockId.substring(0,8));
+    if (el) el.innerHTML = _lnItems(block);
+    _updatePanelSubtitle(blockId);
+    schedulePreviewUpdate(blockId);
+  }
+
+  function _fbLinks(block) {
+    var d   = block.data;
+    var bid = block.id.substring(0,8);
+    var colOpts = [2,3,4,5,6].map(function(n) {
+      return '<option value="' + n + '"' + (parseInt(d.cols||3,10) === n ? ' selected' : '') + '>' + n + '</option>';
+    }).join('');
+    var rowOpts = [1,2,3,4].map(function(n) {
+      return '<option value="' + n + '"' + (parseInt(d.rows||1,10) === n ? ' selected' : '') + '>' + n + '</option>';
+    }).join('');
+    return _fLangTabs(block.id + '-ln-title',
+      _fInput(block, 'titleIt', 'Titolo sezione ITA', d.titleIt || '', ''),
+      _fInput(block, 'titleEn', 'Titolo sezione ENG', d.titleEn || '', '')
+    ) +
+    '<hr class="inner-divider"/>' +
+    '<div class="field-row">' +
+      '<div class="field"><label>Colonne</label>' +
+        '<select data-field="cols" onchange="syncLinksSize(\'' + block.id + '\')"> ' + colOpts + '</select>' +
+      '</div>' +
+      '<div class="field"><label>Righe</label>' +
+        '<select data-field="rows" onchange="syncLinksSize(\'' + block.id + '\')"> ' + rowOpts + '</select>' +
+      '</div>' +
+    '</div>' +
+    '<div style="display:flex;gap:14px;flex-wrap:wrap;padding-top:4px;margin-bottom:8px;">' +
+      [{v:'compact',l:'Compatto'},{v:'normal',l:'Normale'},{v:'wide',l:'Ampio'}].map(function(o) {
+        var chk = ((d.gap || 'normal') === o.v) ? ' checked' : '';
+        return '<label style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--muted);cursor:pointer;">' +
+          '<input type="radio" name="ln-gap-' + bid + '" data-field="gap" value="' + o.v + '"' + chk + '/>' +
+          escHtml(o.l) + '</label>';
+      }).join('') +
+    '</div>' +
+    _fSelect(block, 'imgRatio', 'Proporzioni logo', d.imgRatio || '1/1', [
+      {v:'1/1',l:'1:1 (quadrato)'},{v:'3/2',l:'3:2 (paesaggio)'},
+      {v:'4/3',l:'4:3 (classico)'},{v:'16/9',l:'16:9 (wide)'},
+      {v:'2/1',l:'2:1 (orizzontale)'},{v:'3/1',l:'3:1 (banner)'}
+    ]) +
+    '<div class="toggle-field" style="margin-top:4px;">' +
+      '<input type="checkbox" id="ln-altbg-' + bid + '" data-field="altBg"' + (d.altBg ? ' checked' : '') + '/>' +
+      '<label for="ln-altbg-' + bid + '">Sfondo alternato</label>' +
+    '</div>' +
+    '<hr class="inner-divider"/>' +
+    '<p class="inner-h3">Elementi (' + (parseInt(d.cols||3,10) * parseInt(d.rows||1,10)) + ' totali)</p>' +
+    '<div class="dyn-list" id="ln-' + bid + '">' + _lnItems(block) + '</div>';
   }
 
   function _fbCard(block) {
@@ -2033,6 +2213,7 @@
       case 'separator': return _fbSeparator(block);
       case 'card':      return _fbCard(block);
       case 'cardgrid':  return _fbCardGrid(block);
+      case 'links':     return _fbLinks(block);
       default: return '<p style="color:var(--muted);font-size:.72rem;">Tipo sconosciuto.</p>';
     }
   }
@@ -2075,9 +2256,27 @@
         }
         return;
       }
+      /* Link grid item fields */
+      if (t.dataset.lnIdx !== undefined && t.dataset.lnField) {
+        var li = parseInt(t.dataset.lnIdx, 10);
+        if (block.data.items && block.data.items[li]) {
+          block.data.items[li][t.dataset.lnField] = t.value;
+          markDirty(); schedulePreviewUpdate(block.id);
+        }
+        return;
+      }
     });
     bodyEl.addEventListener('change', function(e) {
       var t = e.target;
+      /* Link item border checkbox */
+      if (t.dataset.lnIdx !== undefined && t.dataset.lnField) {
+        var li2 = parseInt(t.dataset.lnIdx, 10);
+        if (block.data.items && block.data.items[li2]) {
+          block.data.items[li2][t.dataset.lnField] = t.type === 'checkbox' ? t.checked : t.value;
+          markDirty(); schedulePreviewUpdate(block.id);
+        }
+        return;
+      }
       if (!t.dataset.field) return;
       var u = {};
       if (t.type === 'checkbox') {
@@ -2129,7 +2328,8 @@
     specs:     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>',
     separator: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/></svg>',
     card:      '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
-    cardgrid:  '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/><line x1="12" y1="5" x2="12" y2="7"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'
+    cardgrid:  '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/><line x1="12" y1="5" x2="12" y2="7"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+    links:     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'
   };
 
   function getBlockSubtitle(block) {
@@ -2145,7 +2345,8 @@
       case 'specs':     return d.name     || '';
       case 'separator': return ({sm:'piccolo',md:'medio',lg:'grande'})[d.size] || '';
       case 'card':      return d.title ? d.title.substring(0,42)+(d.title.length>42?'\u2026':'') : (d.link || '');
-      case 'cardgrid':  return (d.cols||3) + '\u00d7' + (d.rows||2) + ' — ' + ((d.cards||[]).length) + ' card';
+      case 'cardgrid':  return (d.cols||3) + '\u00d7' + (d.rows||2) + ' \u2014 ' + ((d.cards||[]).length) + ' card';
+      case 'links':     return (d.cols||3) + '\u00d7' + (d.rows||1) + ' \u2014 ' + ((d.items||[]).length) + ' link';
       default:          return '';
     }
   }
@@ -2658,10 +2859,14 @@
     var paths = [];
     var d = block.data;
     function add(p) { if (p && /^img\//i.test(p)) paths.push(p); }
-    if (block.type === 'hero' || block.type === 'photo') {
+    if (block.type === 'hero' || block.type === 'photo' || block.type === 'card') {
       add(d.jpg); add(d.webp);
     } else if (block.type === 'gallery') {
       (d.photos || []).forEach(function(ph) { add(ph.jpg); add(ph.webp); });
+    } else if (block.type === 'cardgrid') {
+      (d.cards || []).forEach(function(c) { add(c.jpg); add(c.webp); });
+    } else if (block.type === 'links') {
+      (d.items || []).forEach(function(it) { add(it.jpg); add(it.webp); });
     }
     return paths;
   }
@@ -2728,8 +2933,8 @@
 
   /* Locate the paired input (jpg \u2194 webp) inside the same .field-row, if any. */
   function _findPartnerInput(btn, targetInput) {
-    /* Support data-field, data-photo-field (gallery items), and data-global */
-    var field  = targetInput.dataset.field || targetInput.dataset.photoField || '';
+    /* Support data-field, data-photo-field (gallery items), data-ln-field (link items), and data-global */
+    var field  = targetInput.dataset.field || targetInput.dataset.photoField || targetInput.dataset.lnField || '';
     var global = targetInput.dataset.global || '';
     var fieldRow = btn.closest ? btn.closest('.field-row') : null;
     if (!fieldRow) return null;
@@ -2738,6 +2943,7 @@
       /* Handles 'jpg'→'webp', 'webp'→'jpg', 'cardThumbJpg'→'cardThumbWebp', etc. */
       return fieldRow.querySelector('[data-field="' + partnerField + '"]') ||
              fieldRow.querySelector('[data-photo-field="' + partnerField + '"]') ||
+             fieldRow.querySelector('[data-ln-field="' + partnerField + '"]') ||
              fieldRow.querySelector('[data-global="' + partnerField + '"]') || null;
     }
     if (global) {
@@ -2774,6 +2980,9 @@
     var jpgQ      = 0.85;
     var webpQ     = 0.82;
     var partnerInp = _findPartnerInput(btn, targetInput);
+    /* Capture old paths now so we can delete them after a successful upload */
+    var oldJpg  = isWebp ? (partnerInp ? partnerInp.value : '') : targetInput.value;
+    var oldWebp = isWebp ? targetInput.value : (partnerInp ? partnerInp.value : '');
     if (btn) btn.classList.add('busy');
     setStatus('Conversione immagine\u2026', '');
     Promise.all([
@@ -2792,6 +3001,8 @@
     })
     .then(function(paths) {
       var uploaded = paths.filter(Boolean);
+      deleteServerFile(oldJpg);
+      deleteServerFile(oldWebp);
       setStatus('Upload completato: ' + uploaded.join(' + '), '');
     })
     .catch(function(err) { setStatus('Upload fallito: ' + err.message, 'err'); })
@@ -3552,30 +3763,58 @@
   }
 
   function _rVideo(block, lang) {
-    var d = block.data, ytId = d.ytId || '';
-    if (!ytId) {
+    var d      = block.data;
+    var ytId   = d.ytId || '';
+    var extras = d.extraVideos || [];
+    if (!ytId && !extras.length) {
       return '<section class="video-sec"><div class="sec-wrap">' +
         '<p style="color:var(--muted);font-size:.75rem;letter-spacing:2px;text-transform:uppercase;">Video: ID YouTube non impostato</p>' +
         '</div></section>';
     }
-    var titleIt = d.titleIt || ytId, titleEn = d.titleEn || titleIt;
-    var title   = lang === 'en' ? titleEn : titleIt;
+    var titleIt = d.titleIt || ytId, titleEn = d.titleEn || ytId;
+    var title   = lang === 'en' ? (titleEn || titleIt) : (titleIt || titleEn);
     var startQ  = d.startAt ? ('?start=' + parseInt(d.startAt, 10)) : '';
+    var startT  = d.startAt ? ('&t='     + parseInt(d.startAt, 10)) : '';
     var descIt  = d.descIt || '', descEn = d.descEn || '';
     var ytSvg   = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E";
-    var maxW    = block.variant === 'wide' ? '100%' : '70%';
-    var extras  = d.extraVideos || [];
+    var sizeMap   = { narrow: '45%', medium: '70%', wide: '85%', full: '100%' };
+    var maxW      = sizeMap[d.size] || (block.variant === 'wide' ? '100%' : '70%');
+    var mode      = d.mode || 'player';
+    var extraCols = parseInt(d.extraCols, 10) || 2;
+    /* Custom labels (fall back to defaults if empty) */
+    var watchIt    = d.watchLabelIt    || 'Guarda il video';
+    var watchEn    = d.watchLabelEn    || 'Watch the video';
+    var seeAlsoIt  = d.seeAlsoLabelIt  || 'Guarda anche';
+    var seeAlsoEn  = d.seeAlsoLabelEn  || 'See also';
 
-    /* Extra videos list items */
-    function mkEv(evLang) {
-      return extras.map(function(ev) {
-        var t = (evLang === 'en' ? ev.titleEn : ev.titleIt) || ev.ytId || '';
-        return '<li><a href="https://www.youtube.com/watch?v=' + escHtml(ev.ytId||'') + '" target="_blank" rel="noopener noreferrer">' +
+    /* Extra videos — each item rendered as thumb or player depending on its mode */
+    /* Grid style: strictly N columns, no minimum width — extraCols always wins */
+    var evGridStyle = 'display:grid;grid-template-columns:repeat(' + extraCols + ',minmax(0,1fr));gap:16px;';
+
+    function mkEvHtml(evLang) {
+      var cells = extras.map(function(ev) {
+        var t      = (evLang === 'en' ? ev.titleEn : ev.titleIt) || ev.ytId || '';
+        var evMode = ev.mode || 'thumb';
+        if (evMode === 'player') {
+          return '<div>' +
+            '<div class="video-wrap"><iframe src="https://www.youtube.com/embed/' + escHtml(ev.ytId||'') + '" ' +
+            'title="' + escHtml(t) + '" loading="lazy" ' +
+            'allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" ' +
+            'allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' +
+            (t ? '<p style="text-align:center;font-family:var(--serif);font-size:.8rem;margin-top:.5rem;color:var(--muted);">' + escHtml(t) + '</p>' : '') +
+            '</div>';
+        }
+        /* thumb mode */
+        return '<div>' +
+          '<a href="https://www.youtube.com/watch?v=' + escHtml(ev.ytId||'') + '" target="_blank" rel="noopener noreferrer" ' +
+          'style="display:flex;flex-direction:column;text-decoration:none;color:inherit;gap:6px;">' +
           '<div class="yt-thumb">' +
-          '<img src="https://i.ytimg.com/vi/' + escHtml(ev.ytId||'') + '/hqdefault.jpg" alt="' + escHtml(t) + '" loading="lazy"/>' +
+          '<img src="https://i.ytimg.com/vi/' + escHtml(ev.ytId||'') + '/hqdefault.jpg" alt="' + escHtml(t) + '" loading="lazy" style="width:100%;height:auto;display:block;"/>' +
           '<img src="' + ytSvg + '" alt="" class="yt-play" width="44" height="31"/></div>' +
-          '<span>' + escHtml(t) + '</span></a></li>';
-      }).join('');
+          '<span style="font-size:.75rem;color:var(--muted);font-family:var(--sans);line-height:1.3;">' + escHtml(t) + '</span>' +
+          '</a></div>';
+      });
+      return '<div style="' + evGridStyle + '">' + cells.join('') + '</div>';
     }
 
     var descHtml = '';
@@ -3591,28 +3830,46 @@
       if (lang === 'both') {
         evHtml = '<div class="sec-wrap" style="margin-top:2rem;">' +
           biWrap(
-            '<p class="video-links-lbl">Guarda anche</p><ul class="video-links">' + mkEv('it') + '</ul>',
-            '<p class="video-links-lbl">See also</p><ul class="video-links">' + mkEv('en') + '</ul>',
+            '<p class="video-links-lbl">' + escHtml(seeAlsoIt) + '</p>' + mkEvHtml('it'),
+            '<p class="video-links-lbl">' + escHtml(seeAlsoEn) + '</p>' + mkEvHtml('en'),
             'both'
           ) + '</div>';
       } else {
-        var lbl2 = lang === 'en' ? 'See also' : 'Guarda anche';
-        evHtml = '<div class="sec-wrap" style="margin-top:2rem;"><p class="video-links-lbl">' + escHtml(lbl2) + '</p>' +
-          '<ul class="video-links">' + mkEv(lang) + '</ul></div>';
+        var seeAlsoLbl = lang === 'en' ? seeAlsoEn : seeAlsoIt;
+        evHtml = '<div class="sec-wrap" style="margin-top:2rem;"><p class="video-links-lbl">' + escHtml(seeAlsoLbl) + '</p>' +
+          mkEvHtml(lang) + '</div>';
       }
     }
 
-    var lblIt = 'Guarda il video', lblEn = 'Watch the video';
-    var lbl   = biEl('p', 'video-lbl', lblIt, lblEn, lang);
+    /* Main video: player (iframe) or thumb (clickable thumbnail → YouTube) */
+    var mainVideoHtml = '';
+    if (ytId) {
+      var lbl = biEl('p', 'video-lbl', watchIt, watchEn, lang);
+      var mainEmbed;
+      if (mode === 'thumb') {
+        var thumbSrc = 'https://i.ytimg.com/vi/' + escHtml(ytId) + '/maxresdefault.jpg';
+        var ytLink   = 'https://www.youtube.com/watch?v=' + escHtml(ytId) + startT;
+        mainEmbed =
+          '<div style="max-width:' + maxW + ';margin:0 auto;">' +
+          '<a href="' + ytLink + '" target="_blank" rel="noopener noreferrer" style="display:block;">' +
+          '<div class="yt-thumb">' +
+          '<img src="' + thumbSrc + '" alt="' + escHtml(title) + '" loading="lazy" style="width:100%;height:auto;display:block;"/>' +
+          '<img src="' + ytSvg + '" alt="" class="yt-play" style="width:68px;height:auto;"/>' +
+          '</div></a></div>';
+      } else {
+        mainEmbed =
+          '<div style="max-width:' + maxW + ';margin:0 auto;"><div class="video-wrap">' +
+          '<iframe src="https://www.youtube.com/embed/' + escHtml(ytId) + escHtml(startQ) + '" title="' + escHtml(title) + '" ' +
+          'loading="lazy" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" ' +
+          'allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>' +
+          '</div></div>';
+      }
+      mainVideoHtml = '<div class="sec-wrap">' + lbl + '</div>' + mainEmbed;
+    }
 
     return (
       '<section class="video-sec">' +
-      '<div class="sec-wrap">' + lbl + '</div>' +
-      '<div style="max-width:' + maxW + ';margin:0 auto;"><div class="video-wrap">' +
-      '<iframe src="https://www.youtube.com/embed/' + escHtml(ytId) + escHtml(startQ) + '" title="' + escHtml(title) + '" ' +
-      'loading="lazy" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" ' +
-      'allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>' +
-      '</div></div>' + descHtml + evHtml + '</section>'
+      mainVideoHtml + descHtml + evHtml + '</section>'
     );
   }
 
@@ -3789,7 +4046,87 @@
       '</div></div></section>';
   }
 
-  /* Public dispatcher — lang: 'it' | 'en' | 'both' (default, bilingual preview) */
+  function _rLinks(block, lang) {
+    var d        = block.data;
+    var items    = d.items || [];
+    var cols     = parseInt(d.cols, 10) || 3;
+    var gap      = d.gap || 'normal';
+    var imgRatio = d.imgRatio || '1/1';
+    var altBg    = d.altBg || false;
+    var gapMap   = { compact: '12px', normal: '20px', wide: '32px' };
+    var gapVal   = gapMap[gap] || '20px';
+    var bgStyle  = altBg ? 'background:var(--bg-alt,#f5f5f0);' : '';
+    var titleIt  = d.titleIt || '', titleEn = d.titleEn || '';
+
+    if (!items.length && !titleIt && !titleEn) {
+      return '<section class="links-sec" style="' + bgStyle + 'padding:40px 48px;">' +
+        '<div class="wrap"><p style="color:var(--muted);font-size:.75rem;letter-spacing:2px;text-transform:uppercase;">Link: nessun elemento</p></div></section>';
+    }
+
+    var titleHtml = '';
+    if (titleIt || titleEn) {
+      if (lang === 'both') {
+        titleHtml = (titleIt ? '<p class="video-links-lbl" data-lang="it" style="margin-top:0;">' + escHtml(titleIt) + '</p>' : '') +
+                    (titleEn ? '<p class="video-links-lbl" data-lang="en" hidden style="margin-top:0;">' + escHtml(titleEn) + '</p>' : '');
+      } else {
+        var tl = lang === 'en' ? (titleEn || titleIt) : (titleIt || titleEn);
+        if (tl) titleHtml = '<p class="video-links-lbl" style="margin-top:0;">' + escHtml(tl) + '</p>';
+      }
+    }
+
+    var gridStyle = 'display:grid;grid-template-columns:repeat(' + cols + ',minmax(0,1fr));gap:' + gapVal + ';';
+    var TSTYLE = 'font-family:var(--sans);font-size:.9rem;font-weight:600;color:var(--ink);margin:.5rem 0 .15rem;line-height:1.3;';
+    var SSTYLE = 'font-family:var(--sans);font-size:.78rem;color:var(--muted);margin:0;line-height:1.4;';
+
+    function mkBiP(style, it, en) {
+      if (!it && !en) return '';
+      if (lang === 'both') {
+        return (it ? '<p style="' + style + '" data-lang="it">' + it + '</p>' : '') +
+               (en ? '<p style="' + style + '" data-lang="en" hidden>' + en + '</p>' : '');
+      }
+      var t = lang === 'en' ? en : it;
+      return t ? '<p style="' + style + '">' + t + '</p>' : '';
+    }
+
+    var itemsHtml = items.map(function(item) {
+      var jpg    = item.jpg  || '';
+      var webp   = item.webp || '';
+      var textIt = escHtml(item.textIt    || '');
+      var textEn = escHtml(item.textEn    || item.textIt || '');
+      var subIt  = escHtml(item.subtextIt || '');
+      var subEn  = escHtml(item.subtextEn || item.subtextIt || '');
+      var link     = item.link ? escHtml(item.link) : '';
+      var border   = item.border || false;
+      var logoSize = parseInt(item.logoSize, 10) || 80;
+
+      var bdrStyle = border ? 'border:1px solid var(--border,#dbd5c5);border-radius:2px;' : '';
+      var wl = webp ? '<source type="image/webp" srcset="' + escHtml(webp) + '"/>' : '';
+      var logoHtml = jpg
+        ? '<div style="flex:0 0 ' + logoSize + 'px;width:' + logoSize + 'px;aspect-ratio:' + imgRatio + ';overflow:hidden;">' +
+            '<picture>' + wl +
+            '<source type="image/jpeg" srcset="' + escHtml(jpg) + '"/>' +
+            '<img src="' + escHtml(jpg) + '" alt="' + (textIt || textEn) + '" loading="lazy" ' +
+            'style="width:100%;height:100%;object-fit:contain;display:block;"/>' +
+            '</picture></div>'
+        : '<div style="flex:0 0 ' + logoSize + 'px;"></div>';
+      var tHtml = mkBiP(TSTYLE, textIt, textEn);
+      var sHtml = mkBiP(SSTYLE, subIt,  subEn);
+      var textBlock = (tHtml || sHtml) ? '<div style="min-width:0;">' + tHtml + sHtml + '</div>' : '';
+      var inner = logoHtml + textBlock;
+      var itemStyle = 'display:flex;flex-direction:row;align-items:center;gap:.75rem;padding:.75rem;' + bdrStyle;
+      if (link) {
+        return '<a href="' + link + '" target="_blank" rel="noopener noreferrer" style="' + itemStyle + 'text-decoration:none;color:inherit;">' + inner + '</a>';
+      }
+      return '<div style="' + itemStyle + '">' + inner + '</div>';
+    }).join('');
+
+    return '<section class="links-sec" style="' + bgStyle + 'padding:40px 0;">' +
+      '<div class="wrap">' +
+      (titleHtml ? '<div style="margin-bottom:1rem;">' + titleHtml + '</div>' : '') +
+      '<div style="' + gridStyle + '">' + itemsHtml + '</div>' +
+      '</div></section>';
+  }
+
   function renderBlock(block, lang) {
     lang = lang || 'both';
     switch (block.type) {
@@ -3804,6 +4141,7 @@
       case 'separator': return _rSeparator(block);
       case 'card':      return _rCard(block, lang);
       case 'cardgrid':  return _rCardGrid(block, lang);
+      case 'links':     return _rLinks(block, lang);
       default:          return '';
     }
   }
