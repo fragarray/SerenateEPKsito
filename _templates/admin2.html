@@ -199,6 +199,8 @@
     .block-type-badge.t-section   { background: #e8edf5; color: var(--type-section); }
     .block-type-badge.t-specs     { background: #ede8f5; color: var(--type-specs); }
     .block-type-badge.t-separator { background: #f0f0f0; color: var(--type-separator); }
+    .block-type-badge.t-card      { background: #e8f0f8; color: #4a80c4; }
+    .block-type-badge.t-cardgrid   { background: #e8f4e8; color: #3a8a5c; }
 
     .block-panel-title {
       flex: 1; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; color: var(--ink);
@@ -540,7 +542,7 @@
 
     /* ── CARD PREVIEW PANEL ─────────────────────────────────────────────────── */
     #card-prev-panel {
-      position: fixed; top: 64px; right: 24px; width: 330px;
+      position: fixed; top: 64px; right: 24px; width: 710px; max-width: calc(100vw - 32px);
       z-index: 9000; display: none; flex-direction: column;
       background: #1c1a14; border: 1px solid var(--border); border-radius: 3px;
       box-shadow: 0 10px 40px rgba(0,0,0,.55);
@@ -555,7 +557,25 @@
       font-size: 0.58rem; letter-spacing: 2px; text-transform: uppercase;
       color: var(--gold-lt); font-weight: 700; flex: 1;
     }
-    .cpv-inner { padding: 16px; background: #f3f0e7; overflow: auto; max-height: calc(100vh - 140px); }
+    .cpv-body { display: flex; flex: 1; overflow: hidden; min-height: 220px; max-height: calc(100vh - 110px); }
+    .cpv-inner { width: 310px; flex-shrink: 0; padding: 16px; background: #f3f0e7; overflow-y: auto; }
+    .cpv-code-wrap { flex: 1; display: flex; flex-direction: column; border-left: 1px solid var(--border); min-width: 0; overflow: hidden; }
+    .cpv-code-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 5px 10px; background: var(--panel); border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .cpv-code-hdr-lbl { font-size: 0.56rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+    .cpv-copy-btn {
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 1px; padding: 2px 8px;
+      border: 1px solid var(--border); background: none; color: var(--gold-lt); cursor: pointer; border-radius: 2px;
+    }
+    .cpv-copy-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .cpv-code-ta {
+      flex: 1; width: 100%; resize: none; border: none;
+      background: #0c0b09; color: #c8c2b5;
+      font-family: 'Courier New', Courier, monospace; font-size: 0.67rem; line-height: 1.6;
+      padding: 12px; box-sizing: border-box;
+    }
     .cpv-foot {
       display: flex; gap: 6px; padding: 6px 10px;
       background: var(--bg); border-top: 1px solid var(--border); flex-shrink: 0;
@@ -904,7 +924,16 @@
       <span class="cpv-bar-title">&#9642; Anteprima Card &ndash; index.html</span>
       <button class="btn-preview-action" onclick="closeCardPreview()" title="Chiudi">&#10005;</button>
     </div>
-    <div class="cpv-inner" id="card-prev-inner"></div>
+    <div class="cpv-body">
+      <div class="cpv-inner" id="card-prev-inner"></div>
+      <div class="cpv-code-wrap">
+        <div class="cpv-code-hdr">
+          <span class="cpv-code-hdr-lbl">Codice HTML &mdash; incolla in index.html</span>
+          <button class="cpv-copy-btn" onclick="copyCardSnippet()" title="Copia codice">&#10697; Copia</button>
+        </div>
+        <textarea id="card-prev-code" class="cpv-code-ta" readonly spellcheck="false"></textarea>
+      </div>
+    </div>
     <div class="cpv-foot">
       <button class="cpv-lang-btn active" id="cpv-btn-it" onclick="setCardPreviewLang('it')">ITA</button>
       <button class="cpv-lang-btn" id="cpv-btn-en" onclick="setCardPreviewLang('en')">ENG</button>
@@ -999,6 +1028,22 @@
           <span class="btc-desc">Spazio / divisore visivo</span>
         </button>
 
+        <button class="block-type-card" onclick="addBlock('card');closeModal('modal-add-block')">
+          <div class="btc-icon" style="background:#e8f0f8;color:#4a80c4;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <span class="btc-label">Card</span>
+          <span class="btc-desc">Scheda con immagine e link</span>
+        </button>
+
+        <button class="block-type-card" onclick="addBlock('cardgrid');closeModal('modal-add-block')">
+          <div class="btc-icon" style="background:#e8f4e8;color:#3a8a5c;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>
+          </div>
+          <span class="btc-label">Griglia card</span>
+          <span class="btc-desc">Griglia N×M di card</span>
+        </button>
+
       </div><!-- /block-type-grid -->
 
       <div class="modal-footer">
@@ -1061,7 +1106,9 @@
   var BLOCK_LABELS = {
     hero: 'Hero', lead: 'Lead', paragraph: 'Paragrafo',
     photo: 'Foto', gallery: 'Galleria', video: 'Video',
-    section: 'Sezione testo', specs: 'Scheda tecnica', separator: 'Separatore'
+    section: 'Sezione testo', specs: 'Scheda tecnica', separator: 'Separatore',
+    card: 'Card',
+    cardgrid: 'Griglia card'
   };
 
   /* Default data shape for every block type */
@@ -1084,7 +1131,15 @@
                  year: '', city: '', discography: '',
                  membersIt: '', membersEn: '', collab: '',
                  website: '', techRiderUrl: '' },
-    separator: { size: 'md', style: 'blank' }
+    separator: { size: 'md', style: 'blank' },
+    card:      { jpg: '', webp: '', altIt: '', altEn: '',
+                 title: '',
+                 tagIt: '', tagEn: '',
+                 descIt: '', descEn: '',
+                 link: '',
+                 ctaLabelIt: 'Scopri \u2192', ctaLabelEn: 'Discover \u2192',
+                 align: 'center', width: 'medium', imgRatio: '3/2', altBg: false },
+    cardgrid:  { cols: 3, rows: 2, gap: 'normal', imgRatio: '3/2', altBg: false, cards: [] }
   };
 
   /* Variants available per block type */
@@ -1821,6 +1876,150 @@
       '</div>';
   }
 
+  /* ── Card grid: dynamic card list ──────────────────────────── */
+  function _cgCardDefaults() {
+    return { jpg: '', webp: '', altIt: '', title: '', tagIt: '', tagEn: '', descIt: '', descEn: '', link: '', ctaLabelIt: 'Scopri \u2192', ctaLabelEn: 'Discover \u2192' };
+  }
+
+  function _cgItems(block) {
+    var cards = block.data.cards || [];
+    var cols  = parseInt(block.data.cols, 10) || 3;
+    if (!cards.length) return '<p style="font-size:0.65rem;color:var(--muted);padding:4px 0;">Aggiorna la griglia per popolare le card.</p>';
+    return cards.map(function(c, i) {
+      var row = Math.floor(i / cols) + 1;
+      var col = (i % cols) + 1;
+      return '<div class="dyn-item" style="padding:8px 6px;">' +
+        '<span class="dyn-item-num">' + row + '\u00d7' + col + '</span>' +
+        '<div class="dyn-item-body">' +
+          '<div class="field-row">' +
+            '<div class="field"><label>JPG</label><div class="img-input-row">' +
+              '<input type="text" data-cg-idx="' + i + '" data-cg-field="jpg" value="' + escHtml(c.jpg||'') + '" placeholder="img/foto.jpg"/>' +
+              '<button type="button" class="btn-img-upload" onclick="triggerImgUpload(this)" title="Carica">\u21d1</button>' +
+            '</div></div>' +
+            '<div class="field"><label>WebP</label><div class="img-input-row">' +
+              '<input type="text" data-cg-idx="' + i + '" data-cg-field="webp" value="' + escHtml(c.webp||'') + '" placeholder="img/foto.webp"/>' +
+              '<button type="button" class="btn-img-upload" onclick="triggerImgUpload(this)" title="Carica">\u21d1</button>' +
+            '</div></div>' +
+          '</div>' +
+          '<div class="field"><label>Titolo</label>' +
+            '<input type="text" data-cg-idx="' + i + '" data-cg-field="title" value="' + escHtml(c.title||'') + '"/>' +
+          '</div>' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Tag IT</label><input type="text" data-cg-idx="' + i + '" data-cg-field="tagIt" value="' + escHtml(c.tagIt||'') + '"/></div>' +
+            '<div class="field"><label>Tag EN</label><input type="text" data-cg-idx="' + i + '" data-cg-field="tagEn" value="' + escHtml(c.tagEn||'') + '"/></div>' +
+          '</div>' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Desc IT</label><textarea rows="2" data-cg-idx="' + i + '" data-cg-field="descIt">' + escHtml(c.descIt||'') + '</textarea></div>' +
+            '<div class="field"><label>Desc EN</label><textarea rows="2" data-cg-idx="' + i + '" data-cg-field="descEn">' + escHtml(c.descEn||'') + '</textarea></div>' +
+          '</div>' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Link</label><input type="text" data-cg-idx="' + i + '" data-cg-field="link" value="' + escHtml(c.link||'') + '" placeholder="presskit_wedding.html"/></div>' +
+            '<div class="field"><label>CTA IT</label><input type="text" data-cg-idx="' + i + '" data-cg-field="ctaLabelIt" value="' + escHtml(c.ctaLabelIt||'Scopri \u2192') + '"/></div>' +
+            '<div class="field"><label>CTA EN</label><input type="text" data-cg-idx="' + i + '" data-cg-field="ctaLabelEn" value="' + escHtml(c.ctaLabelEn||'Discover \u2192') + '"/></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function syncCardGridSize(blockId) {
+    var block = getBlock(blockId);
+    if (!block) return;
+    pushUndo();
+    var cols  = parseInt(block.data.cols, 10) || 3;
+    var rows  = parseInt(block.data.rows, 10) || 2;
+    var total = cols * rows;
+    var cards = block.data.cards || [];
+    while (cards.length < total) { cards.push(_cgCardDefaults()); }
+    if (cards.length > total) { cards.length = total; }
+    block.data.cards = cards;
+    markDirty();
+    var el = document.getElementById('cg-' + blockId.substring(0,8));
+    if (el) el.innerHTML = _cgItems(block);
+    _updatePanelSubtitle(blockId);
+    schedulePreviewUpdate(blockId);
+  }
+
+  function _fbCardGrid(block) {
+    var d   = block.data;
+    var bid = block.id.substring(0,8);
+    var colOpts = [2,3,4].map(function(n) {
+      return '<option value="' + n + '"' + (parseInt(d.cols||3,10) === n ? ' selected' : '') + '>' + n + '</option>';
+    }).join('');
+    var rowOpts = [1,2,3,4].map(function(n) {
+      return '<option value="' + n + '"' + (parseInt(d.rows||2,10) === n ? ' selected' : '') + '>' + n + '</option>';
+    }).join('');
+    return '<div class="field-row">' +
+        '<div class="field"><label>Colonne</label>' +
+          '<select data-field="cols" onchange="syncCardGridSize(\'' + block.id + '\')">' + colOpts + '</select>' +
+        '</div>' +
+        '<div class="field"><label>Righe</label>' +
+          '<select data-field="rows" onchange="syncCardGridSize(\'' + block.id + '\')">' + rowOpts + '</select>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:14px;flex-wrap:wrap;padding-top:4px;margin-bottom:8px;">' +
+        [{v:'compact',l:'Compatto'},{v:'normal',l:'Normale'},{v:'wide',l:'Ampio'}].map(function(o) {
+          var chk = ((d.gap || 'normal') === o.v) ? ' checked' : '';
+          return '<label style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--muted);cursor:pointer;">' +
+            '<input type="radio" name="cg-gap-' + bid + '" data-field="gap" value="' + o.v + '"' + chk + '/>' +
+            escHtml(o.l) + '</label>';
+        }).join('') +
+      '</div>' +
+      _fSelect(block, 'imgRatio', 'Proporzioni immagini', d.imgRatio || '3/2', [
+        {v:'3/2',l:'3:2 (paesaggio)'},{v:'4/3',l:'4:3 (classico)'},
+        {v:'1/1',l:'1:1 (quadrato)'},{v:'16/9',l:'16:9 (wide)'}
+      ]) +
+      '<div class="toggle-field" style="margin-top:4px;">' +
+        '<input type="checkbox" id="cg-altbg-' + bid + '" data-field="altBg"' + (d.altBg ? ' checked' : '') + '/>' +
+        '<label for="cg-altbg-' + bid + '">Sfondo alternato</label>' +
+      '</div>' +
+      '<hr class="inner-divider"/>' +
+      '<p class="inner-h3">Card (' + (parseInt(d.cols||3,10) * parseInt(d.rows||2,10)) + ' totali)</p>' +
+      '<div class="dyn-list" id="cg-' + bid + '">' + _cgItems(block) + '</div>';
+  }
+
+  function _fbCard(block) {
+    var d   = block.data;
+    var bid = block.id.substring(0,8);
+    return _fImgPair(block, 'jpg', 'webp', d.jpg || '', d.webp || '') +
+      _fSelect(block, 'imgRatio', 'Proporzioni immagine', d.imgRatio || '3/2', [
+        {v:'3/2',l:'3:2 (paesaggio)'},{v:'4/3',l:'4:3 (classico)'},
+        {v:'1/1',l:'1:1 (quadrato)'},{v:'16/9',l:'16:9 (wide)'}
+      ]) +
+      _fInput(block, 'title', 'Titolo', d.title || '', 'Es. Serenate Wedding') +
+      '<div class="field-row">' +
+        _fInput(block, 'tagIt', 'Tag ITA', d.tagIt || '', 'Es. Matrimoni &amp; eventi') +
+        _fInput(block, 'tagEn', 'Tag ENG', d.tagEn || '', 'Es. Weddings &amp; events') +
+      '</div>' +
+      _fLangTabs(block.id + '-card',
+        _fTextarea(block, 'descIt', 'Descrizione ITA', d.descIt || '', {}),
+        _fTextarea(block, 'descEn', 'Descrizione ENG', d.descEn || '', {})
+      ) +
+      _fInput(block, 'link', 'Link pagina', d.link || '', 'Es. presskit_wedding.html') +
+      '<div class="field-row">' +
+        _fInput(block, 'ctaLabelIt', 'Testo link ITA', d.ctaLabelIt || 'Scopri \u2192', '') +
+        _fInput(block, 'ctaLabelEn', 'Testo link ENG', d.ctaLabelEn || 'Discover \u2192', '') +
+      '</div>' +
+      '<hr class="inner-divider"/>' +
+      '<p class="inner-h3">Posizione e dimensioni</p>' +
+      '<p class="inner-label" style="margin-bottom:4px;">Allineamento</p>' +
+      '<div style="display:flex;gap:14px;flex-wrap:wrap;padding-top:2px;margin-bottom:8px;">' +
+        [['left','Sinistra'],['center','Centro'],['right','Destra']].map(function(a) {
+          var chk = ((d.align || 'center') === a[0]) ? ' checked' : '';
+          return '<label style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--muted);cursor:pointer;">'
+            + '<input type="radio" name="card-align-' + bid + '" data-field="align" value="' + a[0] + '"' + chk + '/>'
+            + escHtml(a[1]) + '</label>';
+        }).join('') +
+      '</div>' +
+      _fSelect(block, 'width', 'Larghezza card', d.width || 'medium', [
+        {v:'narrow',l:'Stretta (280 px)'},{v:'medium',l:'Media (360 px)'},{v:'wide',l:'Larga (480 px)'},{v:'full',l:'Intera larghezza'}
+      ]) +
+      '<div class="toggle-field" style="margin-top:6px;">' +
+        '<input type="checkbox" id="card-altbg-' + bid + '" data-field="altBg"' + (d.altBg ? ' checked' : '') + '/>' +
+        '<label for="card-altbg-' + bid + '">Sfondo alternato</label>' +
+      '</div>';
+  }
+
   function buildBlockFormBody(block) {
     switch (block.type) {
       case 'hero':      return _fbHero(block);
@@ -1832,6 +2031,8 @@
       case 'section':   return _fbSection(block);
       case 'specs':     return _fbSpecs(block);
       case 'separator': return _fbSeparator(block);
+      case 'card':      return _fbCard(block);
+      case 'cardgrid':  return _fbCardGrid(block);
       default: return '<p style="color:var(--muted);font-size:.72rem;">Tipo sconosciuto.</p>';
     }
   }
@@ -1861,6 +2062,15 @@
         var vi = parseInt(t.dataset.vidIdx, 10);
         if (block.data.extraVideos && block.data.extraVideos[vi]) {
           block.data.extraVideos[vi][t.dataset.vidField] = t.value;
+          markDirty(); schedulePreviewUpdate(block.id);
+        }
+        return;
+      }
+      /* Card grid card fields */
+      if (t.dataset.cgIdx !== undefined && t.dataset.cgField) {
+        var ci = parseInt(t.dataset.cgIdx, 10);
+        if (block.data.cards && block.data.cards[ci]) {
+          block.data.cards[ci][t.dataset.cgField] = t.value;
           markDirty(); schedulePreviewUpdate(block.id);
         }
         return;
@@ -1917,7 +2127,9 @@
     video:     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>',
     section:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="4" rx="1"/><line x1="3" y1="13" x2="21" y2="13"/><line x1="3" y1="17" x2="17" y2="17"/></svg>',
     specs:     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>',
-    separator: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/></svg>'
+    separator: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/></svg>',
+    card:      '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+    cardgrid:  '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/><line x1="12" y1="5" x2="12" y2="7"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'
   };
 
   function getBlockSubtitle(block) {
@@ -1932,6 +2144,8 @@
       case 'section':   return d.titleIt  || '';
       case 'specs':     return d.name     || '';
       case 'separator': return ({sm:'piccolo',md:'medio',lg:'grande'})[d.size] || '';
+      case 'card':      return d.title ? d.title.substring(0,42)+(d.title.length>42?'\u2026':'') : (d.link || '');
+      case 'cardgrid':  return (d.cols||3) + '\u00d7' + (d.rows||2) + ' — ' + ((d.cards||[]).length) + ' card';
       default:          return '';
     }
   }
@@ -2317,6 +2531,58 @@
       + '</div></article>';
   }
 
+  function buildCardSnippet() {
+    var g     = STATE.global;
+    var name  = g.name          || 'Nome Artista';
+    var slug  = g.slug          || 'nome-artista';
+    var tagIt = g.cardTagIt     || '';
+    var tagEn = g.cardTagEn     || tagIt;
+    var dIt   = g.cardDescIt    || '';
+    var dEn   = g.cardDescEn    || dIt;
+    var jpg   = g.cardThumbJpg  || 'img/artista_thumb.jpg';
+    var webp  = g.cardThumbWebp || '';
+    var e     = escHtml;
+    var LF    = String.fromCharCode(10);
+    var lines = [
+      '<!-- Copia e incolla questo blocco dentro .productions-grid in index.html -->',
+      '',
+      '          <article class="prod-card">',
+      '            <div class="prod-card-img">',
+      '              <picture>'
+    ];
+    if (webp) lines.push('                <source type="image/webp" srcset="' + e(webp) + '" />');
+    lines.push('                <source type="image/jpeg" srcset="' + e(jpg) + '" />');
+    lines.push('                <img src="' + e(jpg) + '" alt="' + e(name) + '" loading="lazy" width="600" height="400" />');
+    lines.push('              </picture>');
+    lines.push('            </div>');
+    lines.push('            <div class="prod-card-body">');
+    if (tagIt) lines.push('              <p class="prod-card-tag" data-lang="it">' + e(tagIt) + '</p>');
+    if (tagEn) lines.push('              <p class="prod-card-tag" data-lang="en" hidden>' + e(tagEn) + '</p>');
+    lines.push('              <h2 class="prod-card-title">' + e(name) + '</h2>');
+    if (dIt)  lines.push('              <p class="prod-card-desc" data-lang="it">' + e(dIt) + '</p>');
+    if (dEn)  lines.push('              <p class="prod-card-desc" data-lang="en" hidden>' + e(dEn) + '</p>');
+    lines.push('              <a class="prod-card-link" href="' + e(slug) + '.html" data-lang="it" aria-label="Scopri ' + e(name) + '">' + 'Scopri →</a>');
+    lines.push('              <a class="prod-card-link" href="' + e(slug) + '.html" data-lang="en" hidden aria-label="Discover ' + e(name) + '">' + 'Discover →</a>');
+    lines.push('            </div>');
+    lines.push('          </article>');
+    return lines.join(LF);
+  }
+
+  function copyCardSnippet() {
+    var ta = document.getElementById('card-prev-code');
+    if (!ta) return;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(function() {
+          var btn = document.querySelector('.cpv-copy-btn');
+          if (btn) { var orig = btn.textContent; btn.textContent = '\u2713 Copiato!'; setTimeout(function() { btn.textContent = orig; }, 1800); }
+        });
+      } else {
+        ta.select(); document.execCommand('copy');
+      }
+    } catch(e) { ta.select(); document.execCommand('copy'); }
+  }
+
   function openCardPreview() {
     var panel = document.getElementById('card-prev-panel');
     if (panel) panel.classList.add('cpv-visible');
@@ -2339,6 +2605,8 @@
     if (!panel || !panel.classList.contains('cpv-visible')) return;
     var inner = document.getElementById('card-prev-inner');
     if (inner) inner.innerHTML = buildCardHTML(_cpvLang);
+    var ta = document.getElementById('card-prev-code');
+    if (ta) ta.value = buildCardSnippet();
   }
 
   /* Drag the card preview panel */
@@ -2876,11 +3144,11 @@
       try {
         var slug = STATE.global.slug || 'artista';
         var zip  = new JSZip();
-        zip.file(slug + '_it.html',   buildExportHTML('it', css));
-        zip.file(slug + '_en.html',   buildExportHTML('en', css));
+        zip.file(slug + '.html',          buildBilingualExportHTML(css));
         zip.file(slug + '_data.json', JSON.stringify({ global: STATE.global, blocks: STATE.blocks }, null, 2));
         zip.file('presskit/' + slug + '_presskit_it.html', buildStaticHTML('it'));
         zip.file('presskit/' + slug + '_presskit_en.html', buildStaticHTML('en'));
+        zip.file('card_snippet.html', buildCardSnippet());
         zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } })
           .then(function(blob) {
             var a = document.createElement('a');
@@ -3075,7 +3343,12 @@
       '  if(d.type==="setMode")B.classList.toggle("editor-mode",d.payload.mode==="editor");',
       '  if(d.type==="patchBlock"){',
       '    var pe=document.querySelector("[data-block-id=\\"" + d.payload.id + "\\"]");',
-      '    if(pe){pe.innerHTML=d.payload.html;if(!pe.querySelector(".prev-toolbar"))pe.appendChild(tb(pe.dataset.blockId));}',
+      '    if(pe){',
+      '      pe.innerHTML=d.payload.html;',
+      '      if(!pe.querySelector(".prev-toolbar"))pe.appendChild(tb(pe.dataset.blockId));',
+      '      var cl=document.documentElement.lang||"it";',
+      '      pe.querySelectorAll("[data-lang]").forEach(function(el){el.hidden=el.dataset.lang!==cl;});',
+      '    }',
       '  }',
       '  if(d.type==="highlightBlock"){',
       '    var bid=d.payload.id;',
@@ -3417,6 +3690,105 @@
     return '<div aria-hidden="true" style="height:' + h + ';"></div>';
   }
 
+  function _rCard(block, lang) {
+    var d        = block.data;
+    var jpg      = d.jpg  || '';
+    var webp     = d.webp || '';
+    var title    = escHtml(d.title || 'Card');
+    var link     = escHtml(d.link  || '#');
+    var tagIt    = escHtml(d.tagIt  || '');
+    var tagEn    = escHtml(d.tagEn  || d.tagIt || '');
+    var descIt   = escHtml(d.descIt || '');
+    var descEn   = escHtml(d.descEn || d.descIt || '');
+    var ctaIt    = escHtml(d.ctaLabelIt || 'Scopri \u2192');
+    var ctaEn    = escHtml(d.ctaLabelEn || 'Discover \u2192');
+    var align    = d.align || 'center';
+    var width    = d.width || 'medium';
+    var imgRatio = d.imgRatio || '3/2';
+    var altBg    = d.altBg || false;
+    var widthMap = { narrow: '280px', medium: '360px', wide: '480px', full: '100%' };
+    var maxW     = widthMap[width] || '360px';
+    var justMap  = { left: 'flex-start', center: 'center', right: 'flex-end' };
+    var justify  = justMap[align] || 'center';
+    var bgStyle  = altBg ? 'background:var(--bg-alt,#f5f5f0);' : '';
+    var wl       = webp ? '<source type="image/webp" srcset="' + escHtml(webp) + '"/>' : '';
+    var imgStyle = ' style="aspect-ratio:' + imgRatio + ';overflow:hidden;"';
+    var picHtml  = jpg
+      ? '<div class="card-img"' + imgStyle + '><picture>' + wl +
+          '<source type="image/jpeg" srcset="' + escHtml(jpg) + '"/>' +
+          '<img src="' + escHtml(jpg) + '" alt="' + escHtml(d.altIt || title) + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;"/>' +
+        '</picture></div>'
+      : '';
+    var tagHtml  = (tagIt || tagEn) ? biEl('p', 'card-tag', tagIt, tagEn, lang) : '';
+    var descHtml = (descIt || descEn) ? biEl('p', 'card-desc', descIt, descEn, lang) : '';
+    var ctaHtml  = d.link
+      ? (lang === 'both'
+          ? '<a class="card-link" href="' + link + '" data-lang="it">' + ctaIt + '</a>' +
+            '<a class="card-link" href="' + link + '" data-lang="en" hidden>' + ctaEn + '</a>'
+          : '<a class="card-link" href="' + link + '">' + (lang === 'en' ? ctaEn : ctaIt) + '</a>')
+      : '';
+    return '<section class="cards" style="' + bgStyle + '">' +
+      '<div class="wrap"><div style="display:flex;justify-content:' + justify + ';">' +
+        '<article class="card" style="max-width:' + maxW + ';width:100%;">' + picHtml +
+          '<div class="card-body">' + tagHtml + '<h2 class="card-title">' + title + '</h2>' + descHtml + ctaHtml + '</div>' +
+        '</article>' +
+      '</div></div></section>';
+  }
+
+
+  function _rCardGrid(block, lang) {
+    var d        = block.data;
+    var cols     = parseInt(d.cols, 10) || 3;
+    var gap      = d.gap || 'normal';
+    var imgRatio = d.imgRatio || '3/2';
+    var altBg    = d.altBg || false;
+    var cards    = d.cards || [];
+    var gapMap   = { compact: '12px', normal: '24px', wide: '40px' };
+    var gapVal   = gapMap[gap] || '24px';
+    var bgStyle  = altBg ? 'background:var(--bg-alt,#f5f5f0);' : '';
+    var gridStyle = 'display:grid;grid-template-columns:repeat(' + cols + ',1fr);gap:' + gapVal + ';';
+
+    var cardsHtml = cards.map(function(c) {
+      var title   = escHtml(c.title  || '');
+      var link    = escHtml(c.link   || '#');
+      var tagIt   = escHtml(c.tagIt  || '');
+      var tagEn   = escHtml(c.tagEn  || c.tagIt || '');
+      var descIt  = escHtml(c.descIt || '');
+      var descEn  = escHtml(c.descEn || c.descIt || '');
+      var ctaIt   = escHtml(c.ctaLabelIt || 'Scopri \u2192');
+      var ctaEn   = escHtml(c.ctaLabelEn || 'Discover \u2192');
+      var jpg     = c.jpg  || '';
+      var webp    = c.webp || '';
+      var wl      = webp ? '<source type="image/webp" srcset="' + escHtml(webp) + '"/>' : '';
+      var imgSty  = ' style="aspect-ratio:' + imgRatio + ';overflow:hidden;"';
+      var picHtml = jpg
+        ? '<div class="card-img"' + imgSty + '><picture>' + wl +
+            '<source type="image/jpeg" srcset="' + escHtml(jpg) + '"/>' +
+            '<img src="' + escHtml(jpg) + '" alt="' + escHtml(c.altIt || title) + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;"/>' +
+          '</picture></div>'
+        : '';
+      var tagHtml  = (tagIt || tagEn) ? biEl('p', 'card-tag', tagIt, tagEn, lang) : '';
+      var descHtml = (descIt || descEn) ? biEl('p', 'card-desc', descIt, descEn, lang) : '';
+      var ctaHtml  = c.link
+        ? (lang === 'both'
+            ? '<a class="card-link" href="' + link + '" data-lang="it">' + ctaIt + '</a>' +
+              '<a class="card-link" href="' + link + '" data-lang="en" hidden>' + ctaEn + '</a>'
+            : '<a class="card-link" href="' + link + '">' + (lang === 'en' ? ctaEn : ctaIt) + '</a>')
+        : '';
+      return '<article class="card">' + picHtml +
+        '<div class="card-body">' + tagHtml +
+          (title ? '<h2 class="card-title">' + title + '</h2>' : '') +
+          descHtml + ctaHtml +
+        '</div>' +
+      '</article>';
+    }).join('');
+
+    return '<section class="cards" style="' + bgStyle + '">' +
+      '<div class="wrap"><div style="' + gridStyle + '">' +
+        cardsHtml +
+      '</div></div></section>';
+  }
+
   /* Public dispatcher — lang: 'it' | 'en' | 'both' (default, bilingual preview) */
   function renderBlock(block, lang) {
     lang = lang || 'both';
@@ -3430,6 +3802,8 @@
       case 'section':   return _rSection(block, lang);
       case 'specs':     return _rSpecs(block, lang);
       case 'separator': return _rSeparator(block);
+      case 'card':      return _rCard(block, lang);
+      case 'cardgrid':  return _rCardGrid(block, lang);
       default:          return '';
     }
   }
@@ -3501,15 +3875,15 @@
   /* Inline lang-toggle script (used in both preview and export) */
   function _langScript(fixedLang) {
     if (fixedLang && fixedLang !== 'both') {
-      /* Export: just set the fixed lang once, no toggle */
-      return '<script nomodule>(function(){' +
+      /* Export single-lang: show only the fixed language, no toggle */
+      return '<script>(function(){' +
         'var l="' + fixedLang + '";' +
         'document.documentElement.lang=l;' +
         'document.querySelectorAll("[data-lang]").forEach(function(el){el.hidden=el.dataset.lang!==l;});' +
         '})();<\/script>';
     }
-    /* Preview: full toggle with localStorage */
-    return '<script nomodule>(function(){' +
+    /* Bilingual: full toggle stored in localStorage */
+    return '<script>(function(){' +
       'function setLang(l){' +
         'try{localStorage.setItem("lang",l);}catch(_){}' +
         'document.documentElement.lang=l;' +
@@ -3519,6 +3893,7 @@
           'b.setAttribute("aria-pressed",b.dataset.langTarget===l?"true":"false");' +
         '});' +
       '}' +
+      'window._setLang=setLang;' +
       'document.querySelectorAll(".lang-btn").forEach(function(b){b.addEventListener("click",function(){setLang(b.dataset.langTarget);});});' +
       'var s="it";try{s=localStorage.getItem("lang")||"it";}catch(_){}' +
       'setLang(s);' +
@@ -3566,12 +3941,53 @@
     );
   }
 
+  /* Bilingual export HTML — single file with language toggle, no bridge scripts */
+  function buildBilingualExportHTML(cssContent) {
+    var g       = STATE.global;
+    var name    = g.name || 'Nome Artista';
+    var slug    = g.slug || 'artista';
+    var metaIt  = g.metaIt || name;
+    var heroBlock = STATE.blocks.find(function(b) { return b.type === 'hero'; });
+    var heroJpg   = heroBlock ? heroBlock.data.jpg : '';
+    var cssTag    = cssContent ? '<style>' + cssContent + '</style>' : '<link rel="stylesheet" href="assets/css/style.css"/>';
+    return (
+      '<!DOCTYPE html>\n<html lang="it">\n<head>\n' +
+      '<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>\n' +
+      '<title>' + escHtml(name) + ' \u2013 AltraMarea Produzioni</title>\n' +
+      '<meta name="description" content="' + escHtml(metaIt) + '"/>\n' +
+      '<meta property="og:title" content="' + escHtml(name) + ' \u2013 AltraMarea Produzioni"/>\n' +
+      '<meta property="og:description" content="' + escHtml(metaIt) + '"/>\n' +
+      '<meta property="og:url" content="https://www.altramareaproduzioni.it/' + escHtml(slug) + '.html"/>\n' +
+      (heroJpg ? '<meta property="og:image" content="https://www.altramareaproduzioni.it/' + escHtml(heroJpg) + '"/>\n' : '') +
+      '<link rel="icon" type="image/png" href="img/logo_sito.png"/>\n' +
+      '<link rel="preconnect" href="https://fonts.googleapis.com"/>' +
+      '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>' +
+      '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>\n' +
+      cssTag + '\n' + _colorVarCSS() +
+      '\n</head>\n<body>\n' +
+      '<a href="#main" class="skip-link">Skip to content</a>\n' +
+      '<a class="home-link" href="index.html" aria-label="Torna alla homepage">' +
+        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/>' +
+          '<polyline points="9 21 9 12 15 12 15 21"/>' +
+        '</svg>' +
+      '</a>\n' +
+      '<nav class="lang-bar" role="navigation" aria-label="Seleziona lingua">' +
+        '<button class="lang-btn" data-lang-target="it" aria-pressed="true">ITA</button>' +
+        '<button class="lang-btn" data-lang-target="en" aria-pressed="false">ENG</button>' +
+      '</nav>\n' +
+      _coverHeader(g, 'both') + '\n' +
+      '<main id="main">\n' +
+      STATE.blocks.map(function(b) { return renderBlock(b, 'both'); }).join('\n') +
+      '\n</main>\n' +
+      _footer(g, 'both') + '\n' +
+      _langScript() +
+      '\n</body>\n</html>'
+    );
+  }
+
   /* Export HTML for a single language — links to external CSS (F6) */
   function buildExportHTML(lang, cssContent) {
-    var g    = STATE.global;
-    var name = g.name || 'Nome Artista';
-    var slug = g.slug || 'artista';
-    var meta = (lang === 'en' ? g.metaEn : g.metaIt) || name;
     var heroBlock = STATE.blocks.find(function(b) { return b.type === 'hero'; });
     var heroJpg   = heroBlock ? heroBlock.data.jpg : '';
     var cssTag    = cssContent ? '<style>' + cssContent + '</style>' : '<link rel="stylesheet" href="assets/css/style.css"/>';
