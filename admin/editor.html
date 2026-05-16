@@ -785,6 +785,7 @@
                   <select data-global="headerType" onchange="toggleLogoField()">
                     <option value="text">Solo testo</option>
                     <option value="logo">Logo + testo</option>
+                    <option value="logo-only">Solo logo</option>
                   </select>
                 </div>
               </div>
@@ -796,7 +797,7 @@
                     <span class="hint">SVG: scalabile e colorabile via filtro. Usa fill="currentColor" nell'SVG per massima flessibilit&agrave;.</span>
                   </div>
                 </div>
-                <div class="field-row">
+                <div class="field-row" id="logo-pos-row">
                   <div class="field">
                     <label>Posizione logo</label>
                     <select data-global="logoPos">
@@ -2695,9 +2696,12 @@
   }
 
   function toggleLogoField() {
-    var sel   = document.querySelector('[data-global="headerType"]');
+    var sel    = document.querySelector('[data-global="headerType"]');
     var fields = document.getElementById('header-logo-fields');
-    if (fields) fields.hidden = !(sel && sel.value === 'logo');
+    var posRow = document.getElementById('logo-pos-row');
+    var v = sel ? sel.value : 'text';
+    if (fields) fields.hidden = !(v === 'logo' || v === 'logo-only');
+    if (posRow) posRow.hidden = (v === 'logo-only');
   }
 
   /* ══════════════════════════════════════════════════════════════
@@ -3141,7 +3145,8 @@
     picker.click();
   }
 
-  /* Convert source image to JPEG + WebP, upload both, auto-fill paired field */
+  /* Convert source image to JPEG + WebP, upload both, auto-fill paired field.
+     For SVG/PNG (transparency-capable) with no paired field, upload the original as-is. */
   function doImgUpload(file, targetInput, btn) {
     var field     = targetInput.dataset.field || targetInput.dataset.photoField || targetInput.dataset.global || '';
     var isWebp    = /webp/i.test(field) || /webp/i.test(targetInput.placeholder || '');
@@ -3154,6 +3159,22 @@
     var oldJpg  = isWebp ? (partnerInp ? partnerInp.value : '') : targetInput.value;
     var oldWebp = isWebp ? targetInput.value : (partnerInp ? partnerInp.value : '');
     if (btn) btn.classList.add('busy');
+
+    /* ── Logo / graphic upload: SVG or PNG with no paired field → preserve original ── */
+    var isTransparentFmt = /svg|png/i.test(file.type) || /\.svg$|\.png$/i.test(file.name);
+    if (isTransparentFmt && !partnerInp) {
+      setStatus('Upload ' + file.name + '\u2026', '');
+      var slug = STATE.global.slug || '';
+      _uploadBlob(file, file.name, targetInput, slug)
+        .then(function(path) {
+          deleteServerFile(oldJpg);
+          setStatus('Upload completato: ' + path, '');
+        })
+        .catch(function(err) { setStatus('Upload fallito: ' + err.message, 'err'); })
+        .finally(function()  { if (btn) btn.classList.remove('busy'); });
+      return;
+    }
+
     setStatus('Conversione immagine\u2026', '');
     Promise.all([
       _convertToBlob(file, 'image/jpeg', jpgQ, maxW),
@@ -3327,7 +3348,12 @@
 
     /* COVER HEADER */
     var _sLf = _logoFilterCSS(g.logoFilter);
-    if (g.headerType === 'logo' && g.logoUrl) {
+    if (g.headerType === 'logo-only' && g.logoUrl) {
+      var _slh2 = parseInt(g.logoHeight, 10) || 88;
+      var _sSt2 = 'height:' + _slh2 + 'px;width:auto;display:inline-block;' + (_sLf ? 'filter:' + _sLf + ';' : '');
+      o.push('<!-- COVER -->\n<div style="background:#1c1a17;text-align:center;padding:44px 24px 40px;">\n');
+      o.push('<img alt="' + esc(name) + '" src="' + esc(absUrl(g.logoUrl)) + '" style="' + _sSt2 + '"/>\n');
+    } else if (g.headerType === 'logo' && g.logoUrl) {
       var _slh   = parseInt(g.logoHeight, 10) || 80;
       var _sSt   = 'height:' + _slh + 'px;width:auto;display:block;flex-shrink:0;' + (_sLf ? 'filter:' + _sLf + ';' : '');
       var _sLogo = '<img alt="' + esc(name) + '" src="' + esc(absUrl(g.logoUrl)) + '" style="' + _sSt + '"/>';
@@ -4552,6 +4578,14 @@
 
   function _coverHeader(g, lang) {
     var name = g.name || 'Nome Artista';
+    if (g.headerType === 'logo-only' && g.logoUrl) {
+      var lh = parseInt(g.logoHeight, 10) || 88;
+      var lf = _logoFilterCSS(g.logoFilter);
+      var iSt = 'height:' + lh + 'px;width:auto;display:inline-block;' + (lf ? 'filter:' + lf + ';' : '');
+      return '<header class="cover-header" style="background:#1c1a17">' +
+        '<img src="' + escHtml(g.logoUrl) + '" alt="' + escHtml(name) + '" style="' + iSt + '"/>' +
+        '</header>';
+    }
     if (g.headerType === 'logo' && g.logoUrl) {
       var lh    = parseInt(g.logoHeight, 10) || 80;
       var lf    = _logoFilterCSS(g.logoFilter);
