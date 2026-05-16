@@ -1144,10 +1144,19 @@
                  extraVideos: [] },
     section:   { titleIt: '', titleEn: '', bodyIt: '', bodyEn: '', altBg: false,
                  ctaLabelIt: '', ctaLabelEn: '', ctaUrl: '' },
-    specs:     { name: '', subtitle: '', genre: '', duration: '',
-                 year: '', city: '', discography: '',
-                 membersIt: '', membersEn: '', collab: '',
-                 website: '', techRiderUrl: '' },
+    specs:     { rows: [
+                   { labelIt: 'Titolo',               labelEn: 'Title',                valueIt: '', valueEn: '' },
+                   { labelIt: 'Sottotitolo',          labelEn: 'Subtitle',             valueIt: '', valueEn: '' },
+                   { labelIt: 'Genere',               labelEn: 'Genre',                valueIt: '', valueEn: '' },
+                   { labelIt: 'Durata',               labelEn: 'Duration',             valueIt: '', valueEn: '' },
+                   { labelIt: 'Anno',                 labelEn: 'Year',                 valueIt: '', valueEn: '' },
+                   { labelIt: 'Citt\u00e0',           labelEn: 'City',                 valueIt: '', valueEn: '' },
+                   { labelIt: 'Discografia',          labelEn: 'Discography',          valueIt: '', valueEn: '' },
+                   { labelIt: 'Formazione',           labelEn: 'Line-up',              valueIt: '', valueEn: '' },
+                   { labelIt: 'In collaborazione con',labelEn: 'In collaboration with',valueIt: '', valueEn: '' },
+                   { labelIt: 'Website',              labelEn: 'Website',              valueIt: '', valueEn: '' },
+                   { labelIt: 'Tech Rider',           labelEn: 'Tech Rider',           valueIt: '', valueEn: '' }
+                 ], btns: [] },
     separator: { size: 'md', style: 'blank' },
     card:      { jpg: '', webp: '', altIt: '', altEn: '',
                  title: '',
@@ -1927,28 +1936,129 @@
       '</div>';
   }
 
+  /* ── Specs: dynamic rows & buttons ─────────────────────────── */
+  function _spRowDefaults() {
+    return { labelIt: '', labelEn: '', valueIt: '', valueEn: '' };
+  }
+  function _spBtnDefaults() {
+    return { labelIt: '', labelEn: '', url: '' };
+  }
+
+  function _spRows(block) {
+    var rows = block.data.rows || [];
+    var bid  = block.id.substring(0,8);
+    if (!rows.length) return '<p style="font-size:0.65rem;color:var(--muted);padding:4px 0;">Nessuna riga — clicca + per aggiungere.</p>';
+    return rows.map(function(r, i) {
+      var canUp   = i > 0;
+      var canDown = i < rows.length - 1;
+      return '<div class="dyn-item" style="padding:8px 6px;">' +
+        '<div style="display:flex;flex-direction:column;gap:2px;align-items:center;padding-top:4px;">' +
+          '<button type="button" class="btn-remove" style="font-size:11px;padding:2px 5px;' + (canUp ? '' : 'opacity:.3;pointer-events:none;') + '" onclick="moveSpecsRow(\'' + block.id + '\',' + i + ',-1)" title="Su">\u2191</button>' +
+          '<span class="dyn-item-num" style="min-width:0;">' + (i+1) + '</span>' +
+          '<button type="button" class="btn-remove" style="font-size:11px;padding:2px 5px;' + (canDown ? '' : 'opacity:.3;pointer-events:none;') + '" onclick="moveSpecsRow(\'' + block.id + '\',' + i + ',1)" title="Gi\u00f9">\u2193</button>' +
+        '</div>' +
+        '<div class="dyn-item-body">' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Etichetta IT</label><input type="text" data-sp-row-idx="' + i + '" data-sp-row-field="labelIt" value="' + escHtml(r.labelIt||'') + '" placeholder="es. Genere"/></div>' +
+            '<div class="field"><label>Etichetta EN</label><input type="text" data-sp-row-idx="' + i + '" data-sp-row-field="labelEn" value="' + escHtml(r.labelEn||'') + '" placeholder="e.g. Genre"/></div>' +
+          '</div>' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Valore IT</label><textarea rows="2" data-sp-row-idx="' + i + '" data-sp-row-field="valueIt" style="resize:vertical;min-height:38px;">' + escHtml(r.valueIt||'') + '</textarea></div>' +
+            '<div class="field"><label>Valore EN</label><textarea rows="2" data-sp-row-idx="' + i + '" data-sp-row-field="valueEn" style="resize:vertical;min-height:38px;">' + escHtml(r.valueEn||'') + '</textarea></div>' +
+          '</div>' +
+        '</div>' +
+        '<button type="button" class="btn-remove" onclick="removeSpecsRow(\'' + block.id + '\',' + i + ')" title="Rimuovi">\u2715</button>' +
+      '</div>';
+    }).join('');
+  }
+
+  function addSpecsRow(blockId) {
+    var block = getBlock(blockId);
+    if (!block) return;
+    pushUndo();
+    if (!block.data.rows) block.data.rows = [];
+    block.data.rows.push(_spRowDefaults());
+    markDirty();
+    var el = document.getElementById('sp-rows-' + blockId.substring(0,8));
+    if (el) el.innerHTML = _spRows(block);
+    schedulePreviewUpdate(blockId);
+  }
+
+  function removeSpecsRow(blockId, idx) {
+    var block = getBlock(blockId);
+    if (!block) return;
+    pushUndo();
+    block.data.rows.splice(idx, 1);
+    markDirty();
+    var el = document.getElementById('sp-rows-' + blockId.substring(0,8));
+    if (el) el.innerHTML = _spRows(block);
+    schedulePreviewUpdate(blockId);
+  }
+
+  function moveSpecsRow(blockId, idx, dir) {
+    var block = getBlock(blockId);
+    if (!block) return;
+    var rows = block.data.rows || [];
+    var newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= rows.length) return;
+    pushUndo();
+    var tmp = rows[idx]; rows[idx] = rows[newIdx]; rows[newIdx] = tmp;
+    markDirty();
+    var el = document.getElementById('sp-rows-' + blockId.substring(0,8));
+    if (el) el.innerHTML = _spRows(block);
+    schedulePreviewUpdate(blockId);
+  }
+
+  function _spBtns(block) {
+    var btns = block.data.btns || [];
+    if (!btns.length) return '<p style="font-size:0.65rem;color:var(--muted);padding:4px 0;">Nessun pulsante — clicca + per aggiungere.</p>';
+    return btns.map(function(b, i) {
+      return '<div class="dyn-item" style="padding:8px 6px;">' +
+        '<span class="dyn-item-num">' + (i+1) + '</span>' +
+        '<div class="dyn-item-body">' +
+          '<div class="field"><label>URL</label><input type="text" data-sp-btn-idx="' + i + '" data-sp-btn-field="url" value="' + escHtml(b.url||'') + '" placeholder="https://\u2026"/></div>' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Etichetta IT</label><input type="text" data-sp-btn-idx="' + i + '" data-sp-btn-field="labelIt" value="' + escHtml(b.labelIt||'') + '" placeholder="es. Scarica Tech Rider"/></div>' +
+            '<div class="field"><label>Label EN</label><input type="text" data-sp-btn-idx="' + i + '" data-sp-btn-field="labelEn" value="' + escHtml(b.labelEn||'') + '" placeholder="e.g. Download Tech Rider"/></div>' +
+          '</div>' +
+        '</div>' +
+        '<button type="button" class="btn-remove" onclick="removeSpecsBtn(\'' + block.id + '\',' + i + ')" title="Rimuovi">\u2715</button>' +
+      '</div>';
+    }).join('');
+  }
+
+  function addSpecsBtn(blockId) {
+    var block = getBlock(blockId);
+    if (!block) return;
+    pushUndo();
+    if (!block.data.btns) block.data.btns = [];
+    block.data.btns.push(_spBtnDefaults());
+    markDirty();
+    var el = document.getElementById('sp-btns-' + blockId.substring(0,8));
+    if (el) el.innerHTML = _spBtns(block);
+    schedulePreviewUpdate(blockId);
+  }
+
+  function removeSpecsBtn(blockId, idx) {
+    var block = getBlock(blockId);
+    if (!block) return;
+    pushUndo();
+    block.data.btns.splice(idx, 1);
+    markDirty();
+    var el = document.getElementById('sp-btns-' + blockId.substring(0,8));
+    if (el) el.innerHTML = _spBtns(block);
+    schedulePreviewUpdate(blockId);
+  }
+
   function _fbSpecs(block) {
-    var d = block.data;
     var bid = block.id.substring(0,8);
-    return '<div class="field-row">' +
-        _fInput(block, 'name', 'Titolo', d.name) +
-        _fInput(block, 'subtitle', 'Sottotitolo', d.subtitle) +
-      '</div>' +
-      '<div class="field-row">' +
-        _fInput(block, 'genre', 'Genere', d.genre) +
-        _fInput(block, 'duration', 'Durata', d.duration) +
-      '</div>' +
-      '<div class="field-row">' +
-        _fInput(block, 'year', 'Anno', d.year) +
-        _fInput(block, 'city', 'Città', d.city) +
-      '</div>' +
-      _fInput(block, 'discography', 'Discografia', d.discography) +
+    return '<p class="inner-h3">Righe tabella</p>' +
+      '<div class="dyn-list" id="sp-rows-' + bid + '">' + _spRows(block) + '</div>' +
+      '<button type="button" class="btn-add" onclick="addSpecsRow(\'' + block.id + '\')">+ Aggiungi riga</button>' +
       '<hr class="inner-divider"/>' +
-      _fLangTabs(bid + 's',
-        _fTextarea(block, 'membersIt', 'Formazione IT', d.membersIt),
-        _fTextarea(block, 'membersEn', 'Formazione EN', d.membersEn)
-      ) +
-      _fInput(block, 'collab', 'In collaborazione con', d.collab);
+      '<p class="inner-h3">Pulsanti CTA</p>' +
+      '<div class="dyn-list" id="sp-btns-' + bid + '">' + _spBtns(block) + '</div>' +
+      '<button type="button" class="btn-add" onclick="addSpecsBtn(\'' + block.id + '\')">+ Aggiungi pulsante</button>';
   }
 
   function _fbSeparator(block) {
@@ -2298,6 +2408,24 @@
         var li = parseInt(t.dataset.lnIdx, 10);
         if (block.data.items && block.data.items[li]) {
           block.data.items[li][t.dataset.lnField] = t.value;
+          markDirty(); schedulePreviewUpdate(block.id);
+        }
+        return;
+      }
+      /* Specs row fields */
+      if (t.dataset.spRowIdx !== undefined && t.dataset.spRowField) {
+        var sri = parseInt(t.dataset.spRowIdx, 10);
+        if (block.data.rows && block.data.rows[sri]) {
+          block.data.rows[sri][t.dataset.spRowField] = t.value;
+          markDirty(); schedulePreviewUpdate(block.id);
+        }
+        return;
+      }
+      /* Specs button fields */
+      if (t.dataset.spBtnIdx !== undefined && t.dataset.spBtnField) {
+        var sbi = parseInt(t.dataset.spBtnIdx, 10);
+        if (block.data.btns && block.data.btns[sbi]) {
+          block.data.btns[sbi][t.dataset.spBtnField] = t.value;
           markDirty(); schedulePreviewUpdate(block.id);
         }
         return;
@@ -3953,41 +4081,57 @@
   }
 
   function _rSpecs(block, lang) {
-    var d = block.data;
+    var d    = block.data;
+    var rows = d.rows || [];
+    var btns = d.btns || [];
+
     var mkRows = function(l) {
-      var r = [];
-      var row = function(lIt, lEn, v) {
-        if (!v) return;
-        r.push('<tr><th scope="row">' + escHtml(l === 'en' ? lEn : lIt) + '</th><td>' + escHtml(v) + '</td></tr>');
-      };
-      row('Titolo',               'Title',                d.name);
-      row('Sottotitolo',          'Subtitle',              d.subtitle);
-      row('Genere',               'Genre',                 d.genre);
-      row('Durata',               'Duration',              d.duration);
-      row('Anno',                 'Year',                  d.year);
-      row('Citt\u00e0',           'City',                  d.city);
-      row('Discografia',          'Discography',           d.discography);
-      row('Formazione',           'Line-up',               l === 'en' ? (d.membersEn||d.membersIt) : d.membersIt);
-      row('In collaborazione con','In collaboration with', d.collab);
-      if (d.website) {
-        r.push('<tr><th scope="row">Website</th><td><a href="' + escHtml(d.website) + '" target="_blank" rel="noopener noreferrer">' + escHtml(d.website) + '</a></td></tr>');
-      }
-      if (d.techRiderUrl) {
-        r.push('<tr><th scope="row">Tech Rider</th><td><a href="' + escHtml(d.techRiderUrl) + '" target="_blank" rel="noopener noreferrer">Download</a></td></tr>');
-      }
-      return r.join('');
+      return rows.map(function(r) {
+        var label = l === 'en' ? (r.labelEn || r.labelIt) : (r.labelIt || r.labelEn);
+        var value = l === 'en' ? (r.valueEn || r.valueIt) : (r.valueIt || r.valueEn);
+        if (!value || !value.trim()) return '';
+        var valHtml = /^https?:\/\//.test(value.trim())
+          ? '<a href="' + escHtml(value.trim()) + '" target="_blank" rel="noopener noreferrer" style="color:var(--acc-lt);">' + escHtml(value.trim()) + '</a>'
+          : escHtml(value).replace(/\n/g, '<br/>');
+        return '<tr><td class="td-lbl">' + escHtml(label) + '</td><td class="td-val">' + valHtml + '</td></tr>';
+      }).join('');
     };
+
+    var mkBtns = function(l) {
+      return btns.filter(function(b) { return b.url && (b.labelIt || b.labelEn); })
+        .map(function(b) {
+          var label = l === 'en' ? (b.labelEn || b.labelIt) : (b.labelIt || b.labelEn);
+          return '<a href="' + escHtml(b.url) + '" target="_blank" rel="noopener noreferrer" ' +
+            'style="display:inline-block;padding:10px 28px;background:var(--gold);color:#fff;text-decoration:none;' +
+            'font-family:\'Lato\',Arial,sans-serif;font-size:0.82rem;letter-spacing:1.5px;text-transform:uppercase;margin:.5rem .5rem 0 0;">' +
+            escHtml(label) + '</a>';
+        }).join('');
+    };
+
     if (lang === 'both') {
       var rIt = mkRows('it'), rEn = mkRows('en');
-      if (!rIt && !rEn) return '';
+      var bIt = mkBtns('it'), bEn = mkBtns('en');
+      if (!rIt && !rEn && !bIt && !bEn) return '';
+      var tableIt = rIt ? '<table class="specs-table">' + rIt + '</table>' : '';
+      var tableEn = rEn ? '<table class="specs-table">' + rEn + '</table>' : '';
+      var btnHtml = (bIt || bEn)
+        ? '<div style="margin-top:1.5rem;">' +
+            (bIt ? '<div data-lang="it">' + bIt + '</div>' : '') +
+            (bEn ? '<div data-lang="en" hidden>' + bEn + '</div>' : '') +
+          '</div>'
+        : '';
       return '<section class="sec-specs"><div class="sec-wrap">' +
-        biWrap('<table class="specs-table">' + rIt + '</table>',
-               '<table class="specs-table">' + rEn + '</table>', 'both') +
+        biWrap(tableIt, tableEn, 'both') + btnHtml +
         '</div></section>';
     }
-    var rows = mkRows(lang || 'it');
-    if (!rows) return '';
-    return '<section class="sec-specs"><div class="sec-wrap"><table class="specs-table">' + rows + '</table></div></section>';
+    var l = lang || 'it';
+    var tableHtml = mkRows(l);
+    var btnsHtml  = mkBtns(l);
+    if (!tableHtml && !btnsHtml) return '';
+    return '<section class="sec-specs"><div class="sec-wrap">' +
+      (tableHtml ? '<table class="specs-table">' + tableHtml + '</table>' : '') +
+      (btnsHtml  ? '<div style="margin-top:1.5rem;">' + btnsHtml + '</div>' : '') +
+      '</div></section>';
   }
 
   function _rSeparator(block) {
@@ -4179,7 +4323,7 @@
       return '<div style="' + itemStyle + '">' + inner + '</div>';
     }).join('');
 
-    return '<section class="links-sec" style="' + bgStyle + 'padding:40px 0;">' +
+    return '<section class="links-sec" style="' + bgStyle + 'padding:40px 48px;">' +
       '<div class="wrap">' +
       (titleHtml ? '<div style="margin-bottom:1rem;">' + titleHtml + '</div>' : '') +
       '<div style="' + gridStyle + '">' + itemsHtml + '</div>' +
