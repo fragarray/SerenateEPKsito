@@ -47,11 +47,48 @@ $action = $_POST['action'] ?? 'upload';
 // ══════════════════════════════════════════════════════════════════
 // ACTION: delete
 // ══════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
+// ACTION: save_html
+// ══════════════════════════════════════════════════════════════════
+if ($action === 'save_html') {
+    $slug = trim($_POST['slug'] ?? '');
+
+    if (!preg_match('/^[a-z0-9_\-]{1,80}$/i', $slug)) {
+        fail('Slug non valido.');
+    }
+
+    if (empty($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
+        $fErr = $_FILES['file']['error'] ?? -1;
+        fail('File HTML non ricevuto (errore ' . $fErr . ').');
+    }
+
+    $htmlContent = file_get_contents($_FILES['file']['tmp_name']);
+    if ($htmlContent === false || strlen($htmlContent) < 10) {
+        fail('Contenuto HTML vuoto o illeggibile.');
+    }
+
+    $artistiDir = __DIR__ . '/artisti';
+    if (!is_dir($artistiDir)) {
+        if (!mkdir($artistiDir, 0755, true)) {
+            fail('Cartella artisti/ non trovata e impossibile crearla.');
+        }
+    }
+
+    $dest = $artistiDir . '/' . $slug . '.html';
+
+    if (file_put_contents($dest, $htmlContent) === false) {
+        fail('Impossibile scrivere il file. Controlla i permessi della cartella artisti/.');
+    }
+
+    echo json_encode(['ok' => true, 'path' => 'artisti/' . $slug . '.html']);
+    exit;
+}
+
 if ($action === 'delete') {
     $rawPath = $_POST['path'] ?? '';
 
-    // Accetta solo path nella forma "img/filename.ext"
-    if (!preg_match('/^img\/[a-z0-9_\-]+\.[a-z]{3,4}$/i', $rawPath)) {
+    // Accetta solo path nella forma "img/filename.ext" o "img/subfolder/filename.ext"
+    if (!preg_match('/^img\/[a-z0-9_\-]+(\/[a-z0-9_\-]+)?\.[a-z]{3,4}$/i', $rawPath)) {
         fail('Path non valido.');
     }
 
@@ -121,18 +158,36 @@ if (!in_array($ext, ALLOWED_EXT, true)) {
     fail('Estensione non consentita: ' . $ext);
 }
 
+// ── Sottocartella per progetto (opzionale) ───────────────────────
+$subfolder = trim($_POST['subfolder'] ?? '');
+if ($subfolder !== '' && !preg_match('/^[a-z0-9_\-]{1,60}$/i', $subfolder)) {
+    fail('Subfolder non valido.');
+}
+
 // ── Sanifica il nome file ─────────────────────────────────────────
 $base     = pathinfo($f['name'], PATHINFO_FILENAME);
 $base     = preg_replace('/[^a-z0-9_\-]/i', '_', $base);
 $base     = strtolower(trim($base, '_'));
 $base     = substr($base ?: 'img', 0, 60);
 $filename = $base . '_' . time() . '.' . $ext;
-$dest     = IMG_DIR . $filename;
 
 // ── Controlla che la cartella esista ─────────────────────────────
 if (!is_dir(IMG_DIR)) {
     fail('Cartella img/ non trovata sul server. Creala via FTP/cPanel.');
 }
+
+// ── Crea la sottocartella se richiesta ───────────────────────────
+if ($subfolder !== '') {
+    $targetDir = IMG_DIR . $subfolder . '/';
+    if (!is_dir($targetDir) && !mkdir($targetDir, 0755, true)) {
+        fail('Impossibile creare la sottocartella img/' . $subfolder . '/.');
+    }
+} else {
+    $targetDir = IMG_DIR;
+}
+
+$dest    = $targetDir . $filename;
+$relPath = 'img/' . ($subfolder !== '' ? $subfolder . '/' : '') . $filename;
 
 // ── Sposta il file ────────────────────────────────────────────────
 if (!move_uploaded_file($f['tmp_name'], $dest)) {
@@ -142,7 +197,7 @@ if (!move_uploaded_file($f['tmp_name'], $dest)) {
 // ── Risposta successo ─────────────────────────────────────────────
 echo json_encode([
     'ok'   => true,
-    'path' => 'img/' . $filename,
+    'path' => $relPath,
     'name' => $filename,
     'size' => $f['size'],
 ]);

@@ -631,6 +631,10 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Genera ZIP
       </button>
+      <button class="btn-secondary" onclick="saveToHosting()" id="btn-save-hosting" title="Carica la pagina nella cartella artisti/ sull'hosting">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        Salva su hosting
+      </button>
     </div>
   </header>
 
@@ -3078,10 +3082,11 @@
 
   /* Upload a single Blob as fileName; fills targetInput if provided.
      Returns a Promise<string> with the server path. */
-  function _uploadBlob(blob, fileName, targetInput) {
+  function _uploadBlob(blob, fileName, targetInput, subfolder) {
     var fd = new FormData();
     fd.append('token',  UPLOAD_CFG.token);
     fd.append('action', 'upload');
+    if (subfolder) fd.append('subfolder', subfolder);
     fd.append('file',   new File([blob], fileName, { type: blob.type }));
     return fetch(UPLOAD_CFG.url, { method: 'POST', body: fd })
       .then(function(r) { return r.json(); })
@@ -3160,8 +3165,9 @@
       var jpgInp  = isWebp ? partnerInp : targetInput;
       var webpInp = isWebp ? targetInput : partnerInp;
       setStatus('Upload JPEG + WebP\u2026', '');
-      var uploads = [ _uploadBlob(jpgBlob, baseName + '.jpg', jpgInp) ];
-      if (webpInp) uploads.push(_uploadBlob(webpBlob, baseName + '.webp', webpInp));
+      var slug = STATE.global.slug || '';
+      var uploads = [ _uploadBlob(jpgBlob, baseName + '.jpg', jpgInp, slug) ];
+      if (webpInp) uploads.push(_uploadBlob(webpBlob, baseName + '.webp', webpInp, slug));
       return Promise.all(uploads);
     })
     .then(function(paths) {
@@ -3172,6 +3178,87 @@
     })
     .catch(function(err) { setStatus('Upload fallito: ' + err.message, 'err'); })
     .finally(function()  { if (btn) btn.classList.remove('busy'); });
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     SALVA SU HOSTING — carica la pagina bilingue in artisti/[slug].html
+     ───────────────────────────────────────────────────────────── */
+  function saveToHosting() {
+    var slug = STATE.global.slug || '';
+    if (!slug) {
+      setStatus('Imposta lo slug del progetto prima di caricare.', 'err');
+      return;
+    }
+    var dest = 'artisti/' + slug + '.html';
+    document.getElementById('msh-dest').textContent     = dest;
+    document.getElementById('msh-expected').textContent = slug;
+    document.getElementById('msh-confirm-input').value  = '';
+    document.getElementById('msh-error').textContent    = '';
+    document.getElementById('msh-confirm-btn').disabled = true;
+    document.getElementById('modal-save-hosting').removeAttribute('hidden');
+    setTimeout(function() { document.getElementById('msh-confirm-input').focus(); }, 80);
+  }
+
+  function _mshCheckInput() {
+    var slug = STATE.global.slug || '';
+    var val  = (document.getElementById('msh-confirm-input').value || '').trim();
+    var btn  = document.getElementById('msh-confirm-btn');
+    btn.disabled = (val !== slug);
+  }
+
+  function confirmSaveToHosting() {
+    var slug = STATE.global.slug || '';
+    var val  = (document.getElementById('msh-confirm-input').value || '').trim();
+    if (val !== slug) {
+      document.getElementById('msh-error').textContent = 'Il nome non corrisponde allo slug del progetto.';
+      return;
+    }
+    closeModal('modal-save-hosting');
+    var btn = document.getElementById('btn-save-hosting');
+    if (btn) btn.classList.add('busy');
+    setStatus('Generazione HTML bilingue\u2026', '');
+    var html;
+    try { html = buildBilingualExportHTML(); }
+    catch(e) {
+      if (btn) btn.classList.remove('busy');
+      setStatus('Errore generazione HTML: ' + e.message, 'err');
+      return;
+    }
+    /* Fix relative paths: the file lives in artisti/ so absolutify href/src
+       that would otherwise resolve one level too deep.
+       Only touches paths starting with assets/, img/, or index.html —
+       fragment-only hrefs (href="#main") and external URLs are left intact. */
+    var _base = 'https://www.altramareaproduzioni.it/';
+    html = html.replace(/\bhref="(assets\/[^"]+)"/g, 'href="' + _base + '$1"');
+    html = html.replace(/\bhref="(img\/[^"]+)"/g,    'href="' + _base + '$1"');
+    html = html.replace(/\bhref="(index\.html)"/g,    'href="' + _base + '$1"');
+    html = html.replace(/\bsrc="(img\/[^"]+)"/g,      'src="'  + _base + '$1"');
+    var fd = new FormData();
+    fd.append('token',  UPLOAD_CFG.token);
+    fd.append('action', 'save_html');
+    fd.append('slug',   slug);
+    fd.append('file',   new Blob([html], { type: 'text/html' }), slug + '.html');
+    setStatus('Caricamento su hosting\u2026', '');
+    fetch(UPLOAD_CFG.url, { method: 'POST', body: fd })
+      .then(function(r) { return r.text().then(function(t) { return { status: r.status, text: t }; }); })
+      .then(function(res) {
+        if (btn) btn.classList.remove('busy');
+        var data;
+        try { data = JSON.parse(res.text); } catch(e) {
+          setStatus('Errore hosting (HTTP ' + res.status + '): risposta non JSON', 'err');
+          console.error('Risposta server:', res.text.slice(0, 500));
+          return;
+        }
+        if (data.ok) {
+          setStatus('Pagina caricata: ' + data.path, '');
+        } else {
+          setStatus('Errore hosting: ' + (data.error || 'risposta non valida'), 'err');
+        }
+      })
+      .catch(function(err) {
+        if (btn) btn.classList.remove('busy');
+        setStatus('Errore di rete: ' + err.message, 'err');
+      });
   }
 
   /* Save STATE as a downloadable JSON file */
@@ -4813,6 +4900,33 @@
   });
 
   </script>
+
+  <!-- ╔══════════════════════════════════════════════════════════╗
+       MODAL – SALVA SU HOSTING
+  ╚══════════════════════════════════════════════════════════╝ -->
+  <div class="modal-overlay" id="modal-save-hosting" hidden>
+    <div class="modal-box" style="max-width:440px;">
+      <p class="modal-title">Salva su hosting</p>
+      <p class="modal-desc">Verrà caricata la versione bilingue nella cartella <code>artisti/</code>.</p>
+      <p style="font-size:0.82rem;color:var(--ink);margin-bottom:6px;">
+        File di destinazione: <code id="msh-dest"></code>
+      </p>
+      <p style="font-size:0.82rem;color:var(--ink);margin-bottom:14px;">
+        Per confermare, scrivi il nome del progetto (<strong id="msh-expected"></strong>):
+      </p>
+      <input type="text" id="msh-confirm-input"
+        style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--border);background:#fff;font-family:inherit;font-size:0.9rem;"
+        placeholder="nome progetto"
+        autocomplete="off"
+        oninput="_mshCheckInput()"
+      />
+      <div id="msh-error" style="font-size:0.75rem;color:#c0392b;min-height:18px;margin-top:6px;"></div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('modal-save-hosting')">Annulla</button>
+        <button class="btn-primary" id="msh-confirm-btn" onclick="confirmSaveToHosting()" disabled>Carica</button>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
