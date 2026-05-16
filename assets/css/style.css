@@ -135,7 +135,7 @@ body.live .home-btn:hover { background: var(--acc); color: #fff; }
 
 /* ── HEADER – index.html ──────────────────────────────────────── */
 .cover-header {
-  background: var(--ink);
+  background: var(--ink, #1c1a17);
   text-align: center;
   padding: 44px 24px 40px;
 }

@@ -4541,7 +4541,7 @@
   ══════════════════════════════════════════════════════════════ */
   function _colorVarCSS() {
     var c = getActiveColors();
-    return '<style>:root{--gold:' + c.main + ';--gold-lt:' + c.lt + ';--acc:' + c.main + ';--acc-lt:' + c.lt + ';}</style>';
+    return '<style>:root{--ink:#1c1a17;--gold:' + c.main + ';--gold-lt:' + c.lt + ';--acc:' + c.main + ';--acc-lt:' + c.lt + ';}</style>';
   }
 
   function _logoFilterCSS(f) {
@@ -4562,10 +4562,10 @@
         biEl('p','agency-tagline', g.subtitleIt, g.subtitleEn, lang) +
         '</div>';
       var inner = g.logoPos === 'right' ? textEl + logoEl : logoEl + textEl;
-      return '<header class="cover-header"><div style="display:flex;align-items:center;justify-content:center;gap:28px;">' +
+      return '<header class="cover-header" style="background:#1c1a17"><div style="display:flex;align-items:center;justify-content:center;gap:28px;">' +
         inner + '</div></header>';
     }
-    return '<header class="cover-header">' +
+    return '<header class="cover-header" style="background:#1c1a17">' +
       '<h1 class="agency-name">' + escHtml(name) + '</h1>' +
       biEl('p','agency-tagline', g.subtitleIt, g.subtitleEn, lang) +
       '</header>';
