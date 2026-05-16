@@ -3391,48 +3391,35 @@
       }
 
       else if (block.type === 'specs') {
-        var rows = [];
+        var spRows = d.rows || [];
+        var spBtns = d.btns || [];
+        var spTableRows = [];
         var spFirst = true;
-        function specRow(lblIt, lblEn, v, rawHtml) {
-          if (!v) return;
-          var lbl  = isEn ? lblEn : lblIt;
-          var cell = rawHtml ? v : esc(v);
-          var rs   = spFirst ? 'border-top:1px solid #3a3730;' : '';
-          rows.push('<tr>' +
-            '<td style="' + TDLBL + rs + '" valign="top">' + esc(lbl) + '</td>' +
-            '<td style="' + TDVAL + rs + '" valign="top">' + cell + '</td>' +
+        spRows.forEach(function(r) {
+          var value = isEn ? (r.valueEn || r.valueIt || '') : (r.valueIt || '');
+          if (!value || !value.trim()) return;
+          var label = isEn ? (r.labelEn || r.labelIt || '') : (r.labelIt || r.labelEn || '');
+          var rs    = spFirst ? 'border-top:1px solid #3a3730;' : '';
+          var isUrl = /^https?:\/\//.test(value.trim());
+          var valHtml = isUrl
+            ? '<a href="' + esc(value.trim()) + '" target="_blank" rel="noopener noreferrer" style="color:' + lt + ';text-decoration:none;">' + esc(value.trim()) + '</a>'
+            : esc(value).replace(/\n/g, '<br/>');
+          var tdV = value.indexOf('\n') >= 0 ? TDVMB + rs : TDVAL + rs;
+          spTableRows.push('<tr>' +
+            '<td style="' + TDLBL + rs + '" valign="top">' + esc(label) + '</td>' +
+            '<td style="' + tdV + '" valign="top">' + valHtml + '</td>' +
             '</tr>');
           spFirst = false;
-        }
-        var mbRaw = isEn ? (d.membersEn || d.membersIt || '') : (d.membersIt || '');
-        var mbHtml = mbRaw ? mbRaw.split('\n').map(function(ln) {
-          var t = ln.trim(); if (!t) return '';
-          var ix = t.indexOf(' \u2013 ');
-          if (ix < 0) ix = t.indexOf(' - ');
-          if (ix > 0) return '<strong style="color:#e8e2d8;">' + esc(t.slice(0,ix)) + '</strong> \u2013 ' + esc(t.slice(ix+3));
-          return esc(t);
-        }).filter(Boolean).join('<br/>') : '';
-        specRow('Nome',   'Name',       d.name);
-        specRow('Sottotitolo', 'Subtitle', d.subtitle);
-        specRow('Genere', 'Genre',      d.genre);
-        specRow('Durata', 'Duration',   d.duration);
-        if (mbHtml) {
-          var rs0 = spFirst ? 'border-top:1px solid #3a3730;' : '';
-          rows.push('<tr>' +
-            '<td style="' + TDLBL + rs0 + '" valign="top">' + esc(isEn ? 'Members' : 'Formazione') + '</td>' +
-            '<td style="' + TDVMB + rs0 + '" valign="top">' + mbHtml + '</td>' +
-            '</tr>');
-          spFirst = false;
-        }
-        specRow('Collaborazioni', 'Collaborators', d.collab ? d.collab.split('\n').filter(Boolean).join(' \u00b7 ') : '');
-        specRow('Discografia', 'Discography', d.discography);
-        if (d.year || d.city) specRow('Fondazione', 'Founded', [d.year, d.city].filter(Boolean).join(' \u2013 '));
-        if (d.website) specRow('Sito web', 'Website',
-          '<a href="' + esc(d.website) + '" target="_blank" rel="noopener noreferrer" style="color:' + lt + ';text-decoration:none;">' + esc(d.website) + '</a>',
-          true);
-        if (d.techRiderUrl) specRow('Tech Rider', 'Tech Rider',
-          '<a href="' + esc(d.techRiderUrl) + '" target="_blank" rel="noopener noreferrer" style="color:' + lt + ';text-decoration:none;">Download</a>',
-          true);
+        });
+
+        var spBtnHtml = spBtns.filter(function(b) { return b.url && (b.labelIt || b.labelEn); })
+          .map(function(b) {
+            var lbl = isEn ? (b.labelEn || b.labelIt) : (b.labelIt || b.labelEn);
+            return '<a href="' + esc(b.url) + '" target="_blank" rel="noopener noreferrer" ' +
+              'style="display:inline-block;padding:10px 24px;background:' + accent + ';color:#fff;' +
+              'font-family:Arial,Helvetica,sans-serif;font-size:0.82rem;letter-spacing:1.5px;text-transform:uppercase;' +
+              'text-decoration:none;margin:0 8px 8px 0;">' + esc(lbl) + '</a>';
+          }).join('');
 
         /* Contacts from global STATE */
         var creds = [];
@@ -3447,9 +3434,12 @@
         if (cYt) creds.push('YouTube: <a href="https://www.youtube.com/@' + esc(cYt) + '" target="_blank" rel="noopener noreferrer" style="color:' + lt + ';text-decoration:none;">youtube.com/@' + esc(cYt) + '</a>');
 
         o.push('<!-- SPECS -->\n<div style="background:#1c1a17;color:#e8e2d8;padding:72px 48px;">\n<div style="' + WRAP + '">\n');
-        if (rows.length) {
+        if (spTableRows.length) {
           o.push('<table width="100%" style="width:100%;border-collapse:collapse;margin-bottom:36px;">\n' +
-            rows.join('\n') + '\n</table>\n');
+            spTableRows.join('\n') + '\n</table>\n');
+        }
+        if (spBtnHtml) {
+          o.push('<div style="margin-top:1.5rem;margin-bottom:0.5rem;">' + spBtnHtml + '</div>\n');
         }
         if (creds.length) {
           o.push('<div style="font-family:Arial,Helvetica,sans-serif;font-size:0.9rem;line-height:1.9;color:#a09b93;' +
@@ -3461,6 +3451,116 @@
           'style="font-family:Arial,Helvetica,sans-serif;font-size:0.85rem;letter-spacing:0.08em;color:' + accent + ';text-decoration:none;">' +
           'www.altramareaproduzioni.it</a>\n');
         o.push('</div>\n</div>\n</div>\n\n');
+      }
+
+      else if (block.type === 'card') {
+        var cardJpg   = absUrl(d.jpg || '');
+        var cardTitle = esc(d.title || '');
+        var cardTag   = isEn ? esc(d.tagEn || d.tagIt || '') : esc(d.tagIt || '');
+        var cardDesc  = isEn ? (d.descEn || d.descIt || '') : (d.descIt || '');
+        var cardCta   = isEn ? esc(d.ctaLabelEn || d.ctaLabelIt || 'Discover \u2192') : esc(d.ctaLabelIt || 'Scopri \u2192');
+        var cardAlt   = esc(isEn ? (d.altEn || d.altIt || '') : (d.altIt || ''));
+        var cardLink  = d.link ? esc(d.link) : '';
+        var cardMaxW  = ({ narrow: '280px', medium: '360px', wide: '480px', full: '100%' })[d.width || 'medium'] || '360px';
+        if (!cardTitle && !cardJpg) return;
+        var cardSec = d.altBg ? SECA : SEC;
+        o.push('<div style="' + cardSec + '">\n<div style="' + WRAP + '">\n');
+        o.push('<div style="margin:0 auto;max-width:' + cardMaxW + ';">\n');
+        if (cardJpg) {
+          var cImg = '<img src="' + esc(cardJpg) + '" alt="' + cardAlt + '" style="display:block;width:100%;height:auto;" width="100%"/>';
+          o.push(cardLink ? '<a href="' + cardLink + '" target="_blank" rel="noopener noreferrer" style="display:block;line-height:0;">' + cImg + '</a>\n' : cImg + '\n');
+        }
+        o.push('<div style="padding:20px 0;">\n');
+        if (cardTag)   o.push('<p style="font-family:Arial,Helvetica,sans-serif;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:' + accent + ';margin:0 0 8px;">' + cardTag + '</p>\n');
+        if (cardTitle) o.push('<h2 style="font-family:Georgia,serif;font-size:1.3rem;font-weight:400;color:#1c1a17;margin:0 0 12px;line-height:1.3;">' + cardTitle + '</h2>\n');
+        if (cardDesc)  o.push('<p style="font-family:Georgia,serif;font-size:0.95rem;line-height:1.6;color:#5a5248;margin:0 0 16px;">' + esc(cardDesc) + '</p>\n');
+        if (cardLink && cardCta) {
+          o.push('<a href="' + cardLink + '" target="_blank" rel="noopener noreferrer" ' +
+            'style="display:inline-block;padding:8px 20px;background:' + accent + ';color:#fff;' +
+            'font-family:Arial,Helvetica,sans-serif;font-size:0.82rem;text-decoration:none;">' + cardCta + '</a>\n');
+        }
+        o.push('</div>\n</div>\n</div>\n</div>\n\n');
+      }
+
+      else if (block.type === 'cardgrid') {
+        var cgCards = d.cards || [];
+        if (!cgCards.length) return;
+        var cgCols  = parseInt(d.cols, 10) || 3;
+        var cgColW  = Math.floor(100 / cgCols);
+        var cgSec   = d.altBg ? SECA : SEC;
+        o.push('<div style="' + cgSec + '">\n<div style="' + WRAP + '">\n');
+        o.push('<table width="100%" style="width:100%;border-collapse:collapse;">\n');
+        for (var ci = 0; ci < cgCards.length; ci += cgCols) {
+          o.push('<tr>\n');
+          for (var cj = 0; cj < cgCols; cj++) {
+            var cc = cgCards[ci + cj] || null;
+            o.push('<td width="' + cgColW + '%" style="width:' + cgColW + '%;vertical-align:top;padding:6px;">\n');
+            if (cc) {
+              var ccJpg   = absUrl(cc.jpg || '');
+              var ccTitle = esc(cc.title || '');
+              var ccTag   = isEn ? esc(cc.tagEn || cc.tagIt || '') : esc(cc.tagIt || '');
+              var ccDesc  = isEn ? (cc.descEn || cc.descIt || '') : (cc.descIt || '');
+              var ccCta   = isEn ? esc(cc.ctaLabelEn || cc.ctaLabelIt || 'Discover \u2192') : esc(cc.ctaLabelIt || 'Scopri \u2192');
+              var ccAlt   = esc(cc.altIt || cc.title || '');
+              var ccLink  = cc.link ? esc(cc.link) : '';
+              if (ccJpg) {
+                var ccImg = '<img src="' + esc(ccJpg) + '" alt="' + ccAlt + '" style="display:block;width:100%;height:auto;" width="100%"/>';
+                o.push(ccLink ? '<a href="' + ccLink + '" target="_blank" rel="noopener noreferrer" style="display:block;line-height:0;">' + ccImg + '</a>\n' : ccImg + '\n');
+              }
+              if (ccTag)   o.push('<p style="font-family:Arial,Helvetica,sans-serif;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;color:' + accent + ';margin:8px 0 4px;">' + ccTag + '</p>\n');
+              if (ccTitle) o.push('<p style="font-family:Georgia,serif;font-size:1rem;font-weight:400;color:#1c1a17;margin:4px 0 8px;line-height:1.3;">' + ccTitle + '</p>\n');
+              if (ccDesc)  o.push('<p style="font-family:Georgia,serif;font-size:0.9rem;line-height:1.5;color:#5a5248;margin:0 0 8px;">' + esc(ccDesc) + '</p>\n');
+              if (ccLink && ccCta) {
+                o.push('<a href="' + ccLink + '" target="_blank" rel="noopener noreferrer" ' +
+                  'style="display:inline-block;padding:6px 14px;background:' + accent + ';color:#fff;' +
+                  'font-family:Arial,Helvetica,sans-serif;font-size:0.78rem;text-decoration:none;">' + ccCta + '</a>\n');
+              }
+            }
+            o.push('</td>\n');
+          }
+          o.push('</tr>\n');
+        }
+        o.push('</table>\n</div>\n</div>\n\n');
+      }
+
+      else if (block.type === 'links') {
+        var lnItems = d.items || [];
+        if (!lnItems.length) return;
+        var lnCols  = parseInt(d.cols, 10) || 3;
+        var lnColW  = Math.floor(100 / lnCols);
+        var lnSec   = d.altBg ? SECA : SEC;
+        var lnTitle = isEn ? (d.titleEn || d.titleIt || '') : (d.titleIt || '');
+        o.push('<div style="' + lnSec + '">\n<div style="' + WRAP + '">\n');
+        if (lnTitle) o.push('<p style="' + LBL + '">' + esc(lnTitle) + '</p>\n');
+        o.push('<table width="100%" style="width:100%;border-collapse:collapse;">\n');
+        for (var li2 = 0; li2 < lnItems.length; li2 += lnCols) {
+          o.push('<tr>\n');
+          for (var lj = 0; lj < lnCols; lj++) {
+            var lnIt = lnItems[li2 + lj] || null;
+            o.push('<td width="' + lnColW + '%" style="width:' + lnColW + '%;vertical-align:middle;padding:4px;">\n');
+            if (lnIt) {
+              var lnJpg  = absUrl(lnIt.jpg || '');
+              var lnText = isEn ? esc(lnIt.textEn || lnIt.textIt || '') : esc(lnIt.textIt || '');
+              var lnSub  = isEn ? esc(lnIt.subtextEn || lnIt.subtextIt || '') : esc(lnIt.subtextIt || '');
+              var lnLnk  = lnIt.link ? esc(lnIt.link) : '';
+              var lnSz   = parseInt(lnIt.logoSize, 10) || 80;
+              var lnBdr  = lnIt.border ? 'border:1px solid #dbd5c5;' : '';
+              var lnInner = '';
+              if (lnJpg)  lnInner += '<img src="' + esc(lnJpg) + '" alt="' + lnText + '" width="' + lnSz + '" style="display:inline-block;vertical-align:middle;height:auto;max-width:' + lnSz + 'px;"/> ';
+              if (lnText) lnInner += '<span style="font-family:Arial,Helvetica,sans-serif;font-size:0.9rem;font-weight:600;color:#1c1a17;">' + lnText + '</span>';
+              if (lnSub)  lnInner += '<br/><span style="font-family:Arial,Helvetica,sans-serif;font-size:0.78rem;color:#5a5248;">' + lnSub + '</span>';
+              if (lnInner) {
+                var lnWrap = 'display:block;text-decoration:none;color:inherit;padding:6px;' + lnBdr;
+                o.push(lnLnk
+                  ? '<a href="' + lnLnk + '" target="_blank" rel="noopener noreferrer" style="' + lnWrap + '">' + lnInner + '</a>\n'
+                  : '<div style="' + lnWrap + '">' + lnInner + '</div>\n');
+              }
+            }
+            o.push('</td>\n');
+          }
+          o.push('</tr>\n');
+        }
+        o.push('</table>\n</div>\n</div>\n\n');
       }
 
       else if (block.type === 'separator') {
