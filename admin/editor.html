@@ -39,6 +39,7 @@
       --type-section:   #4a5a6b;
       --type-specs:     #5a4a6b;
       --type-separator: #888;
+      --type-services:  #3a6b4a;
     }
 
     html, body { height: 100%; overflow: hidden; }
@@ -202,6 +203,7 @@
     .block-type-badge.t-card      { background: #e8f0f8; color: #4a80c4; }
     .block-type-badge.t-cardgrid   { background: #e8f4e8; color: #3a8a5c; }
     .block-type-badge.t-links       { background: #f0e8f8; color: #7a4a9b; }
+    .block-type-badge.t-services    { background: #e8f5ec; color: var(--type-services); }
 
     .block-panel-title {
       flex: 1; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; color: var(--ink);
@@ -1058,6 +1060,14 @@
           <span class="btc-desc">Griglia di link con logo e testo</span>
         </button>
 
+        <button class="block-type-card" onclick="addBlock('services');closeModal('modal-add-block')">
+          <div class="btc-icon" style="background:#e8f5ec;color:#3a6b4a;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </div>
+          <span class="btc-label">Servizi / Cosa facciamo</span>
+          <span class="btc-desc">Griglia numerata con titoli e liste</span>
+        </button>
+
       </div><!-- /block-type-grid -->
 
       <div class="modal-footer">
@@ -1123,7 +1133,8 @@
     section: 'Sezione testo', specs: 'Scheda tecnica', separator: 'Separatore',
     card: 'Card',
     cardgrid: 'Griglia card',
-    links:    'Link'
+    links:    'Link',
+    services: 'Servizi / Cosa facciamo'
   };
 
   /* Default data shape for every block type */
@@ -1161,8 +1172,15 @@
                    { labelIt: 'In collaborazione con',labelEn: 'In collaboration with',valueIt: '', valueEn: '' },
                    { labelIt: 'Website',              labelEn: 'Website',              valueIt: '', valueEn: '' },
                    { labelIt: 'Tech Rider',           labelEn: 'Tech Rider',           valueIt: '', valueEn: '' }
-                 ], btns: [] },
+                 ], btns: [], altBg: false },
     separator: { size: 'md', style: 'blank' },
+    services:  { labelIt: 'Cosa facciamo', labelEn: 'What We Do', altBg: false,
+                 items: [
+                   { tag: '01', titleIt: '', titleEn: '', type: 'list', contentIt: '', contentEn: '' },
+                   { tag: '02', titleIt: '', titleEn: '', type: 'list', contentIt: '', contentEn: '' },
+                   { tag: '03', titleIt: '', titleEn: '', type: 'text', contentIt: '', contentEn: '' },
+                   { tag: '04', titleIt: '', titleEn: '', type: 'text', contentIt: '', contentEn: '' }
+                 ] },
     card:      { jpg: '', webp: '', altIt: '', altEn: '',
                  title: '',
                  tagIt: '', tagEn: '',
@@ -2056,14 +2074,121 @@
   }
 
   function _fbSpecs(block) {
+    var d   = block.data;
     var bid = block.id.substring(0,8);
-    return '<p class="inner-h3">Righe tabella</p>' +
+    return '<div class="toggle-field">' +
+        '<input type="checkbox" id="' + _fid(block,'altBg') + '" data-field="altBg"' + (d.altBg ? ' checked' : '') + '/>' +
+        '<label for="' + _fid(block,'altBg') + '">Sfondo chiaro (invece del nero)</label>' +
+      '</div>' +
+      '<hr class="inner-divider"/>' +
+      '<p class="inner-h3">Righe tabella</p>' +
       '<div class="dyn-list" id="sp-rows-' + bid + '">' + _spRows(block) + '</div>' +
       '<button type="button" class="btn-add" onclick="addSpecsRow(\'' + block.id + '\')">+ Aggiungi riga</button>' +
       '<hr class="inner-divider"/>' +
       '<p class="inner-h3">Pulsanti CTA</p>' +
       '<div class="dyn-list" id="sp-btns-' + bid + '">' + _spBtns(block) + '</div>' +
       '<button type="button" class="btn-add" onclick="addSpecsBtn(\'' + block.id + '\')">+ Aggiungi pulsante</button>';
+  }
+
+  /* ── Services: dynamic items (Cosa facciamo grid) ───────────── */
+  function _svcItemDefaults(n) {
+    return { tag: String(n).padStart(2,'0'), titleIt: '', titleEn: '', type: 'list', contentIt: '', contentEn: '' };
+  }
+
+  function _svcItems(block) {
+    var items = block.data.items || [];
+    if (!items.length) return '<p style="font-size:0.65rem;color:var(--muted);padding:4px 0;">Nessuna voce \u2014 clicca + per aggiungere.</p>';
+    return items.map(function(item, i) {
+      var canUp = i > 0, canDown = i < items.length - 1;
+      var isList = item.type !== 'text';
+      return '<div class="dyn-item" style="padding:8px 6px;">' +
+        '<div style="display:flex;flex-direction:column;gap:2px;align-items:center;padding-top:4px;">' +
+          '<button type="button" class="btn-remove" style="font-size:11px;padding:2px 5px;' + (canUp ? '' : 'opacity:.3;pointer-events:none;') + '" onclick="moveServiceItem(\'' + block.id + '\',' + i + ',-1)" title="Su">\u2191</button>' +
+          '<span class="dyn-item-num" style="min-width:0;">' + (i+1) + '</span>' +
+          '<button type="button" class="btn-remove" style="font-size:11px;padding:2px 5px;' + (canDown ? '' : 'opacity:.3;pointer-events:none;') + '" onclick="moveServiceItem(\'' + block.id + '\',' + i + ',1)" title="Gi\u00f9">\u2193</button>' +
+        '</div>' +
+        '<div class="dyn-item-body">' +
+          '<div class="field-row">' +
+            '<div class="field" style="flex:0 0 64px;"><label>Tag</label>' +
+            '<input type="text" data-svc-idx="' + i + '" data-svc-field="tag" value="' + escHtml(item.tag||String(i+1).padStart(2,'0')) + '" placeholder="01"/></div>' +
+            '<div class="field"><label>Titolo IT</label>' +
+            '<input type="text" data-svc-idx="' + i + '" data-svc-field="titleIt" value="' + escHtml(item.titleIt||'') + '"/></div>' +
+            '<div class="field"><label>Title EN</label>' +
+            '<input type="text" data-svc-idx="' + i + '" data-svc-field="titleEn" value="' + escHtml(item.titleEn||'') + '"/></div>' +
+          '</div>' +
+          '<div class="field-row">' +
+            '<div class="field" style="flex:0 0 140px;"><label>Tipo contenuto</label>' +
+            '<select data-svc-idx="' + i + '" data-svc-field="type">' +
+              '<option value="list"' + (isList ? ' selected' : '') + '>Elenco puntato</option>' +
+              '<option value="text"' + (!isList ? ' selected' : '') + '>Paragrafo testo</option>' +
+            '</select></div>' +
+          '</div>' +
+          '<div class="field-row">' +
+            '<div class="field"><label>Contenuto IT' + (isList ? ' \u2014 una voce per riga' : '') + '</label>' +
+            '<textarea rows="3" data-svc-idx="' + i + '" data-svc-field="contentIt" style="resize:vertical;min-height:52px;">' + escHtml(item.contentIt||'') + '</textarea></div>' +
+            '<div class="field"><label>Content EN' + (isList ? ' \u2014 one item per line' : '') + '</label>' +
+            '<textarea rows="3" data-svc-idx="' + i + '" data-svc-field="contentEn" style="resize:vertical;min-height:52px;">' + escHtml(item.contentEn||'') + '</textarea></div>' +
+          '</div>' +
+        '</div>' +
+        '<button type="button" class="btn-remove" onclick="removeServiceItem(\'' + block.id + '\',' + i + ')" title="Rimuovi">\u2715</button>' +
+      '</div>';
+    }).join('');
+  }
+
+  function addServiceItem(blockId) {
+    var block = getBlock(blockId);
+    if (!block) return;
+    pushUndo();
+    if (!block.data.items) block.data.items = [];
+    block.data.items.push(_svcItemDefaults(block.data.items.length + 1));
+    markDirty();
+    var el = document.getElementById('svc-items-' + blockId.substring(0,8));
+    if (el) el.innerHTML = _svcItems(block);
+    schedulePreviewUpdate(blockId);
+  }
+
+  function removeServiceItem(blockId, idx) {
+    var block = getBlock(blockId);
+    if (!block) return;
+    pushUndo();
+    block.data.items.splice(idx, 1);
+    markDirty();
+    var el = document.getElementById('svc-items-' + blockId.substring(0,8));
+    if (el) el.innerHTML = _svcItems(block);
+    schedulePreviewUpdate(blockId);
+  }
+
+  function moveServiceItem(blockId, idx, dir) {
+    var block = getBlock(blockId);
+    if (!block) return;
+    var items = block.data.items || [];
+    var newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= items.length) return;
+    pushUndo();
+    var tmp = items[idx]; items[idx] = items[newIdx]; items[newIdx] = tmp;
+    markDirty();
+    var el = document.getElementById('svc-items-' + blockId.substring(0,8));
+    if (el) el.innerHTML = _svcItems(block);
+    schedulePreviewUpdate(blockId);
+  }
+
+  function _fbServices(block) {
+    var d   = block.data;
+    var bid = block.id.substring(0,8);
+    return '<div class="field-row">' +
+        '<div class="field"><label>Etichetta sezione IT</label>' +
+        '<input type="text" data-field="labelIt" value="' + escHtml(d.labelIt||'') + '" placeholder="es. Cosa facciamo"/></div>' +
+        '<div class="field"><label>Label section EN</label>' +
+        '<input type="text" data-field="labelEn" value="' + escHtml(d.labelEn||'') + '" placeholder="e.g. What We Do"/></div>' +
+      '</div>' +
+      '<div class="toggle-field">' +
+        '<input type="checkbox" id="' + _fid(block,'altBg') + '" data-field="altBg"' + (d.altBg ? ' checked' : '') + '/>' +
+        '<label for="' + _fid(block,'altBg') + '">Sfondo alternato (chiaro scuro)</label>' +
+      '</div>' +
+      '<hr class="inner-divider"/>' +
+      '<p class="inner-h3">Voci</p>' +
+      '<div class="dyn-list" id="svc-items-' + bid + '">' + _svcItems(block) + '</div>' +
+      '<button type="button" class="btn-add" onclick="addServiceItem(\'' + block.id + '\')">+ Aggiungi voce</button>';
   }
 
   function _fbSeparator(block) {
@@ -2366,6 +2491,7 @@
       case 'card':      return _fbCard(block);
       case 'cardgrid':  return _fbCardGrid(block);
       case 'links':     return _fbLinks(block);
+      case 'services':  return _fbServices(block);
       default: return '<p style="color:var(--muted);font-size:.72rem;">Tipo sconosciuto.</p>';
     }
   }
@@ -2435,6 +2561,15 @@
         }
         return;
       }
+      /* Services item fields */
+      if (t.dataset.svcIdx !== undefined && t.dataset.svcField) {
+        var svci = parseInt(t.dataset.svcIdx, 10);
+        if (block.data.items && block.data.items[svci]) {
+          block.data.items[svci][t.dataset.svcField] = t.value;
+          markDirty(); schedulePreviewUpdate(block.id);
+        }
+        return;
+      }
     });
     bodyEl.addEventListener('change', function(e) {
       var t = e.target;
@@ -2499,7 +2634,8 @@
     separator: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/></svg>',
     card:      '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
     cardgrid:  '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/><line x1="12" y1="5" x2="12" y2="7"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
-    links:     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'
+    links:     '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
+    services:  '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>'
   };
 
   function getBlockSubtitle(block) {
@@ -2517,6 +2653,7 @@
       case 'card':      return d.title ? d.title.substring(0,42)+(d.title.length>42?'\u2026':'') : (d.link || '');
       case 'cardgrid':  return (d.cols||3) + '\u00d7' + (d.rows||2) + ' \u2014 ' + ((d.cards||[]).length) + ' card';
       case 'links':     return (d.cols||3) + '\u00d7' + (d.rows||1) + ' \u2014 ' + ((d.items||[]).length) + ' link';
+      case 'services':  return (d.labelIt || '') + ' \u2014 ' + ((d.items||[]).length) + ' voci';
       default:          return '';
     }
   }
@@ -3506,20 +3643,33 @@
       else if (block.type === 'specs') {
         var spRows = d.rows || [];
         var spBtns = d.btns || [];
+        var spBg    = d.altBg ? '#f2ede4' : '#1c1a17';
+        var spColor = d.altBg ? '#1c1a17' : '#e8e2d8';
+        var spTdLbl = d.altBg
+          ? 'padding:14px 0;vertical-align:top;font-family:Arial,Helvetica,sans-serif;font-size:0.72rem;color:' + accent + ';text-transform:uppercase;letter-spacing:2px;font-weight:700;white-space:nowrap;padding-right:28px;width:1%;border-bottom:1px solid #dbd5c5;'
+          : TDLBL;
+        var spTdVal = d.altBg
+          ? 'padding:14px 0;vertical-align:top;font-family:Arial,Helvetica,sans-serif;font-size:0.9rem;color:#5a5248;border-bottom:1px solid #dbd5c5;'
+          : TDVAL;
+        var spTdVmb = d.altBg
+          ? 'padding:14px 0;vertical-align:top;font-family:Arial,Helvetica,sans-serif;font-size:0.9rem;color:#5a5248;line-height:1.7;border-bottom:1px solid #dbd5c5;'
+          : TDVMB;
+        var spBorderTop = d.altBg ? '1px solid #dbd5c5' : '1px solid #3a3730';
+        var spBorderRow = d.altBg ? '1px solid #dbd5c5' : '1px solid #3a3730';
         var spTableRows = [];
         var spFirst = true;
         spRows.forEach(function(r) {
           var value = isEn ? (r.valueEn || r.valueIt || '') : (r.valueIt || '');
           if (!value || !value.trim()) return;
           var label = isEn ? (r.labelEn || r.labelIt || '') : (r.labelIt || r.labelEn || '');
-          var rs    = spFirst ? 'border-top:1px solid #3a3730;' : '';
+          var rs    = spFirst ? 'border-top:' + spBorderRow + ';' : '';
           var isUrl = /^https?:\/\//.test(value.trim());
           var valHtml = isUrl
             ? '<a href="' + esc(value.trim()) + '" target="_blank" rel="noopener noreferrer" style="color:' + lt + ';text-decoration:none;">' + esc(value.trim()) + '</a>'
             : esc(value).replace(/\n/g, '<br/>');
-          var tdV = value.indexOf('\n') >= 0 ? TDVMB + rs : TDVAL + rs;
+          var tdV = value.indexOf('\n') >= 0 ? spTdVmb + rs : spTdVal + rs;
           spTableRows.push('<tr>' +
-            '<td style="' + TDLBL + rs + '" valign="top">' + esc(label) + '</td>' +
+            '<td style="' + spTdLbl + rs + '" valign="top">' + esc(label) + '</td>' +
             '<td style="' + tdV + '" valign="top">' + valHtml + '</td>' +
             '</tr>');
           spFirst = false;
@@ -3546,7 +3696,7 @@
         if (cIg) creds.push('Instagram: <a href="https://www.instagram.com/' + esc(cIg) + '/" target="_blank" rel="noopener noreferrer" style="color:' + lt + ';text-decoration:none;">@' + esc(cIg) + '</a>');
         if (cYt) creds.push('YouTube: <a href="https://www.youtube.com/@' + esc(cYt) + '" target="_blank" rel="noopener noreferrer" style="color:' + lt + ';text-decoration:none;">youtube.com/@' + esc(cYt) + '</a>');
 
-        o.push('<!-- SPECS -->\n<div style="background:#1c1a17;color:#e8e2d8;padding:72px 48px;">\n<div style="' + WRAP + '">\n');
+        o.push('<!-- SPECS -->\n<div style="background:' + spBg + ';color:' + spColor + ';padding:72px 48px;">\n<div style="' + WRAP + '">\n');
         if (spTableRows.length) {
           o.push('<table width="100%" style="width:100%;border-collapse:collapse;margin-bottom:36px;">\n' +
             spTableRows.join('\n') + '\n</table>\n');
@@ -3555,11 +3705,12 @@
           o.push('<div style="margin-top:1.5rem;margin-bottom:0.5rem;">' + spBtnHtml + '</div>\n');
         }
         if (creds.length) {
-          o.push('<div style="font-family:Arial,Helvetica,sans-serif;font-size:0.9rem;line-height:1.9;color:#a09b93;' +
-            'margin-top:36px;padding-top:32px;border-top:1px solid #3a3730;">\n  ' +
+          var credsColor = d.altBg ? '#5a5248' : '#a09b93';
+          o.push('<div style="font-family:Arial,Helvetica,sans-serif;font-size:0.9rem;line-height:1.9;color:' + credsColor + ';' +
+            'margin-top:36px;padding-top:32px;border-top:' + spBorderTop + ';">\n  ' +
             creds.join('<br/>\n  ') + '\n</div>\n');
         }
-        o.push('<div style="margin-top:56px;padding-top:44px;border-top:1px solid #3a3730;text-align:center;">\n');
+        o.push('<div style="margin-top:56px;padding-top:44px;border-top:' + spBorderTop + ';text-align:center;">\n');
         o.push('<a href="https://www.altramareaproduzioni.it" target="_blank" rel="noopener noreferrer" ' +
           'style="font-family:Arial,Helvetica,sans-serif;font-size:0.85rem;letter-spacing:0.08em;color:' + accent + ';text-decoration:none;">' +
           'www.altramareaproduzioni.it</a>\n');
@@ -3691,6 +3842,51 @@
         } else {
           o.push('<div style="height:' + sepH + ';"></div>\n\n');
         }
+      }
+
+      else if (block.type === 'services') {
+        var svcItems = d.items || [];
+        if (!svcItems.length) return;
+        var svcBg  = d.altBg ? '#e8e3d6' : '#faf7f2';
+        var svcBdr = d.altBg ? '' : 'border-bottom:1px solid #dbd5c5;';
+        var svcLabel = isEn ? (d.labelEn || d.labelIt || '') : (d.labelIt || '');
+        var SVC_LBL_ST = 'font-family:Arial,Helvetica,sans-serif;font-size:0.72rem;font-weight:700;color:' + accent + ';letter-spacing:2.5px;text-transform:uppercase;margin-bottom:28px;';
+        var SVC_TAG_ST = 'font-family:Arial,Helvetica,sans-serif;font-size:0.62rem;font-weight:700;color:' + accent + ';letter-spacing:2px;text-transform:uppercase;margin:0 0 8px;';
+        var SVC_TTL_ST = 'font-family:Georgia,serif;font-size:1.2rem;font-weight:400;color:#1c1a17;margin:0 0 10px;line-height:1.3;';
+        var SVC_DSC_ST = 'font-family:Arial,Helvetica,sans-serif;font-size:0.9rem;font-weight:300;line-height:1.7;color:#5a5248;margin:0;';
+        var SVC_LI_ST  = 'font-family:Arial,Helvetica,sans-serif;font-size:0.9rem;font-weight:300;line-height:1.7;color:#5a5248;';
+        var cols2 = 2;
+        var colW2 = Math.floor(100 / cols2);
+        o.push('<div style="background:' + svcBg + ';padding:64px 48px;' + svcBdr + '">\n<div style="' + WRAP + '">\n');
+        if (svcLabel) o.push('<p style="' + SVC_LBL_ST + '">' + esc(svcLabel) + '</p>\n');
+        o.push('<table width="100%" style="width:100%;border-collapse:collapse;">\n');
+        for (var si = 0; si < svcItems.length; si += cols2) {
+          o.push('<tr>\n');
+          for (var sj = 0; sj < cols2; sj++) {
+            var svc = svcItems[si + sj] || null;
+            o.push('<td width="' + colW2 + '%" style="width:' + colW2 + '%;vertical-align:top;padding:16px 16px 24px 0;border-top:1px solid #dbd5c5;">\n');
+            if (svc) {
+              var svcTag  = esc(svc.tag || '');
+              var svcTit  = esc(isEn ? (svc.titleEn || svc.titleIt || '') : (svc.titleIt || ''));
+              var svcCont = isEn ? (svc.contentEn || svc.contentIt || '') : (svc.contentIt || '');
+              if (svcTag) o.push('<p style="' + SVC_TAG_ST + '">' + svcTag + '</p>\n');
+              if (svcTit) o.push('<h2 style="' + SVC_TTL_ST + '">' + svcTit + '</h2>\n');
+              if (svcCont) {
+                if (svc.type === 'list') {
+                  var svcLines = svcCont.split('\n').filter(function(s) { return s.trim(); });
+                  o.push('<ul style="margin:0;padding-left:18px;">\n');
+                  svcLines.forEach(function(ln) { o.push('<li style="' + SVC_LI_ST + '">' + esc(ln.trim()) + '</li>\n'); });
+                  o.push('</ul>\n');
+                } else {
+                  o.push('<p style="' + SVC_DSC_ST + '">' + esc(svcCont) + '</p>\n');
+                }
+              }
+            }
+            o.push('</td>\n');
+          }
+          o.push('</tr>\n');
+        }
+        o.push('</table>\n</div>\n</div>\n\n');
       }
     }); /* end forEach blocks */
 
@@ -4297,6 +4493,7 @@
     var d    = block.data;
     var rows = d.rows || [];
     var btns = d.btns || [];
+    var secCls = d.altBg ? 'sec-specs sec-specs-lt' : 'sec-specs';
 
     var mkRows = function(l) {
       return rows.map(function(r) {
@@ -4333,7 +4530,7 @@
             (bEn ? '<div data-lang="en" hidden>' + bEn + '</div>' : '') +
           '</div>'
         : '';
-      return '<section class="sec-specs"><div class="sec-wrap">' +
+      return '<section class="' + secCls + '"><div class="sec-wrap">' +
         biWrap(tableIt, tableEn, 'both') + btnHtml +
         '</div></section>';
     }
@@ -4341,7 +4538,7 @@
     var tableHtml = mkRows(l);
     var btnsHtml  = mkBtns(l);
     if (!tableHtml && !btnsHtml) return '';
-    return '<section class="sec-specs"><div class="sec-wrap">' +
+    return '<section class="' + secCls + '"><div class="sec-wrap">' +
       (tableHtml ? '<table class="specs-table">' + tableHtml + '</table>' : '') +
       (btnsHtml  ? '<div style="margin-top:1.5rem;">' + btnsHtml + '</div>' : '') +
       '</div></section>';
@@ -4361,6 +4558,54 @@
         '</div>';
     }
     return '<div aria-hidden="true" style="height:' + h + ';"></div>';
+  }
+
+  function _rServices(block, lang) {
+    var d     = block.data;
+    var items = d.items || [];
+    var cls   = 'section' + (d.altBg ? ' alt' : '');
+
+    var buildItems = function(l) {
+      return items.map(function(item) {
+        var tag   = escHtml(item.tag || '');
+        var title = escHtml(l === 'en' ? (item.titleEn || item.titleIt || '') : (item.titleIt || item.titleEn || ''));
+        var content = l === 'en' ? (item.contentEn || item.contentIt || '') : (item.contentIt || item.contentEn || '');
+        if (!title && !content) return '';
+        var descHtml = '';
+        if (content) {
+          if (item.type === 'list') {
+            var lines = content.split('\n').filter(function(s) { return s.trim(); });
+            descHtml = '<ul>' + lines.map(function(ln) { return '<li>' + escHtml(ln.trim()) + '</li>'; }).join('') + '</ul>';
+          } else {
+            descHtml = '<p>' + escHtml(content) + '</p>';
+          }
+        }
+        return '<article class="service-item">' +
+          (tag   ? '<p class="service-tag">'   + tag   + '</p>' : '') +
+          (title ? '<h2 class="service-title">' + title + '</h2>' : '') +
+          (descHtml ? '<div class="service-desc">' + descHtml + '</div>' : '') +
+          '</article>';
+      }).join('');
+    };
+
+    var buildSection = function(l) {
+      var label    = l === 'en' ? (d.labelEn || d.labelIt || '') : (d.labelIt || '');
+      var itemsHtml = buildItems(l);
+      if (!itemsHtml && !label) return '';
+      return (label ? '<p class="section-label">' + escHtml(label) + '</p>' : '') +
+        '<div class="services-grid">' + itemsHtml + '</div>';
+    };
+
+    var inner;
+    if (lang === 'both') {
+      var innerIt = buildSection('it'), innerEn = buildSection('en');
+      if (!innerIt && !innerEn) return '';
+      inner = biWrap(innerIt, innerEn, 'both');
+    } else {
+      inner = buildSection(lang || 'it');
+      if (!inner) return '';
+    }
+    return '<section class="' + cls + '"><div class="wrap">' + inner + '</div></section>';
   }
 
   function _rCard(block, lang) {
@@ -4558,6 +4803,7 @@
       case 'card':      return _rCard(block, lang);
       case 'cardgrid':  return _rCardGrid(block, lang);
       case 'links':     return _rLinks(block, lang);
+      case 'services':  return _rServices(block, lang);
       default:          return '';
     }
   }

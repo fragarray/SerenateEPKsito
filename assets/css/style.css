@@ -598,7 +598,12 @@ body.live .sec-alt { background: var(--light-live); }
 .sec-img-full + .sec-img-full { margin-top: 0; }
 
 /* ── PRESSKIT: SPECS SECTION (dark bg) ───────────────────────── */
-.sec-specs { background: var(--ink); color: #e8e2d8; padding: 72px 48px; border-bottom: none; }
+.sec-specs    { background: var(--ink); color: #e8e2d8; padding: 72px 48px; border-bottom: none; }
+.sec-specs-lt { background: var(--light); color: var(--ink); padding: 72px 48px; border-bottom: 1px solid var(--border); }
+.sec-specs-lt .specs-table tr         { border-bottom: 1px solid var(--border); }
+.sec-specs-lt .specs-table tr:first-child { border-top: 1px solid var(--border); }
+.sec-specs-lt .specs-table .td-lbl    { color: var(--gold); }
+.sec-specs-lt .specs-table .td-val    { color: var(--muted); }
 
 .specs-intro {
   font-family: 'Cormorant Garamond', Georgia, serif;
