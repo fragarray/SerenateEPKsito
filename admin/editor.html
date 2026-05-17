@@ -3586,14 +3586,9 @@
         var vtStart = d.startAt ? ('&t=' + parseInt(d.startAt, 10) + 's') : '';
         var vWatchLbl = isEn ? 'Watch on YouTube' : 'Guarda su YouTube';
         var vSeeAlso  = isEn ? 'See also' : 'Guarda anche';
-        /* YouTube play button SVG (data URI) — email-safe, no external dependency */
-        var ytSvgS = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E";
-        /* Overlay: position:absolute centered via negative margins — works in Outlook too */
-        var ytPlaySt = 'position:absolute;top:50%;left:50%;margin-top:-24px;margin-left:-34px;width:68px;height:48px;pointer-events:none;';
         function mkYtThumb(ytId, href, altText, wrapStyle) {
-          return '<a href="' + href + '" target="_blank" rel="noopener noreferrer" style="' + (wrapStyle || 'display:block;position:relative;text-decoration:none;line-height:0;margin-bottom:8px;') + '">' +
+          return '<a href="' + href + '" target="_blank" rel="noopener noreferrer" style="' + (wrapStyle || 'display:block;text-decoration:none;line-height:0;margin-bottom:8px;') + '">' +
             '<img src="https://i.ytimg.com/vi/' + esc(ytId) + '/hqdefault.jpg" alt="' + esc(altText) + '" style="display:block;width:100%;height:auto;" width="100%"/>' +
-            '<img src="' + ytSvgS + '" alt="" style="' + ytPlaySt + '"/>' +
             '</a>';
         }
         o.push('<div style="' + SEC + '">\n<div style="' + WRAP + '">\n');
