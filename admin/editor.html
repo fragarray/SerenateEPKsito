@@ -3586,11 +3586,19 @@
         var vExtras = d.extraVideos || [];
         var vWatchLbl = isEn ? 'Watch on YouTube' : 'Guarda su YouTube';
         var vSeeAlso  = isEn ? 'See also' : 'Guarda anche';
+        /* YouTube play button SVG (data URI) — email-safe, no external dependency */
+        var ytSvgS = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 68 48'%3E%3Crect rx='10' ry='10' width='68' height='48' fill='rgba(255%2C0%2C0%2C.85)'/%3E%3Cpolygon points='27%2C14 27%2C34 47%2C24' fill='white'/%3E%3C/svg%3E";
+        /* Overlay: position:absolute centered via negative margins — works in Outlook too */
+        var ytPlaySt = 'position:absolute;top:50%;left:50%;margin-top:-24px;margin-left:-34px;width:68px;height:48px;pointer-events:none;';
+        function mkYtThumb(ytId, href, altText, wrapStyle) {
+          return '<a href="' + href + '" target="_blank" rel="noopener noreferrer" style="' + (wrapStyle || 'display:block;position:relative;text-decoration:none;line-height:0;margin-bottom:8px;') + '">' +
+            '<img src="https://i.ytimg.com/vi/' + esc(ytId) + '/hqdefault.jpg" alt="' + esc(altText) + '" style="display:block;width:100%;height:auto;" width="100%"/>' +
+            '<img src="' + ytSvgS + '" alt="" style="' + ytPlaySt + '"/>' +
+            '</a>';
+        }
         o.push('<div style="' + SEC + '">\n<div style="' + WRAP + '">\n');
         o.push('<p style="' + LBL + '">' + esc(vtit) + '</p>\n');
-        o.push('<a href="https://www.youtube.com/watch?v=' + esc(d.ytId) + vtStart + '" target="_blank" rel="noopener noreferrer" style="display:block;line-height:0;margin-bottom:12px;">' +
-          '<img src="https://i.ytimg.com/vi/' + esc(d.ytId) + '/hqdefault.jpg" alt="' + esc(vWatchLbl + (vtit ? ' \u2013 ' + vtit : '')) + '" style="display:block;width:100%;height:auto;" width="100%"/>' +
-          '</a>\n');
+        o.push(mkYtThumb(d.ytId, 'https://www.youtube.com/watch?v=' + esc(d.ytId) + vtStart, vWatchLbl + (vtit ? ' \u2013 ' + vtit : ''), 'display:block;position:relative;text-decoration:none;line-height:0;margin-bottom:12px;') + '\n');
         if (vdesc) o.push('<p style="' + BODYL + 'margin-bottom:16px;">' + esc(vdesc) + '</p>\n');
         if (vExtras.length) {
           o.push('<p style="' + LBL + 'margin-top:32px;">' + esc(vSeeAlso) + '</p>\n');
@@ -3601,18 +3609,15 @@
             var ta   = isEn ? taEn : taIt;
             o.push('<tr>\n');
             o.push('<td width="50%" style="width:50%;padding-right:8px;vertical-align:top;">');
-            o.push('<a href="https://www.youtube.com/watch?v=' + esc(va.ytId) + '" target="_blank" rel="noopener noreferrer" style="display:block;text-decoration:none;color:' + accent + ';">');
-            o.push('<img src="https://i.ytimg.com/vi/' + esc(va.ytId) + '/hqdefault.jpg" alt="' + esc(ta) + '" style="display:block;width:100%;height:auto;" width="100%"/>');
-            if (ta) o.push('<span style="display:block;font-family:Arial,Helvetica,sans-serif;font-size:0.78rem;color:' + accent + ';margin-top:5px;line-height:1.3;">' + esc(ta) + '</span>');
-            o.push('</a></td>\n');
+            o.push(mkYtThumb(va.ytId, 'https://www.youtube.com/watch?v=' + esc(va.ytId), ta, 'display:block;position:relative;text-decoration:none;line-height:0;margin-bottom:5px;'));
+            if (ta) o.push('<p style="font-family:Arial,Helvetica,sans-serif;font-size:0.78rem;color:' + accent + ';margin:0 0 12px;line-height:1.3;">' + esc(ta) + '</p>');
+            o.push('</td>\n');
             o.push('<td width="50%" style="width:50%;padding-left:8px;vertical-align:top;">');
             if (vb) {
               var tbIt = vb.titleIt || vb.ytId, tbEn = vb.titleEn || tbIt;
               var tb   = isEn ? tbEn : tbIt;
-              o.push('<a href="https://www.youtube.com/watch?v=' + esc(vb.ytId) + '" target="_blank" rel="noopener noreferrer" style="display:block;text-decoration:none;color:' + accent + ';">');
-              o.push('<img src="https://i.ytimg.com/vi/' + esc(vb.ytId) + '/hqdefault.jpg" alt="' + esc(tb) + '" style="display:block;width:100%;height:auto;" width="100%"/>');
-              if (tb) o.push('<span style="display:block;font-family:Arial,Helvetica,sans-serif;font-size:0.78rem;color:' + accent + ';margin-top:5px;line-height:1.3;">' + esc(tb) + '</span>');
-              o.push('</a>');
+              o.push(mkYtThumb(vb.ytId, 'https://www.youtube.com/watch?v=' + esc(vb.ytId), tb, 'display:block;position:relative;text-decoration:none;line-height:0;margin-bottom:5px;'));
+              if (tb) o.push('<p style="font-family:Arial,Helvetica,sans-serif;font-size:0.78rem;color:' + accent + ';margin:0 0 12px;line-height:1.3;">' + esc(tb) + '</p>');
             }
             o.push('</td>\n</tr>\n');
           }
