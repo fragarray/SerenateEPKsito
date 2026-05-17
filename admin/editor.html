@@ -3577,13 +3577,13 @@
       }
 
       else if (block.type === 'video') {
-        if (!d.ytId) return;
+        var vExtras = d.extraVideos || [];
+        if (!d.ytId && !vExtras.length) return;
         var vtitIt = d.titleIt || d.ytId, vtitEn = d.titleEn || vtitIt;
         var vtit  = isEn ? vtitEn : vtitIt;
         var vdescIt = d.descIt || '', vdescEn = d.descEn || vdescIt;
         var vdesc = isEn ? vdescEn : vdescIt;
         var vtStart = d.startAt ? ('&t=' + parseInt(d.startAt, 10) + 's') : '';
-        var vExtras = d.extraVideos || [];
         var vWatchLbl = isEn ? 'Watch on YouTube' : 'Guarda su YouTube';
         var vSeeAlso  = isEn ? 'See also' : 'Guarda anche';
         /* YouTube play button SVG (data URI) — email-safe, no external dependency */
@@ -3597,11 +3597,16 @@
             '</a>';
         }
         o.push('<div style="' + SEC + '">\n<div style="' + WRAP + '">\n');
-        o.push('<p style="' + LBL + '">' + esc(vtit) + '</p>\n');
-        o.push(mkYtThumb(d.ytId, 'https://www.youtube.com/watch?v=' + esc(d.ytId) + vtStart, vWatchLbl + (vtit ? ' \u2013 ' + vtit : ''), 'display:block;position:relative;text-decoration:none;line-height:0;margin-bottom:12px;') + '\n');
-        if (vdesc) o.push('<p style="' + BODYL + 'margin-bottom:16px;">' + esc(vdesc) + '</p>\n');
+        /* Main video — only if ytId is set */
+        if (d.ytId) {
+          if (vtit) o.push('<p style="' + LBL + '">' + esc(vtit) + '</p>\n');
+          o.push(mkYtThumb(d.ytId, 'https://www.youtube.com/watch?v=' + esc(d.ytId) + vtStart, vWatchLbl + (vtit ? ' \u2013 ' + vtit : ''), 'display:block;position:relative;text-decoration:none;line-height:0;margin-bottom:12px;') + '\n');
+          if (vdesc) o.push('<p style="' + BODYL + 'margin-bottom:16px;">' + esc(vdesc) + '</p>\n');
+        }
+        /* Extra videos */
         if (vExtras.length) {
-          o.push('<p style="' + LBL + 'margin-top:32px;">' + esc(vSeeAlso) + '</p>\n');
+          var vSeeAlsoLbl = d.ytId ? vSeeAlso : (isEn ? (d.titleEn || d.titleIt || 'Videos') : (d.titleIt || 'Video'));
+          o.push('<p style="' + LBL + (d.ytId ? 'margin-top:32px;' : '') + '">' + esc(vSeeAlsoLbl) + '</p>\n');
           o.push('<table width="100%" style="width:100%;border-collapse:collapse;">\n');
           for (var vi = 0; vi < vExtras.length; vi += 2) {
             var va = vExtras[vi], vb = vExtras[vi + 1] || null;
