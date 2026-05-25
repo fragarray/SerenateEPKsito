@@ -589,6 +589,33 @@
       color: var(--muted); cursor: pointer; border-radius: 2px;
     }
     .cpv-lang-btn.active { border-color: var(--gold); color: var(--gold); }
+
+    /* ── TYPOGRAPHY MINI-TOOLBAR ────────────────────────────────── */
+    .typo-wrap { display: flex; flex-direction: column; gap: 0; margin-bottom: 12px; }
+    .typo-wrap > label { font-size: 0.58rem; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; display: block; }
+    .typo-bar {
+      display: flex; align-items: center; gap: 3px; flex-wrap: wrap;
+      padding: 3px 6px; background: var(--light);
+      border: 1px solid var(--border);
+    }
+    .typo-wrap .typo-bar { border-bottom: none; }
+    .typo-bar select {
+      height: 21px; padding: 0 16px 0 4px; min-width: 56px;
+      border: 1px solid #d4cec5; background-color: #fff;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath fill='%235a5248' d='M0 0l4 5 4-5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 4px center; background-size: 7px;
+      color: var(--ink); font-family: 'Lato', Arial, sans-serif; font-size: 0.65rem;
+      cursor: pointer; appearance: none; -webkit-appearance: none; flex-shrink: 0;
+    }
+    .typo-bar input[type="color"] {
+      width: 22px; height: 21px; padding: 1px 2px; border: 1px solid #d4cec5;
+      cursor: pointer; flex-shrink: 0; background: #fff;
+    }
+    .typo-lbl { font-size: 0.52rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); white-space: nowrap; user-select: none; }
+    .typo-sep { width: 1px; height: 14px; background: var(--border); flex-shrink: 0; margin: 0 2px; }
+    .typo-reset { font-size: 0.65rem; color: var(--muted); background: none; border: none; cursor: pointer; padding: 0 2px; line-height: 1; transition: color .12s; }
+    .typo-reset:hover { color: var(--err); }
+    .typo-wrap textarea, .typo-wrap input[type="text"] { border-top: 1px solid #d4cec5 !important; }
   </style>
 </head>
 
@@ -1143,13 +1170,19 @@
                  dimW: 1400, dimH: 350, lockRatio: true,
                  overlayOpacity: '40', objectPosition: 'center',
                  captionIt: '', captionEn: '', captionColor: '#ffffff', captionSize: '1.4rem',
+                 captionFontFamily: 'serif', captionFontWeight: '300',
                  captionGap: '0.5rem',
-                 subtitleIt: '', subtitleEn: '', subtitleColor: '', subtitleSize: '1.0rem' },
-    lead:      { textIt: '', textEn: '', align: 'left' },
-    paragraph: { textIt: '', textEn: '', align: 'left' },
+                 subtitleIt: '', subtitleEn: '', subtitleColor: '', subtitleSize: '1.0rem',
+                 subtitleFontFamily: 'sans', subtitleFontWeight: '300' },
+    lead:      { textIt: '', textEn: '', align: 'left',
+                 textFontFamily: 'inherit', textFontSize: '', textFontWeight: '', textColor: '' },
+    paragraph: { textIt: '', textEn: '', align: 'left',
+                 textFontFamily: 'inherit', textFontSize: '', textFontWeight: '', textColor: '' },
     photo:     { jpg: '', webp: '', altIt: '', altEn: '',
                  captionIt: '', captionEn: '', link: '',
-                 textIt: '', textEn: '' },
+                 captionFontSize: '', captionColor: '',
+                 textIt: '', textEn: '',
+                 textFontFamily: 'inherit', textFontSize: '', textFontWeight: '', textColor: '' },
     gallery:   { cols: '3', aspectRatio: '3/2', gap: 'normal', photos: [] },
     video:     { ytId: '', titleIt: '', titleEn: '',
                  descIt: '', descEn: '', startAt: '',
@@ -1157,9 +1190,12 @@
                  watchLabelIt: '', watchLabelEn: '',
                  seeAlsoLabelIt: '', seeAlsoLabelEn: '',
                  extraCols: 2,
+                 descFontFamily: 'inherit', descFontSize: '', descFontWeight: '', descColor: '',
                  extraVideos: [] },
     section:   { titleIt: '', titleEn: '', bodyIt: '', bodyEn: '', altBg: false,
-                 ctaLabelIt: '', ctaLabelEn: '', ctaUrl: '' },
+                 ctaLabelIt: '', ctaLabelEn: '', ctaUrl: '',
+                 titleFontFamily: 'inherit', titleFontSize: '', titleFontWeight: '', titleColor: '',
+                 bodyFontFamily: 'inherit', bodyFontSize: '', bodyFontWeight: '', bodyColor: '' },
     specs:     { rows: [
                    { labelIt: 'Titolo',               labelEn: 'Title',                valueIt: '', valueEn: '' },
                    { labelIt: 'Sottotitolo',          labelEn: 'Subtitle',             valueIt: '', valueEn: '' },
@@ -1580,6 +1616,95 @@
       '</div></div></div>';
   }
 
+  /* ── Typography toolbar ─────────────────────────────────────
+     prefix: 'text'|'title'|'body'|'caption'|'desc' etc.
+     Returned HTML must sit directly above the textarea/input
+     (wrapped together in a .typo-wrap div by the caller). */
+  var _TY_FAM = [
+    {v:'inherit', l:'Default'},
+    {v:'serif',   l:'Serif'},
+    {v:'sans',    l:'Sans-serif'}
+  ];
+  var _TY_SZ = [
+    {v:'',        l:'Default'},
+    {v:'0.75rem', l:'0.75'}, {v:'0.8rem',  l:'0.8'},  {v:'0.9rem',  l:'0.9'},
+    {v:'1.0rem',  l:'1.0'},  {v:'1.1rem',  l:'1.1'},  {v:'1.2rem',  l:'1.2'},
+    {v:'1.4rem',  l:'1.4'},  {v:'1.6rem',  l:'1.6'},  {v:'1.8rem',  l:'1.8'},
+    {v:'2.0rem',  l:'2.0'},  {v:'2.4rem',  l:'2.4'},  {v:'2.8rem',  l:'2.8'},
+    {v:'3.2rem',  l:'3.2'}
+  ];
+  var _TY_WT = [
+    {v:'',    l:'Default'},
+    {v:'300', l:'Light'},
+    {v:'400', l:'Normal'},
+    {v:'600', l:'Semibold'},
+    {v:'700', l:'Bold'}
+  ];
+
+  function _fTypoBar(block, prefix, opts) {
+    opts = opts || {};
+    var d   = block.data;
+    var fam = d[prefix + 'FontFamily'] != null ? d[prefix + 'FontFamily'] : (opts.defaultFamily != null ? opts.defaultFamily : 'inherit');
+    var sz  = d[prefix + 'FontSize']   != null ? d[prefix + 'FontSize']   : (opts.defaultSize   || '');
+    var wt  = d[prefix + 'FontWeight'] != null ? d[prefix + 'FontWeight'] : (opts.defaultWeight || '');
+    var col = d[prefix + 'Color']      != null ? d[prefix + 'Color']      : (opts.defaultColor  || '');
+
+    var showFont   = opts.showFont   !== false;
+    var showSize   = opts.showSize   !== false;
+    var showWeight = opts.showWeight !== false;
+    var showColor  = opts.showColor  !== false;
+
+    function _sel(fieldName, val, items) {
+      var s = '<select data-field="' + fieldName + '">';
+      items.forEach(function(o) {
+        s += '<option value="' + o.v + '"' + (val === o.v ? ' selected' : '') + '>' + escHtml(o.l) + '</option>';
+      });
+      return s + '</select>';
+    }
+
+    var html = '<div class="typo-bar">';
+    if (showFont) {
+      html += '<span class="typo-lbl">Font</span>' + _sel(prefix + 'FontFamily', fam, _TY_FAM);
+      if (showSize || showWeight || showColor) html += '<span class="typo-sep"></span>';
+    }
+    if (showSize) {
+      html += '<span class="typo-lbl">Dim</span>' + _sel(prefix + 'FontSize', sz, _TY_SZ);
+      if (showWeight || showColor) html += '<span class="typo-sep"></span>';
+    }
+    if (showWeight) {
+      html += '<span class="typo-lbl">Peso</span>' + _sel(prefix + 'FontWeight', wt, _TY_WT);
+      if (showColor) html += '<span class="typo-sep"></span>';
+    }
+    if (showColor) {
+      html += '<span class="typo-lbl">Colore</span>';
+      html += '<input type="color" data-field="' + prefix + 'Color" value="' + escHtml(col || '#1c1a17') + '"/>';
+      if (col) {
+        html += '<button type="button" class="typo-reset" title="Rimuovi colore" ' +
+          'onclick="_typoClearColor(this,\'' + block.id + '\',\'' + prefix + 'Color\')">✕</button>';
+      }
+    }
+    html += '</div>';
+    return html;
+  }
+
+  /* Wraps a label + typo bar + existing field HTML in .typo-wrap */
+  function _fTypoWrap(label, typoBarHtml, fieldInnerHtml) {
+    return '<div class="typo-wrap"><label>' + escHtml(label) + '</label>' + typoBarHtml + fieldInnerHtml + '</div>';
+  }
+
+  /* Reset a typo color field back to empty ("inherit") */
+  function _typoClearColor(btn, blockId, fieldName) {
+    var u = {}; u[fieldName] = '';
+    updateBlockData(blockId, u);
+    var panel = document.getElementById('bpb-' + blockId);
+    if (panel) {
+      var inp = panel.querySelector('[data-field="' + fieldName + '"]');
+      if (inp) inp.value = '#1c1a17';
+    }
+    btn.remove();
+    schedulePreviewUpdate(blockId);
+  }
+
   /* Lang tabs — panelKey must be unique in the page */
   function _fLangTabs(panelKey, contentIt, contentEn) {
     return '<div class="lang-tabs">' +
@@ -1770,6 +1895,14 @@
         '</div>' +
       '</div>' +
       '<div class="field-row">' +
+        _fSelect(block, 'captionFontFamily', 'Font caption', d.captionFontFamily || 'serif', [
+          {v:'inherit',l:'Default'},{v:'serif',l:'Serif'},{v:'sans',l:'Sans-serif'}
+        ]) +
+        _fSelect(block, 'captionFontWeight', 'Peso caption', d.captionFontWeight || '300', [
+          {v:'300',l:'Light'},{v:'400',l:'Normal'},{v:'600',l:'Semibold'},{v:'700',l:'Bold'}
+        ]) +
+      '</div>' +
+      '<div class="field-row">' +
         _fSelect(block, 'captionGap', 'Spazio caption–sottotitolo', d.captionGap || '0.5rem', [
           {v:'0',l:'Nessuno'},{v:'0.25rem',l:'0.25 rem'},{v:'0.5rem',l:'0.5 rem'},
           {v:'0.75rem',l:'0.75 rem'},{v:'1rem',l:'1 rem'},
@@ -1792,6 +1925,14 @@
         '<div class="field"><label>Colore sottotitolo</label>' +
           '<input type="color" data-field="subtitleColor" value="' + escHtml(d.subtitleColor || getActiveColors().lt) + '" style="width:48px;height:32px;padding:2px;cursor:pointer;border:1px solid var(--border);border-radius:4px;"/>' +
         '</div>' +
+      '</div>' +
+      '<div class="field-row">' +
+        _fSelect(block, 'subtitleFontFamily', 'Font sottotitolo', d.subtitleFontFamily || 'sans', [
+          {v:'inherit',l:'Default'},{v:'serif',l:'Serif'},{v:'sans',l:'Sans-serif'}
+        ]) +
+        _fSelect(block, 'subtitleFontWeight', 'Peso sottotitolo', d.subtitleFontWeight || '300', [
+          {v:'300',l:'Light'},{v:'400',l:'Normal'},{v:'600',l:'Semibold'},{v:'700',l:'Bold'}
+        ]) +
       '</div>';
   }
 
@@ -1802,6 +1943,8 @@
         _fTextarea(block, 'textIt', 'Testo IT', d.textIt, { tall: true }),
         _fTextarea(block, 'textEn', 'Testo EN', d.textEn, { tall: true })
       ) +
+      '<p class="inner-h3" style="margin-top:10px;margin-bottom:4px;">Tipografia testo</p>' +
+      _fTypoBar(block, 'text') +
       '<hr class="inner-divider"/>' +
       '<div style="display:flex;gap:14px;flex-wrap:wrap;padding-top:4px;">' +
         ['left','center'].map(function(a) {
@@ -1821,6 +1964,8 @@
         _fTextarea(block, 'textIt', 'Testo IT', d.textIt, { tall: true }),
         _fTextarea(block, 'textEn', 'Testo EN', d.textEn, { tall: true })
       ) +
+      '<p class="inner-h3" style="margin-top:10px;margin-bottom:4px;">Tipografia testo</p>' +
+      _fTypoBar(block, 'text') +
       '<hr class="inner-divider"/>' +
       '<div style="display:flex;gap:14px;flex-wrap:wrap;padding-top:4px;">' +
         ['left','center'].map(function(a) {
@@ -1845,13 +1990,24 @@
         _fInput(block, 'captionIt', 'Caption IT', d.captionIt || '', 'Didascalia sotto la foto'),
         _fInput(block, 'captionEn', 'Caption EN', d.captionEn || '', 'Caption below photo')
       ) +
+      '<div class="field-row" style="margin-top:4px;">' +
+        _fSelect(block, 'captionFontSize', 'Dim. caption', d.captionFontSize || '', [
+          {v:'',l:'Default'},{v:'0.75rem',l:'0.75'},{v:'0.8rem',l:'0.8'},{v:'0.9rem',l:'0.9'},
+          {v:'1.0rem',l:'1.0'},{v:'1.1rem',l:'1.1'},{v:'1.2rem',l:'1.2'}
+        ]) +
+        '<div class="field"><label>Colore caption</label>' +
+          '<input type="color" data-field="captionColor" value="' + escHtml(d.captionColor || '#5a5248') + '"/>' +
+        '</div>' +
+      '</div>' +
       _fInput(block, 'link', 'Link URL (rende la foto cliccabile)', d.link || '', 'https://…') +
       '<hr class="inner-divider"/>' +
       '<p class="inner-h3">Testo colonna destra <span style="font-size:0.65rem;color:var(--muted);">(solo variante Met\u00e0 + testo)</span></p>' +
       _fLangTabs(bid + 'pt',
         _fTextarea(block, 'textIt', 'Testo IT', d.textIt || '', { tall: true }),
         _fTextarea(block, 'textEn', 'Testo EN', d.textEn || '', { tall: true })
-      );
+      ) +
+      '<p class="inner-h3" style="margin-top:10px;margin-bottom:4px;">Tipografia testo colonna</p>' +
+      _fTypoBar(block, 'text');
   }
 
   function _fbGallery(block) {
@@ -1912,6 +2068,8 @@
         _fTextarea(block, 'descIt', 'Descrizione IT', d.descIt || ''),
         _fTextarea(block, 'descEn', 'Description EN', d.descEn || '')
       ) +
+      '<p class="inner-h3" style="margin-top:8px;margin-bottom:4px;">Tipografia descrizione</p>' +
+      _fTypoBar(block, 'desc') +
       '<hr class="inner-divider"/>' +
       '<p class="inner-h3">Etichette personalizzate</p>' +
       _fLangTabs(bid + 'vl',
@@ -1945,6 +2103,10 @@
         _fInput(block, 'titleEn', 'Titolo EN', d.titleEn) +
         _fTextarea(block, 'bodyEn', 'Corpo EN', d.bodyEn, { tall: true })
       ) +
+      '<p class="inner-h3" style="margin-top:10px;margin-bottom:4px;">Tipografia titolo</p>' +
+      _fTypoBar(block, 'title', { showFont: true, showSize: true, showWeight: true, showColor: true }) +
+      '<p class="inner-h3" style="margin-top:8px;margin-bottom:4px;">Tipografia corpo</p>' +
+      _fTypoBar(block, 'body', { showFont: true, showSize: true, showWeight: true, showColor: true }) +
       '<hr class="inner-divider"/>' +
       '<div class="toggle-field">' +
         '<input type="checkbox" id="' + _fid(block,'altBg') + '" data-field="altBg"' + (d.altBg ? ' checked' : '') + '/>' +
@@ -4180,6 +4342,34 @@
   /* ══════════════════════════════════════════════════════════════
      F3 — BILINGUAL HELPERS
   ══════════════════════════════════════════════════════════════ */
+  /* Builds an inline CSS style string from a block's typography fields */
+  function _typoStyle(d, prefix) {
+    var s = '';
+    var fam = d[prefix + 'FontFamily'];
+    var sz  = d[prefix + 'FontSize'];
+    var wt  = d[prefix + 'FontWeight'];
+    var col = d[prefix + 'Color'];
+    if (fam === 'serif')    s += "font-family:'Cormorant Garamond',Georgia,serif;";
+    else if (fam === 'sans') s += "font-family:'Lato',Arial,sans-serif;";
+    if (sz)  s += 'font-size:'   + sz  + ';';
+    if (wt)  s += 'font-weight:' + wt  + ';';
+    if (col) s += 'color:'       + col + ';';
+    return s;
+  }
+
+  /* Like biEl but also injects an inline style on each element */
+  function _styledBiEl(tag, cls, style, textIt, textEn, lang) {
+    var open = '<' + tag + (cls ? ' class="' + cls + '"' : '') + (style ? ' style="' + style + '"' : '');
+    if (lang !== 'both') {
+      var t = lang === 'en' ? textEn : textIt;
+      return t ? open + '>' + escHtml(t) + '</' + tag + '>' : '';
+    }
+    var r = '';
+    if (textIt) r += open + ' data-lang="it">' + escHtml(textIt) + '</' + tag + '>';
+    if (textEn) r += open + ' data-lang="en" hidden>' + escHtml(textEn) + '</' + tag + '>';
+    return r;
+  }
+
   /* Renders one or two <tag> elements with data-lang attributes.
      lang = 'both' → bilingual pair; 'it'|'en' → single element (no data-lang). */
   function biEl(tag, cls, textIt, textEn, lang) {
@@ -4249,6 +4439,17 @@
     var capGap   = escHtml(d.captionGap    || '0.5rem');
     var capSt = 'font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;margin:0 0 ' + capGap + ';color:' + capColor + ';font-size:' + capSize + ';line-height:1.3;';
     var subSt = 'font-family:\'Lato\',Arial,sans-serif;margin:0;color:' + subColor + ';font-size:' + subSize + ';line-height:1.4;';
+    /* Apply custom font family / weight overrides */
+    var capFam = d.captionFontFamily || 'serif';
+    var capWt  = d.captionFontWeight || '300';
+    var subFam = d.subtitleFontFamily || 'sans';
+    var subWt  = d.subtitleFontWeight || '300';
+    if (capFam === 'sans') capSt = capSt.replace('font-family:\'Cormorant Garamond\',Georgia,serif;', 'font-family:\'Lato\',Arial,sans-serif;');
+    else if (capFam === 'inherit') capSt = capSt.replace('font-family:\'Cormorant Garamond\',Georgia,serif;', '');
+    capSt = capSt.replace('font-weight:300;', 'font-weight:' + capWt + ';');
+    if (subFam === 'serif') subSt = subSt.replace('font-family:\'Lato\',Arial,sans-serif;', 'font-family:\'Cormorant Garamond\',Georgia,serif;');
+    else if (subFam === 'inherit') subSt = subSt.replace('font-family:\'Lato\',Arial,sans-serif;', '');
+    subSt = 'font-weight:' + subWt + ';' + subSt;
     function styledBiP(style, it, en) {
       if (!it && !en) return '';
       var open = '<p style="' + style + '"';
@@ -4284,7 +4485,8 @@
     var it = d.textIt || '', en = d.textEn || '';
     if (!it && !en) return '<section class="intro"><div class="wrap"><p class="lead" style="color:var(--muted);font-style:italic;">Lead: nessun testo</p></div></section>';
     var alignStyle = d.align === 'center' ? ' style="text-align:center;"' : '';
-    return '<section class="intro"><div class="wrap"' + alignStyle + '>' + biEl('p','lead',it,en,lang) + '</div></section>';
+    var typoSt = _typoStyle(d, 'text');
+    return '<section class="intro"><div class="wrap"' + alignStyle + '>' + _styledBiEl('p','lead',typoSt,it,en,lang) + '</div></section>';
   }
 
   function _rParagraph(block, lang) {
@@ -4292,7 +4494,8 @@
     var it = d.textIt || '', en = d.textEn || '';
     if (!it && !en) return '<section class="intro"><div class="wrap"><p class="sub" style="color:var(--muted);font-style:italic;">Paragrafo: nessun testo</p></div></section>';
     var alignStyle = d.align === 'center' ? ' style="text-align:center;"' : '';
-    return '<section class="intro"><div class="wrap"' + alignStyle + '>' + biEl('p','sub',it,en,lang) + '</div></section>';
+    var typoSt = _typoStyle(d, 'text');
+    return '<section class="intro"><div class="wrap"' + alignStyle + '>' + _styledBiEl('p','sub',typoSt,it,en,lang) + '</div></section>';
   }
 
   function _rPhoto(block, lang) {
@@ -4308,7 +4511,15 @@
         '<span style="color:var(--muted);font-size:.75rem;letter-spacing:2px;text-transform:uppercase;">Foto: nessuna immagine</span></div>';
     }
     var wl      = webp ? '<source type="image/webp" srcset="' + escHtml(webp) + '"/>' : '';
-    var caption = (capIt || capEn) ? biEl('figcaption', 'photo-caption', capIt, capEn, lang) : '';
+    /* Build caption with typography overrides */
+    var capSt = '';
+    if (d.captionFontSize) capSt += 'font-size:' + d.captionFontSize + ';';
+    if (d.captionColor)    capSt += 'color:' + d.captionColor + ';';
+    var caption = (capIt || capEn)
+      ? (capSt
+          ? _styledBiEl('figcaption', 'photo-caption', capSt, capIt, capEn, lang)
+          : biEl('figcaption', 'photo-caption', capIt, capEn, lang))
+      : '';
     var v = block.variant;
     if (v === 'framed') {
       var imgFr = '<picture>' + wl + '<source type="image/jpeg" srcset="' + escHtml(jpg) + '"/>' +
@@ -4320,7 +4531,14 @@
     }
     if (v === 'half') {
       var textIt = d.textIt || '', textEn = d.textEn || '';
-      var textBlock = (textIt || textEn) ? biWrap(textToParas(textIt), textToParas(textEn), lang) : '';
+      var textTypoSt = _typoStyle(d, 'text');
+      function halfParas(txt) {
+        if (!txt) return '';
+        return txt.split(/\n{2,}/).filter(function(s){ return s.trim(); })
+          .map(function(p){ return '<p class="sub"' + (textTypoSt ? ' style="' + textTypoSt + '"' : '') + '>' + escHtml(p.trim()) + '</p>'; })
+          .join('');
+      }
+      var textBlock = (textIt || textEn) ? biWrap(halfParas(textIt), halfParas(textEn), lang) : '';
       return '<div style="display:flex;align-items:stretch;min-height:340px;">' +
         '<div style="flex:1;overflow:hidden;line-height:0;">' +
           '<picture>' + wl + '<source type="image/jpeg" srcset="' + escHtml(jpg) + '"/>' +
@@ -4420,7 +4638,14 @@
 
     var descHtml = '';
     if (descIt || descEn) {
-      var dIt = descIt ? textToParas(descIt) : '', dEn = descEn ? textToParas(descEn) : '';
+      var dSt = _typoStyle(d, 'desc');
+      function wrapDescParas(txt) {
+        if (!txt) return '';
+        return txt.split(/\n{2,}/).filter(function(s){ return s.trim(); })
+          .map(function(p){ return '<p class="sub"' + (dSt ? ' style="' + dSt + '"' : '') + '>' + escHtml(p.trim()) + '</p>'; })
+          .join('');
+      }
+      var dIt = wrapDescParas(descIt), dEn = wrapDescParas(descEn);
       descHtml = '<div class="sec-wrap" style="margin-top:1rem;">' +
         (lang === 'both' ? biWrap(dIt, dEn, 'both') : (lang === 'en' ? (dEn || dIt) : dIt)) +
         '</div>';
@@ -4487,7 +4712,15 @@
         'style="display:inline-block;padding:10px 28px;background:var(--gold);color:#fff;text-decoration:none;' +
         'font-family:\'Lato\',Arial,sans-serif;font-size:0.82rem;letter-spacing:1.5px;text-transform:uppercase;">' +
         escHtml(ctaLabel) + '</a></p>' : '';
-      return (title ? '<p class="lead">' + escHtml(title) + '</p>' : '') + textToParas(body) + ctaHtml;
+      var titleSt = _typoStyle(d, 'title');
+      var bodySt  = _typoStyle(d, 'body');
+      function bodyParas(txt) {
+        if (!txt) return '';
+        return txt.split(/\n{2,}/).filter(function(s){ return s.trim(); })
+          .map(function(p){ return '<p class="sub"' + (bodySt ? ' style="' + bodySt + '"' : '') + '>' + escHtml(p.trim()) + '</p>'; })
+          .join('');
+      }
+      return (title ? '<p class="lead"' + (titleSt ? ' style="' + titleSt + '"' : '') + '>' + escHtml(title) + '</p>' : '') + bodyParas(body) + ctaHtml;
     };
     return '<section class="' + cls + '"><div class="sec-wrap">' +
       (lang === 'both' ? biWrap(buildInner('it'), buildInner('en'), 'both') : buildInner(lang)) +
