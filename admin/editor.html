@@ -854,6 +854,128 @@
             </div>
           </div>
 
+          <!-- Tipografia globale -->
+          <div class="global-section" id="gs-typo">
+            <div class="global-section-header" onclick="toggleGlobalSection('gs-typo')">
+              <span class="gs-label">Tipografia globale</span>
+              <span class="gs-chevron">▾</span>
+            </div>
+            <div class="global-section-body">
+
+              <!-- Corpo testi -->
+              <p class="inner-h3">Corpo testi generale</p>
+              <div class="field-row">
+                <div class="field">
+                  <label>Font corpo</label>
+                  <select data-global="bodyFontFamily">
+                    <option value="serif">Serif — Cormorant Garamond (default)</option>
+                    <option value="sans">Sans-serif — Lato</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Dimensione testo</label>
+                  <select data-global="bodyFontSize">
+                    <option value="16px">16 px</option>
+                    <option value="17px">17 px</option>
+                    <option value="18px">18 px</option>
+                    <option value="19px">19 px (default)</option>
+                    <option value="20px">20 px</option>
+                    <option value="21px">21 px</option>
+                  </select>
+                </div>
+              </div>
+
+              <hr class="inner-divider"/>
+
+              <!-- Nome artista (header) -->
+              <p class="inner-h3">Nome artista (header)</p>
+              <div class="field-row">
+                <div class="field">
+                  <label>Font</label>
+                  <select data-global="headerNameFontFamily">
+                    <option value="serif">Serif — Cormorant Garamond (default)</option>
+                    <option value="sans">Sans-serif — Lato</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Peso</label>
+                  <select data-global="headerNameFontWeight">
+                    <option value="300">300 — Light (default)</option>
+                    <option value="400">400 — Normal</option>
+                    <option value="600">600 — Semibold</option>
+                    <option value="700">700 — Bold</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label>Spaziatura lettere</label>
+                  <select data-global="headerNameLetterSpacing">
+                    <option value="0">0 — Nessuna</option>
+                    <option value="0.05em">0.05em</option>
+                    <option value="0.10em">0.10em</option>
+                    <option value="0.15em">0.15em</option>
+                    <option value="0.18em">0.18em (default)</option>
+                    <option value="0.20em">0.20em</option>
+                    <option value="0.25em">0.25em</option>
+                    <option value="0.35em">0.35em</option>
+                  </select>
+                </div>
+              </div>
+
+              <hr class="inner-divider"/>
+
+              <!-- Sottotitolo header -->
+              <p class="inner-h3">Sottotitolo (header)</p>
+              <div class="field-row">
+                <div class="field">
+                  <label>Font</label>
+                  <select data-global="headerSubFontFamily">
+                    <option value="sans">Sans-serif — Lato (default)</option>
+                    <option value="serif">Serif — Cormorant Garamond</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Peso</label>
+                  <select data-global="headerSubFontWeight">
+                    <option value="300">300 — Light</option>
+                    <option value="400">400 — Normal (default)</option>
+                    <option value="600">600 — Semibold</option>
+                    <option value="700">700 — Bold</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label>Spaziatura lettere</label>
+                  <select data-global="headerSubLetterSpacing">
+                    <option value="1px">1 px</option>
+                    <option value="2px">2 px</option>
+                    <option value="3px">3 px (default)</option>
+                    <option value="4px">4 px</option>
+                    <option value="5px">5 px</option>
+                    <option value="6px">6 px</option>
+                  </select>
+                </div>
+              </div>
+
+              <hr class="inner-divider"/>
+
+              <!-- Footer / Contatti -->
+              <p class="inner-h3">Footer &amp; contatti</p>
+              <div class="field-row">
+                <div class="field">
+                  <label>Font</label>
+                  <select data-global="footerFontFamily">
+                    <option value="sans">Sans-serif — Lato (default)</option>
+                    <option value="serif">Serif — Cormorant Garamond</option>
+                  </select>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
           <!-- Contatti -->
           <div class="global-section" id="gs-contacts">
             <div class="global-section-header" onclick="toggleGlobalSection('gs-contacts')">
@@ -1256,7 +1378,11 @@
       palette: 'gold', colorMain: '#9b7b2f', colorLight: '#c9a84c',
       headerType: 'text', logoUrl: '', logoPos: 'left', logoFilter: 'white', logoHeight: '80',
       contactName: '', contactEmail: '', contactPhone: '',
-      contactWebsite: '', contactIg: '', contactYt: ''
+      contactWebsite: '', contactIg: '', contactYt: '',
+      bodyFontFamily: 'serif', bodyFontSize: '19px',
+      headerNameFontFamily: 'serif', headerNameFontWeight: '300', headerNameLetterSpacing: '0.18em',
+      headerSubFontFamily: 'sans', headerSubFontWeight: '400', headerSubLetterSpacing: '3px',
+      footerFontFamily: 'sans'
     },
     blocks:     [],
     undoStack:  [],
@@ -3149,7 +3275,11 @@
       palette: 'gold', colorMain: '#9b7b2f', colorLight: '#c9a84c',
       headerType: 'text', logoUrl: '', logoPos: 'left', logoFilter: 'white', logoHeight: '80',
       contactName: '', contactEmail: '', contactPhone: '',
-      contactWebsite: '', contactIg: '', contactYt: ''
+      contactWebsite: '', contactIg: '', contactYt: '',
+      bodyFontFamily: 'serif', bodyFontSize: '19px',
+      headerNameFontFamily: 'serif', headerNameFontWeight: '300', headerNameLetterSpacing: '0.18em',
+      headerSubFontFamily: 'sans', headerSubFontWeight: '400', headerSubLetterSpacing: '3px',
+      footerFontFamily: 'sans'
     };
     STATE.blocks    = [];
     STATE.undoStack = [];
@@ -5051,7 +5181,52 @@
   ══════════════════════════════════════════════════════════════ */
   function _colorVarCSS() {
     var c = getActiveColors();
-    return '<style>:root{--ink:#1c1a17;--gold:' + c.main + ';--gold-lt:' + c.lt + ';--acc:' + c.main + ';--acc-lt:' + c.lt + ';}</style>';
+    var g = STATE.global;
+    var css = ':root{--ink:#1c1a17;--gold:' + c.main + ';--gold-lt:' + c.lt + ';--acc:' + c.main + ';--acc-lt:' + c.lt + ';}';
+
+    /* ── Body typography ── */
+    var bFam = g.bodyFontFamily || 'serif';
+    var bSz  = g.bodyFontSize   || '19px';
+    var bFamCSS = bFam === 'sans' ? "'Lato',Arial,sans-serif" : "'Cormorant Garamond',Georgia,serif";
+    if (bFam !== 'serif') {
+      /* Override body AND all content selectors that have hardcoded serif in style.css */
+      css += 'body,.intro .lead,.intro .sub,.sec p,.sec p.lead,.tagline-strip p,.hero-poem,.hero-caption h1{font-family:' + bFamCSS + ';}';
+    }
+    if (bSz !== '19px') css += 'body{font-size:' + bSz + ';}';
+
+    /* ── Header name ── */
+    var nFam = g.headerNameFontFamily    || 'serif';
+    var nWt  = g.headerNameFontWeight    || '300';
+    var nLs  = g.headerNameLetterSpacing || '0.18em';
+    var nFamCSS = nFam === 'sans' ? "'Lato',Arial,sans-serif" : "'Cormorant Garamond',Georgia,serif";
+    if (nFam !== 'serif' || nWt !== '300' || nLs !== '0.18em') {
+      css += '.agency-name{';
+      if (nFam !== 'serif')    css += 'font-family:'    + nFamCSS + ';';
+      if (nWt  !== '300')      css += 'font-weight:'    + nWt    + ';';
+      if (nLs  !== '0.18em')   css += 'letter-spacing:' + nLs    + ';';
+      css += '}';
+    }
+
+    /* ── Header subtitle ── */
+    var sFam = g.headerSubFontFamily    || 'sans';
+    var sWt  = g.headerSubFontWeight    || '400';
+    var sLs  = g.headerSubLetterSpacing || '3px';
+    var sFamCSS = sFam === 'serif' ? "'Cormorant Garamond',Georgia,serif" : "'Lato',Arial,sans-serif";
+    if (sFam !== 'sans' || sWt !== '400' || sLs !== '3px') {
+      css += '.agency-tagline{';
+      if (sFam !== 'sans') css += 'font-family:'    + sFamCSS + ';';
+      if (sWt  !== '400')  css += 'font-weight:'    + sWt    + ';';
+      if (sLs  !== '3px')  css += 'letter-spacing:' + sLs    + ';';
+      css += '}';
+    }
+
+    /* ── Footer / contacts ── */
+    var fFam = g.footerFontFamily || 'sans';
+    if (fFam !== 'sans') {
+      css += '.contacts,.contacts h2,.contacts p,.contacts a,.contacts-footer,.contacts-footer a{font-family:\'Cormorant Garamond\',Georgia,serif;}';
+    }
+
+    return '<style>' + css + '</style>';
   }
 
   function _logoFilterCSS(f) {
@@ -5075,8 +5250,13 @@
       var lf    = _logoFilterCSS(g.logoFilter);
       var iSt   = 'height:' + lh + 'px;width:auto;flex-shrink:0;' + (lf ? 'filter:' + lf + ';' : '');
       var logoEl = '<img src="' + escHtml(g.logoUrl) + '" alt="' + escHtml(name) + '" style="' + iSt + '"/>';
+      var _nFam   = g.headerNameFontFamily    || 'serif';
+      var _nWt    = g.headerNameFontWeight    || '300';
+      var _nLs    = g.headerNameLetterSpacing || '0.18em';
+      var _nFamCSS = _nFam === 'sans' ? "'Lato',Arial,sans-serif" : "'Cormorant Garamond',Georgia,serif";
+      var _nameSt = 'font-family:' + _nFamCSS + ';font-size:clamp(1.8rem,4vw,2.8rem);font-weight:' + _nWt + ';letter-spacing:' + _nLs + ';text-transform:uppercase;color:#fff;line-height:1.1;margin:0;';
       var textEl = '<div>' +
-        '<p style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:300;letter-spacing:.18em;text-transform:uppercase;color:#fff;line-height:1.1;margin:0;">' + escHtml(name) + '</p>' +
+        '<p style="' + _nameSt + '">' + escHtml(name) + '</p>' +
         biEl('p','agency-tagline', g.subtitleIt, g.subtitleEn, lang) +
         '</div>';
       var inner = g.logoPos === 'right' ? textEl + logoEl : logoEl + textEl;
@@ -5322,7 +5502,7 @@
       if (!raw) return null;
       var data = JSON.parse(raw);
       if (!data.global || !Array.isArray(data.blocks)) { clearAutosave(); return null; }
-      STATE.global = data.global;
+      STATE.global = Object.assign({ bodyFontFamily:'serif', bodyFontSize:'19px', headerNameFontFamily:'serif', headerNameFontWeight:'300', headerNameLetterSpacing:'0.18em', headerSubFontFamily:'sans', headerSubFontWeight:'400', headerSubLetterSpacing:'3px', footerFontFamily:'sans' }, data.global);
       STATE.blocks  = data.blocks;
       var ts = data.savedAt ? new Date(data.savedAt).toLocaleString('it-IT') : '';
       markDirty();
@@ -5367,7 +5547,7 @@
             var parsed = JSON.parse(ev.target.result);
             if (!parsed.global || !Array.isArray(parsed.blocks)) throw new Error('Formato JSON non valido');
             pushUndo();
-            STATE.global = parsed.global;
+            STATE.global = Object.assign({ bodyFontFamily:'serif', bodyFontSize:'19px', headerNameFontFamily:'serif', headerNameFontWeight:'300', headerNameLetterSpacing:'0.18em', headerSubFontFamily:'sans', headerSubFontWeight:'400', headerSubLetterSpacing:'3px', footerFontFamily:'sans' }, parsed.global);
             STATE.blocks  = parsed.blocks;
             syncFormToState();
             markDirty();
